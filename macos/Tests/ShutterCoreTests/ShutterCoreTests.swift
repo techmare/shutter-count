@@ -113,6 +113,31 @@ final class ShutterCoreTests: XCTestCase {
         XCTAssertEqual(PTP.stripDataHeader(data), [0x17, 0x02, 0, 0])
     }
 
+    /// The callback version (used by the Mojave/Catalina app) gives the same result.
+    func testCanonCounterReaderCallbacks() {
+        var ops: [Int] = []
+        let send: CanonCounterReader.Send = { op, _, done in
+            ops.append(op)
+            if op == 0x1015 { done(PTPResponse(code: 0x2005, params: [], data: [])); return }
+            if op == 0x9116 {
+                var ev: [UInt8] = []
+                appendLE32(&ev, 16); appendLE32(&ev, 0xC189); appendLE32(&ev, 0xD1AC); appendLE32(&ev, 535)
+                let sn = Array("283032001879".utf8) + [0]
+                appendLE32(&ev, 12 + sn.count); appendLE32(&ev, 0xC189); appendLE32(&ev, 0xD1AF); ev += sn
+                appendLE32(&ev, 8); appendLE32(&ev, 0)
+                done(PTPResponse(code: 0x2001, params: [], data: ev)); return
+            }
+            done(PTPResponse(code: 0x2001, params: [], data: []))
+        }
+        var result: CanonCounterResult?
+        CanonCounterReader.read(operations: [0x1015, 0x9114, 0x9115, 0x9116, 0x9127], send: send) { result = $0 }
+        XCTAssertEqual(result?.count, 535)
+        XCTAssertEqual(result?.serial, "283032001879")
+        XCTAssertEqual(result?.method, "Standard counter (EOS event)")
+        XCTAssertEqual(ops.suffix(2), [0x9115, 0x9114], "modes are reset at the end")
+        XCTAssertFalse(ops.contains(0x9052))
+    }
+
     /// A camera that answers the standard property: never touches anything else.
     func testCanonCounterReader() async {
         final class Fake: PTPChannel {

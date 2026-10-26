@@ -3,7 +3,7 @@ name: Build APK
 on:
   push:
     branches: [main]
-    paths-ignore: ["macos/**", ".github/workflows/mac.yml"]
+    paths-ignore: ["macos/**", "macos-legacy/**", ".github/workflows/mac.yml", ".github/workflows/mac-legacy.yml"]
   workflow_dispatch:
 
 permissions:

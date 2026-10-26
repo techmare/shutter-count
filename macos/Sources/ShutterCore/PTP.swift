@@ -8,10 +8,13 @@ public struct PTPResponse: Sendable {
     public init(code: Int, params: [Int], data: [UInt8]) { self.code = code; self.params = params; self.data = data }
 }
 
+#if !LEGACY
 /// Something that can run one PTP operation (ImageCaptureCore on the Mac, a fake in tests).
+@available(macOS 10.15, *)
 public protocol PTPChannel: AnyObject {
     func transact(_ op: Int, _ params: [Int], dataOut: [UInt8]?) async throws -> PTPResponse
 }
+#endif
 
 public struct PTPDeviceInfo: Sendable {
     public let vendorExtensionId: Int
@@ -99,6 +102,61 @@ public struct CanonCounterResult: Sendable {
 /// directly or through the EOS event stream, which also carries the body serial (D1AF).
 /// Only read-only status operations are used; no factory or write commands exist here.
 public final class CanonCounterReader {
+    /// Callback-style channel for systems without Swift concurrency (Mojave).
+    public typealias Send = (_ op: Int, _ params: [Int], _ done: @escaping (PTPResponse?) -> Void) -> Void
+
+    /// Same steps as `read(operations:)`, driven by callbacks so it runs on macOS 10.14.
+    public static func read(operations: Set<Int>, send: @escaping Send, completion: @escaping (CanonCounterResult) -> Void) {
+        var log: [String] = []
+        var count: Int?
+        var serial: String?
+        var method: String?
+        func hex(_ v: Int) -> String { String(format: "%04X", v) }
+        func finish() { completion(CanonCounterResult(count: count, serial: serial, method: method, log: log)) }
+
+        func events() {
+            guard [opSetRemoteMode, opSetEventMode, opGetEvent].allSatisfy(operations.contains) else {
+                log.append("EOS event stream: not offered by this camera"); finish(); return
+            }
+            func reset() {
+                send(opSetEventMode, [0]) { _ in send(opSetRemoteMode, [0]) { _ in finish() } }
+            }
+            func poll(_ attempt: Int) {
+                guard attempt < 4 else { reset(); return }
+                send(opGetEvent, []) { r in
+                    guard let r, r.ok else { log.append("GetEvent: \(r.map { hex($0.code) } ?? "no answer")"); reset(); return }
+                    if count == nil, let v = findProp(r.data, propCounter), v.count >= 4, (1...20_000_000).contains(v.le32(0)) {
+                        count = v.le32(0); method = "Standard counter (EOS event)"
+                    }
+                    if serial == nil, let v = findProp(r.data, propSerial) { serial = ascii(v) }
+                    log.append("GetEvent #\(attempt + 1): \(r.data.count) bytes")
+                    if (count != nil && serial != nil) || r.data.count <= 8 { reset() } else { poll(attempt + 1) }
+                }
+            }
+            func request(_ props: [Int]) {
+                guard let p = props.first, operations.contains(opRequestProp) else { poll(0); return }
+                send(opRequestProp, [p]) { r in
+                    log.append("RequestDevicePropValue \(hex(p)): \(r.map { hex($0.code) } ?? "no answer")")
+                    request(Array(props.dropFirst()))
+                }
+            }
+            send(opSetRemoteMode, [1]) { remote in
+                send(opSetEventMode, [1]) { event in
+                    log.append("SetRemoteMode: \(remote.map { hex($0.code) } ?? "-"), SetEventMode: \(event.map { hex($0.code) } ?? "-")")
+                    if remote?.ok == true && event?.ok == true { request([propCounter, propSerial]) } else { reset() }
+                }
+            }
+        }
+
+        send(opGetPropValue, [propCounter]) { r in
+            log.append("GetDevicePropValue D1AC: \(r.map { hex($0.code) } ?? "no answer"), \(r?.data.count ?? 0) bytes")
+            if let r, r.ok, r.data.count >= 4, (1...20_000_000).contains(r.data.le32(0)) {
+                count = r.data.le32(0); method = "Standard counter (PTP property)"
+            }
+            events()
+        }
+    }
+
     public static let propCounter = 0xD1AC
     public static let propSerial = 0xD1AF
     static let opGetPropValue = 0x1015
@@ -108,14 +166,18 @@ public final class CanonCounterReader {
     static let opRequestProp = 0x9127
     static let evtPropChanged = 0xC189
 
-    private let ch: PTPChannel
+#if !LEGACY
+    private let ch: AnyObject
     private var log: [String] = []
 
+    @available(macOS 10.15, *)
     public init(_ channel: PTPChannel) { ch = channel }
 
     private func hex(_ v: Int) -> String { String(format: "%04X", v) }
 
+    @available(macOS 10.15, *)
     public func read(operations: Set<Int>) async -> CanonCounterResult {
+        let ch = self.ch as! PTPChannel
         log = []
         var count: Int?
         var serial: String?
@@ -160,6 +222,8 @@ public final class CanonCounterReader {
         }
         return CanonCounterResult(count: count, serial: serial, method: method, log: log)
     }
+
+#endif
 
     /// Value bytes of a property-changed record in a Canon EOS GetEvent dataset.
     public static func findProp(_ d: [UInt8], _ wanted: Int) -> [UInt8]? {

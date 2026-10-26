@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key><string>Shutter Count Legacy</string>
+    <key>CFBundleDisplayName</key><string>Shutter Count Legacy</string>
+    <key>CFBundleIdentifier</key><string>com.techmare.shuttercount.legacy</string>
+    <key>CFBundleExecutable</key><string>ShutterCountLegacy</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleShortVersionString</key><string>__VERSION__</string>
+    <key>CFBundleVersion</key><string>__BUILD__</string>
+    <key>LSMinimumSystemVersion</key><string>10.14.4</string>
+    <key>LSApplicationCategoryType</key><string>public.app-category.photography</string>
+    <key>NSHighResolutionCapable</key><true/>
+    <key>NSCameraUsageDescription</key><string>Shutter Count reads the newest photo from a connected camera to find its shutter count.</string>
+    <key>NSRemovableVolumesUsageDescription</key><string>Shutter Count reads photos from memory cards to find the shutter count.</string>
+</dict>
+</plist>
