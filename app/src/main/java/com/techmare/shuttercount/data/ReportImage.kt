@@ -31,6 +31,8 @@ data class ReportData(
     val time: Long = System.currentTimeMillis(),
     val experimental: Boolean = false,
     val includesElectronic: Boolean = false,
+    /** True when the rating is the maker's published figure ("nominale"), false for an estimate ("estimée"). */
+    val ratedOfficial: Boolean = false,
 )
 
 private const val W = 1080
@@ -150,14 +152,14 @@ fun renderReport(context: Context, r: ReportData): Bitmap {
         small.textAlign = Paint.Align.CENTER
         c.drawText(formatCount(rated / 2L), PAD + inner / 2, y, small)
         small.textAlign = Paint.Align.RIGHT
-        c.drawText("${formatCount(rated.toLong())} nominal", PAD + inner, y, small)
+        c.drawText("${formatCount(rated.toLong())} " + if (r.ratedOfficial) "(nominale)" else "(estimée)", PAD + inner, y, small)
 
         y += 96f
         val verdict = paint(semi, 64f, TEXT)
         val label = wearFr(wear)
         c.drawText(label, PAD, y, verdict)
         c.drawText(
-            (if (wearPercent(r.count, rated) == 0 && r.count > 0) "moins de 1 %" else "${wearPercent(r.count, rated)} %") + " de la durée de vie nominale",
+            (if (wearPercent(r.count, rated) == 0 && r.count > 0) "moins de 1 %" else "${wearPercent(r.count, rated)} %") + if (r.ratedOfficial) " de la durée de vie nominale" else " de la durée de vie estimée",
             PAD + verdict.measureText(label) + 24f, y - 6f, paint(regular, 36f, MUTED),
         )
     }

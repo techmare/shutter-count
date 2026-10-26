@@ -147,7 +147,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 previous = previousFor(result.serial, result.displayName)
                 addHistory(HistoryEntry(
                     id = System.nanoTime(), time = System.currentTimeMillis(), camera = result.displayName,
-                    serial = result.serial, count = result.shutterCount, ratedLife = result.ratedLife, source = "Photo",
+                    serial = result.serial, count = result.shutterCount, ratedLife = result.ratedLife, ratedOfficial = result.ratedOfficial, source = "Photo",
                 ))
             }
             _photo.value = PhotoState.Done(result, name, previous)
@@ -200,7 +200,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         previous = previousFor(reading.serial, reading.model)
                         addHistory(HistoryEntry(
                             id = System.nanoTime(), time = System.currentTimeMillis(), camera = reading.model,
-                            serial = reading.serial, count = count, ratedLife = reading.ratedLife, source = "USB",
+                            serial = reading.serial, count = count, ratedLife = reading.ratedLife, ratedOfficial = reading.ratedOfficial, source = "USB",
                             experimental = reading.method == CanonMethod.FACTORY && !reading.confirmed,
                         ))
                     }

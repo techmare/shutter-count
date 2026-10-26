@@ -84,6 +84,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     count = count,
                     caption = if (count != null) "shutter actuations" else "This file doesn't contain a shutter count",
                     ratedLife = r.ratedLife,
+                    ratedOfficial = r.ratedOfficial,
                     showWear = showWear,
                 )
                 if (count == null) Note(r.problem ?: "No shutter count found in this file.", warning = true)
@@ -104,6 +105,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                             onClick = {
                                 shareReport(context, ReportData(
                                     r.displayName, r.serial, count, r.ratedLife.takeIf { reportWear }, "Photo (données EXIF)",
+                                    ratedOfficial = r.ratedOfficial,
                                     includesElectronic = r.brand == Brand.CANON,
                                 ))
                             },

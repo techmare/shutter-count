@@ -80,6 +80,7 @@ fun HistoryScreen(vm: MainViewModel) {
                             e.camera, e.serial, e.count, e.ratedLife.takeIf { reportWear },
                             if (e.source == "USB") "USB (lecture directe)" else "Photo (données EXIF)", e.time, e.experimental,
                             includesElectronic = e.source != "USB" && e.camera.startsWith("Canon"),
+                            ratedOfficial = e.ratedOfficial,
                         ))
                     },
                     onNote = { editing = e },

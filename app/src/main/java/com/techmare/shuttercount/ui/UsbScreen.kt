@@ -112,6 +112,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     count = count,
                     caption = if (count != null) "shutter actuations" else "No count yet",
                     ratedLife = r.ratedLife,
+                    ratedOfficial = r.ratedOfficial,
                     badge = if (experimental) "Experimental reading" else null,
                     showWear = showWear,
                 )
@@ -138,7 +139,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = {
-                                shareReport(context, ReportData(r.model, r.serial, count, r.ratedLife.takeIf { reportWear }, "USB (lecture directe)", experimental = experimental))
+                                shareReport(context, ReportData(r.model, r.serial, count, r.ratedLife.takeIf { reportWear }, "USB (lecture directe)", experimental = experimental, ratedOfficial = r.ratedOfficial))
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }

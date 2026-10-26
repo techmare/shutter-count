@@ -68,6 +68,7 @@ fun InstrumentPanel(
     count: Long?,
     caption: String,
     ratedLife: Int? = null,
+    ratedOfficial: Boolean = false,
     badge: String? = null,
     showWear: Boolean = true,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
@@ -106,14 +107,14 @@ fun InstrumentPanel(
 
         if (count != null && ratedLife != null && showWear) {
             Spacer(Modifier.height(16.dp))
-            WearScale(count, ratedLife)
+            WearScale(count, ratedLife, ratedOfficial)
             Spacer(Modifier.height(12.dp))
             val wear = CameraModels.wear(count, ratedLife)
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(wear.label, style = MaterialTheme.typography.titleLarge, color = c.panelText)
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    (if (wearPercent(count, ratedLife) == 0 && count > 0) "Under 1%" else "${wearPercent(count, ratedLife)}%") + " of rated life used",
+                    (if (wearPercent(count, ratedLife) == 0 && count > 0) "Under 1%" else "${wearPercent(count, ratedLife)}%") + (if (ratedOfficial) " of rated life used" else " of estimated life used"),
                     Modifier.padding(bottom = 2.dp),
                     style = MaterialTheme.typography.bodyMedium, color = c.panelMuted,
                 )
@@ -213,7 +214,7 @@ private fun DigitText(d: Int, color: Color, modifier: Modifier) {
 
 /** Ticked scale from 0 to the rated life, filled up to the current count. */
 @Composable
-fun WearScale(count: Long, ratedLife: Int) {
+fun WearScale(count: Long, ratedLife: Int, official: Boolean = false) {
     val c = LocalAppColors.current
     val wear = CameraModels.wear(count, ratedLife)
     val fill = wearColor(wear)
@@ -248,7 +249,7 @@ fun WearScale(count: Long, ratedLife: Int) {
             Spacer(Modifier.weight(1f))
             Text(formatCount(ratedLife / 2L), style = MaterialTheme.typography.bodySmall, color = c.panelMuted)
             Spacer(Modifier.weight(1f))
-            Text("${formatCount(ratedLife.toLong())} rated", style = MaterialTheme.typography.bodySmall, color = c.panelMuted)
+            Text("${formatCount(ratedLife.toLong())} " + if (official) "rated" else "est.", style = MaterialTheme.typography.bodySmall, color = c.panelMuted)
         }
     }
 }

@@ -9,6 +9,8 @@ data class PhotoReading(
     /** Main shutter count, or null when the file does not carry one. */
     val shutterCount: Long?,
     val ratedLife: Int?,
+    /** True when [ratedLife] is the maker's published figure, false when it's an estimate. */
+    val ratedOfficial: Boolean = false,
     val serial: String?,
     val dateTaken: String?,
     val software: String?,
@@ -313,7 +315,8 @@ object PhotoShutterReader {
             model = model,
             displayName = CameraModels.displayName(brand, model),
             shutterCount = count,
-            ratedLife = CameraModels.ratedLife(brand, model),
+            ratedLife = CameraModels.rating(brand, model)?.value,
+            ratedOfficial = CameraModels.rating(brand, model)?.official ?: false,
             serial = serial,
             dateTaken = dateTaken,
             software = software,
@@ -324,8 +327,9 @@ object PhotoShutterReader {
     }
 
     private fun failure(message: String) = PhotoReading(
-        Brand.OTHER, null, null, "Unknown camera", null, null, null, null, null,
-        emptyList(), emptyList(), message,
+        brand = Brand.OTHER, make = null, model = null, displayName = "Unknown camera", shutterCount = null,
+        ratedLife = null, serial = null, dateTaken = null, software = null,
+        details = emptyList(), warnings = emptyList(), problem = message,
     )
 
     private fun startsWith(buf: ByteArray, pos: Int, s: String): Boolean {

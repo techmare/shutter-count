@@ -24,6 +24,7 @@ data class CanonReading(
     val problem: String?,
     /** True when standard methods failed but the experimental route can still be tried. */
     val canTryAdvanced: Boolean,
+    val ratedOfficial: Boolean = false,
     /** What was tried and how the camera answered. */
     val diagnostics: String = "",
 ) {
@@ -65,7 +66,10 @@ class CanonReader(private val session: PtpSession) {
             fun result(
                 counters: List<CanonCounter>, method: CanonMethod?, confirmed: Boolean = true,
                 notes: List<String> = emptyList(), problem: String? = null, canTryAdvanced: Boolean = false,
-            ) = CanonReading(model, serial, firmware, counters, method, confirmed, rated, notes, problem, canTryAdvanced, log.joinToString("\n"))
+            ) = CanonReading(
+                model, serial, firmware, counters, method, confirmed, rated, notes, problem, canTryAdvanced,
+                CameraModels.rating(Brand.CANON, model)?.official ?: false, log.joinToString("\n"),
+            )
 
             if (!info.manufacturer.contains("Canon", ignoreCase = true) && info.vendorExtensionId != 11L) {
                 return result(emptyList(), null,

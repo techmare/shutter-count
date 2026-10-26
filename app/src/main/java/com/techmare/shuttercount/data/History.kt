@@ -15,6 +15,7 @@ data class HistoryEntry(
     val source: String,
     val note: String = "",
     val experimental: Boolean = false,
+    val ratedOfficial: Boolean = false,
 )
 
 /** Saved readings, newest first, kept in SharedPreferences as JSON. */
@@ -37,6 +38,7 @@ class HistoryStore(context: Context) {
                     source = o.optString("source", "Photo"),
                     note = o.optString("note"),
                     experimental = o.optBoolean("experimental"),
+                    ratedOfficial = o.optBoolean("ratedOfficial"),
                 )
             }
         } catch (e: Exception) {
@@ -51,7 +53,7 @@ class HistoryStore(context: Context) {
                 put("id", e.id); put("time", e.time); put("camera", e.camera)
                 put("serial", e.serial ?: ""); put("count", e.count)
                 e.ratedLife?.let { put("rated", it) }
-                put("source", e.source); put("note", e.note); put("experimental", e.experimental)
+                put("source", e.source); put("note", e.note); put("experimental", e.experimental); put("ratedOfficial", e.ratedOfficial)
             })
         }
         prefs.edit().putString(KEY, arr.toString()).apply()
