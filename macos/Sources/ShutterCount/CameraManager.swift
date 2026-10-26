@@ -46,7 +46,7 @@ final class CameraManager: NSObject, ObservableObject {
                 await waitUntilReady(camera)
                 let name = camera.name ?? "Camera"
                 log.append("Camera: \(name), capabilities: \(camera.capabilities.joined(separator: ", "))")
-                let canPTP = camera.capabilities.contains(ICCameraDeviceCanAcceptPTPCommands.rawValue)
+                let canPTP = camera.capabilities.contains(ICDeviceCapability.cameraDeviceCanAcceptPTPCommands.rawValue)
                 var info: PTPDeviceInfo?
                 let channel = ICPTPChannel(camera)
                 if canPTP, let r = try? await channel.transact(0x1001, [], dataOut: nil), r.ok {
