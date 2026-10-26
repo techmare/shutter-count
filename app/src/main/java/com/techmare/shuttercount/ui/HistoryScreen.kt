@@ -43,7 +43,8 @@ import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.core.CameraModels
 import com.techmare.shuttercount.data.HistoryEntry
-import com.techmare.shuttercount.data.buildReport
+import com.techmare.shuttercount.data.ReportData
+import com.techmare.shuttercount.data.shareReport
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.data.formatDate
 import com.techmare.shuttercount.data.wearPercent
@@ -75,8 +76,11 @@ fun HistoryScreen(vm: MainViewModel) {
                 HistoryRow(
                     e, showWear,
                     onShare = {
-                        shareText(context, buildReport(e.camera, e.serial, e.count, e.ratedLife.takeIf { reportWear },
-                            if (e.source == "USB") "USB (lecture directe)" else "photo (EXIF)", e.time, e.experimental))
+                        shareReport(context, ReportData(
+                            e.camera, e.serial, e.count, e.ratedLife.takeIf { reportWear },
+                            if (e.source == "USB") "USB (lecture directe)" else "Photo (données EXIF)", e.time, e.experimental,
+                            includesElectronic = e.source != "USB" && e.camera.startsWith("Canon"),
+                        ))
                     },
                     onNote = { editing = e },
                     onDelete = { deleting = e },

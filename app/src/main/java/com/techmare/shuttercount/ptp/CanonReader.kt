@@ -53,7 +53,9 @@ class CanonReader(private val session: PtpSession) {
         try {
             val info = session.getDeviceInfo()
             val model = info.model.ifBlank { usbProductName ?: "Canon camera" }
-            val serial = info.serialNumber.ifBlank { null }
+            // DeviceInfo's serial on Canon is a 32-character ID, not the body serial. The real one
+            // comes from the EOS event stream (property D1AF); without it, show nothing.
+            var serial: String? = info.serialNumber.trim().takeIf { it.isNotEmpty() && !it.matches(Regex("[0-9a-fA-F]{32}")) }
             val firmware = info.deviceVersion.ifBlank { null }
             val rated = CameraModels.ratedLife(Brand.CANON, model)
             log += "Camera: ${info.manufacturer} / $model / firmware ${firmware ?: "?"} / vendor ext ${info.vendorExtensionId}"
@@ -71,16 +73,19 @@ class CanonReader(private val session: PtpSession) {
             }
 
             // 1. Standard property
-            readProperty()?.let { return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.PROPERTY) }
+            val propCount = readProperty()
 
-            // 2. EOS event stream (also asks the camera to report the counter property)
+            // 2. EOS event stream: also carries the body serial number
+            var eventCount: Long? = null
             if (info.operations.containsAll(listOf(OP_EOS_SET_REMOTE_MODE, OP_EOS_SET_EVENT_MODE, OP_EOS_GET_EVENT))) {
-                readViaEvents(info.operations.contains(OP_EOS_REQUEST_PROP))?.let {
-                    return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.EVENT)
-                }
+                val ev = readViaEvents(info.operations.contains(OP_EOS_REQUEST_PROP))
+                eventCount = ev.first
+                ev.second?.let { serial = it }
             } else {
                 log += "EOS event stream: not offered by this camera"
             }
+            propCount?.let { return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.PROPERTY) }
+            eventCount?.let { return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.EVENT) }
 
             // 3. Experimental MPU route. Some bodies answer it without listing the opcodes.
             val listed = info.operations.contains(OP_FACTORY_SEND) && info.operations.contains(OP_FACTORY_RECV)
@@ -129,28 +134,33 @@ class CanonReader(private val session: PtpSession) {
         if (r.ok && r.data.size >= 4) le32(r.data, 0).takeIf { it in 1..20_000_000 } else null
     } catch (e: PtpException) { log += "GetDevicePropValue D1AC: ${e.message}"; null }
 
-    private fun readViaEvents(canRequest: Boolean): Long? = try {
+    /** Returns (shutter count, body serial number) from Canon's EOS event stream. */
+    private fun readViaEvents(canRequest: Boolean): Pair<Long?, String?> = try {
         val remote = session.transact(OP_EOS_SET_REMOTE_MODE, listOf(1L))
         val event = session.transact(OP_EOS_SET_EVENT_MODE, listOf(1L))
         log += "SetRemoteMode: ${hex(remote.code)}, SetEventMode: ${hex(event.code)}"
-        var found: Long? = null
+        var count: Long? = null
+        var serial: String? = null
         if (remote.ok && event.ok) {
             if (canRequest) {
-                val rq = session.transact(OP_EOS_REQUEST_PROP, listOf(PROP_SHUTTER_COUNTER.toLong()))
-                log += "RequestDevicePropValue D1AC: ${hex(rq.code)}"
+                for (prop in listOf(PROP_SHUTTER_COUNTER, PROP_SERIAL)) {
+                    val rq = session.transact(OP_EOS_REQUEST_PROP, listOf(prop.toLong()))
+                    log += "RequestDevicePropValue ${hex(prop)}: ${hex(rq.code)}"
+                }
             }
             for (attempt in 0 until 4) {
                 val r = session.transact(OP_EOS_GET_EVENT, emptyList())
                 if (!r.ok) { log += "GetEvent: ${hex(r.code)}"; break }
-                found = findCounterInEvents(r.data)
-                log += "GetEvent #${attempt + 1}: ${r.data.size} bytes, counter ${found ?: "not present"}"
-                if (found != null || r.data.size <= 8) break
+                count = count ?: findPropInEvents(r.data, PROP_SHUTTER_COUNTER)?.takeIf { it.size >= 4 }?.let { le32(it, 0) }
+                serial = serial ?: findPropInEvents(r.data, PROP_SERIAL)?.let(::asciiString)
+                log += "GetEvent #${attempt + 1}: ${r.data.size} bytes, counter ${count ?: "not present"}, serial ${if (serial != null) "found" else "not present"}"
+                if ((count != null && serial != null) || r.data.size <= 8) break
             }
         }
         // leave the camera as we found it
         try { session.transact(OP_EOS_SET_EVENT_MODE, listOf(0L)); session.transact(OP_EOS_SET_REMOTE_MODE, listOf(0L)) } catch (_: PtpException) { }
-        found?.takeIf { it in 1..20_000_000 }
-    } catch (e: PtpException) { log += "EOS events: ${e.message}"; null }
+        count?.takeIf { it in 1..20_000_000 } to serial
+    } catch (e: PtpException) { log += "EOS events: ${e.message}"; null to null }
 
     private fun readFactory(): List<CanonCounter> {
         val out = ArrayList<CanonCounter>()
@@ -181,6 +191,7 @@ class CanonReader(private val session: PtpSession) {
 
     companion object {
         const val PROP_SHUTTER_COUNTER = 0xD1AC
+        const val PROP_SERIAL = 0xD1AF
         const val OP_EOS_SET_REMOTE_MODE = 0x9114
         const val OP_EOS_SET_EVENT_MODE = 0x9115
         const val OP_EOS_GET_EVENT = 0x9116
@@ -198,19 +209,30 @@ class CanonReader(private val session: PtpSession) {
         )
 
         /** Scans a Canon EOS GetEvent dataset for property 0xD1AC. */
-        fun findCounterInEvents(d: ByteArray): Long? {
+        fun findCounterInEvents(d: ByteArray): Long? =
+            findPropInEvents(d, PROP_SHUTTER_COUNTER)?.takeIf { it.size >= 4 }?.let { le32(it, 0) }
+
+        /** Value bytes of a property-changed record in a Canon EOS GetEvent dataset. */
+        fun findPropInEvents(d: ByteArray, wanted: Int): ByteArray? {
             var p = 0
             while (p + 8 <= d.size) {
                 val size = le32(d, p)
                 val type = le32(d, p + 4)
                 if (size < 8 || type == 0L || p + size > d.size) break
-                if (type == EVT_PROP_VALUE_CHANGED && size >= 16) {
+                if (type == EVT_PROP_VALUE_CHANGED && size >= 12) {
                     val prop = le32(d, p + 8)
-                    if (prop == PROP_SHUTTER_COUNTER.toLong()) return le32(d, p + 12)
+                    if (prop == wanted.toLong()) return d.copyOfRange(p + 12, (p + size).toInt())
                 }
                 p += size.toInt()
             }
             return null
+        }
+
+        /** Printable serial from a NUL-terminated ASCII value, or null. */
+        fun asciiString(b: ByteArray): String? {
+            val end = b.indexOf(0.toByte()).let { if (it < 0) b.size else it }
+            val s = String(b, 0, end, Charsets.US_ASCII).trim()
+            return s.takeIf { it.length in 4..32 && it.all { c -> c.isLetterOrDigit() } }
         }
 
         /**

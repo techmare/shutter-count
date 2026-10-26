@@ -41,6 +41,5 @@ fun buildReport(
     }
     appendLine("Méthode : $method")
     if (experimental) appendLine("(lecture expérimentale)")
-    appendLine("Date du contrôle : ${formatDate(time)}")
-    append("Contrôlé avec Techmare Shutter Count")
+    append("Date du contrôle : ${formatDate(time)}")
 }

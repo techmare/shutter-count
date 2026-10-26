@@ -29,7 +29,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.UsbState
-import com.techmare.shuttercount.data.buildReport
+import com.techmare.shuttercount.data.ReportData
+import com.techmare.shuttercount.data.shareReport
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.ptp.CanonMethod
 
@@ -137,7 +138,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = {
-                                shareText(context, buildReport(r.model, r.serial, count, r.ratedLife.takeIf { reportWear }, "USB (lecture directe)", experimental = experimental))
+                                shareReport(context, ReportData(r.model, r.serial, count, r.ratedLife.takeIf { reportWear }, "USB (lecture directe)", experimental = experimental))
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }

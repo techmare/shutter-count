@@ -25,7 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.PhotoState
-import com.techmare.shuttercount.data.buildReport
+import com.techmare.shuttercount.core.Brand
+import com.techmare.shuttercount.data.ReportData
+import com.techmare.shuttercount.data.shareReport
 
 @Composable
 fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
@@ -99,7 +101,12 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 if (count != null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
-                            onClick = { shareText(context, buildReport(r.displayName, r.serial, count, r.ratedLife.takeIf { reportWear }, "photo (EXIF)")) },
+                            onClick = {
+                                shareReport(context, ReportData(
+                                    r.displayName, r.serial, count, r.ratedLife.takeIf { reportWear }, "Photo (données EXIF)",
+                                    includesElectronic = r.brand == Brand.CANON,
+                                ))
+                            },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }
                         OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }

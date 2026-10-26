@@ -86,7 +86,10 @@ fun InstrumentPanel(
                 style = MaterialTheme.typography.titleLarge,
                 color = if (titleDim) c.panelMuted else c.panelText,
             )
-            if (trailing != null) Text(trailing, style = MaterialTheme.typography.bodySmall, color = c.panelMuted)
+            if (trailing != null) {
+                Spacer(Modifier.width(12.dp))
+                Text(trailing, style = MaterialTheme.typography.bodySmall, color = c.panelMuted, maxLines = 1)
+            }
         }
         if (badge != null) {
             Spacer(Modifier.height(6.dp))
@@ -110,7 +113,7 @@ fun InstrumentPanel(
                 Text(wear.label, style = MaterialTheme.typography.titleLarge, color = c.panelText)
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    "${wearPercent(count, ratedLife)}% of rated life used",
+                    (if (wearPercent(count, ratedLife) == 0 && count > 0) "Under 1%" else "${wearPercent(count, ratedLife)}%") + " of rated life used",
                     Modifier.padding(bottom = 2.dp),
                     style = MaterialTheme.typography.bodyMedium, color = c.panelMuted,
                 )
