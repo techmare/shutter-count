@@ -27,8 +27,6 @@ final class CameraManager: NSObject, ObservableObject {
         browser.delegate = self
         let mask = ICDeviceTypeMask.camera.rawValue | ICDeviceLocationTypeMask.local.rawValue
         browser.browsedDeviceTypeMask = ICDeviceTypeMask(rawValue: mask) ?? .camera
-        browser.requestContentsAuthorization { _ in }
-        browser.requestControlAuthorization { _ in }
         browser.start()
     }
 
@@ -48,7 +46,7 @@ final class CameraManager: NSObject, ObservableObject {
                 await waitUntilReady(camera)
                 let name = camera.name ?? "Camera"
                 log.append("Camera: \(name), capabilities: \(camera.capabilities.joined(separator: ", "))")
-                let canPTP = camera.capabilities.contains(ICCameraDeviceCanAcceptPTPCommands)
+                let canPTP = camera.capabilities.contains(ICCameraDeviceCanAcceptPTPCommands.rawValue)
                 var info: PTPDeviceInfo?
                 let channel = ICPTPChannel(camera)
                 if canPTP, let r = try? await channel.transact(0x1001, [], dataOut: nil), r.ok {
