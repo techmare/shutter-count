@@ -22,8 +22,10 @@ data class CanonReading(
     val ratedLife: Int?,
     val notes: List<String>,
     val problem: String?,
-    /** True when standard methods failed but the experimental route is available. */
+    /** True when standard methods failed but the experimental route can still be tried. */
     val canTryAdvanced: Boolean,
+    /** What was tried and how the camera answered. */
+    val diagnostics: String = "",
 ) {
     val shutterCount: Long? get() = counters.firstOrNull()?.value
 }
@@ -41,7 +43,11 @@ data class CanonReading(
  */
 class CanonReader(private val session: PtpSession) {
 
+    /** Step-by-step log of what was tried and how the camera answered, for the diagnostic report. */
+    private val log = ArrayList<String>()
+
     fun read(usbProductName: String?, allowAdvanced: Boolean): CanonReading {
+        log.clear()
         session.openSession()
         try {
             val info = session.getDeviceInfo()
@@ -49,49 +55,56 @@ class CanonReader(private val session: PtpSession) {
             val serial = info.serialNumber.ifBlank { null }
             val firmware = info.deviceVersion.ifBlank { null }
             val rated = CameraModels.ratedLife(Brand.CANON, model)
+            log += "Camera: ${info.manufacturer} / $model / firmware ${firmware ?: "?"} / vendor ext ${info.vendorExtensionId}"
+            log += "Operations (${info.operations.size}): " + info.operations.sorted().joinToString(" ") { "%04X".format(it) }
+            log += "Properties (${info.properties.size}): " + info.properties.sorted().joinToString(" ") { "%04X".format(it) }
 
             fun result(
                 counters: List<CanonCounter>, method: CanonMethod?, confirmed: Boolean = true,
                 notes: List<String> = emptyList(), problem: String? = null, canTryAdvanced: Boolean = false,
-            ) = CanonReading(model, serial, firmware, counters, method, confirmed, rated, notes, problem, canTryAdvanced)
+            ) = CanonReading(model, serial, firmware, counters, method, confirmed, rated, notes, problem, canTryAdvanced, log.joinToString("\n"))
 
             if (!info.manufacturer.contains("Canon", ignoreCase = true) && info.vendorExtensionId != 11L) {
                 return result(emptyList(), null,
-                    problem = "This is a ${info.manufacturer.ifBlank { "non-Canon" }} camera. Over USB this app reads Canon only — for Nikon and Sony, use the Photo tab.")
+                    problem = "This is a ${info.manufacturer.ifBlank { "non-Canon" }} camera. Over USB this app reads Canon only. For Nikon and Sony, use the Photo tab.")
             }
 
             // 1. Standard property
             readProperty()?.let { return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.PROPERTY) }
 
-            // 2. EOS event stream
+            // 2. EOS event stream (also asks the camera to report the counter property)
             if (info.operations.containsAll(listOf(OP_EOS_SET_REMOTE_MODE, OP_EOS_SET_EVENT_MODE, OP_EOS_GET_EVENT))) {
-                readViaEvents()?.let { return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.EVENT) }
+                readViaEvents(info.operations.contains(OP_EOS_REQUEST_PROP))?.let {
+                    return result(listOf(CanonCounter("Shutter actuations", it)), CanonMethod.EVENT)
+                }
+            } else {
+                log += "EOS event stream: not offered by this camera"
             }
 
-            // 3. Experimental MPU route
-            val hasFactory = info.operations.contains(OP_FACTORY_SEND) && info.operations.contains(OP_FACTORY_RECV)
-            if (!hasFactory) {
-                return result(emptyList(), null,
-                    problem = "This Canon model doesn't share its shutter count over USB with any method this app knows yet.")
-            }
+            // 3. Experimental MPU route. Some bodies answer it without listing the opcodes.
+            val listed = info.operations.contains(OP_FACTORY_SEND) && info.operations.contains(OP_FACTORY_RECV)
+            log += "Shutter-unit channel 9052/9053: " + if (listed) "listed" else "not listed"
             if (!allowAdvanced) {
                 return result(emptyList(), null,
-                    problem = "This is a newer Canon (DIGIC 6 or later). The standard counter isn't available, but the count can be read from the shutter unit's memory with an experimental method.",
+                    problem = if (listed)
+                        "This is a newer Canon (DIGIC 6 or later). The standard counter isn't available, but the count can be read from the shutter unit's memory with an experimental method."
+                    else
+                        "The standard counter isn't available on this Canon. The experimental method isn't listed by this camera, but some newer Canons answer it anyway. It only reads, so it's safe to try.",
                     canTryAdvanced = true)
             }
 
-            val confirmed = CONFIRMED_FACTORY_MODELS.any { model.contains(it, ignoreCase = true) }
+            val confirmed = listed && CONFIRMED_FACTORY_MODELS.any { model.contains(it, ignoreCase = true) }
             val counters = readFactory()
             if (counters.isEmpty()) {
-                return result(emptyList(), CanonMethod.FACTORY, confirmed,
-                    problem = "The camera didn't answer the experimental read. Nothing was changed on the camera.")
+                return result(emptyList(), CanonMethod.FACTORY, false,
+                    problem = "The camera didn't answer the experimental read either, so this model can't be read yet. Nothing was changed on the camera. Share the diagnostic report so support for it can be added.")
             }
             val notes = mutableListOf<String>()
             if (!confirmed) {
-                notes += "This method is confirmed on the EOS 5D Mark IV only. To check it on this camera: take exactly 5 photos, read again, and the shutter count should go up by exactly 5."
+                notes += "This method is only confirmed on the EOS 5D Mark IV. Check it on this camera: take exactly 5 photos, read again, and the shutter count should go up by exactly 5."
             }
             if (counters.first().value >= 65_000) {
-                notes += "Values above ~65,000 may not decode correctly with this method yet. Compare with a service-centre reading if it matters."
+                notes += "Values above about 65,000 may not decode correctly with this method yet."
             }
             return result(counters, CanonMethod.FACTORY, confirmed, notes)
         } finally {
@@ -99,25 +112,36 @@ class CanonReader(private val session: PtpSession) {
         }
     }
 
+    private fun hex(code: Int) = "%04X".format(code)
+
     private fun readProperty(): Long? = try {
         val r = session.transact(OP_GET_DEVICE_PROP_VALUE, listOf(PROP_SHUTTER_COUNTER.toLong()))
+        log += "GetDevicePropValue D1AC: ${hex(r.code)}, ${r.data.size} bytes"
         if (r.ok && r.data.size >= 4) le32(r.data, 0).takeIf { it in 1..20_000_000 } else null
-    } catch (e: PtpException) { null }
+    } catch (e: PtpException) { log += "GetDevicePropValue D1AC: ${e.message}"; null }
 
-    private fun readViaEvents(): Long? = try {
+    private fun readViaEvents(canRequest: Boolean): Long? = try {
         val remote = session.transact(OP_EOS_SET_REMOTE_MODE, listOf(1L))
         val event = session.transact(OP_EOS_SET_EVENT_MODE, listOf(1L))
+        log += "SetRemoteMode: ${hex(remote.code)}, SetEventMode: ${hex(event.code)}"
         var found: Long? = null
         if (remote.ok && event.ok) {
-            for (attempt in 0 until 3) {
+            if (canRequest) {
+                val rq = session.transact(OP_EOS_REQUEST_PROP, listOf(PROP_SHUTTER_COUNTER.toLong()))
+                log += "RequestDevicePropValue D1AC: ${hex(rq.code)}"
+            }
+            for (attempt in 0 until 4) {
                 val r = session.transact(OP_EOS_GET_EVENT, emptyList())
-                if (!r.ok) break
+                if (!r.ok) { log += "GetEvent: ${hex(r.code)}"; break }
                 found = findCounterInEvents(r.data)
+                log += "GetEvent #${attempt + 1}: ${r.data.size} bytes, counter ${found ?: "not present"}"
                 if (found != null || r.data.size <= 8) break
             }
         }
+        // leave the camera as we found it
+        try { session.transact(OP_EOS_SET_EVENT_MODE, listOf(0L)); session.transact(OP_EOS_SET_REMOTE_MODE, listOf(0L)) } catch (_: PtpException) { }
         found?.takeIf { it in 1..20_000_000 }
-    } catch (e: PtpException) { null }
+    } catch (e: PtpException) { log += "EOS events: ${e.message}"; null }
 
     private fun readFactory(): List<CanonCounter> {
         val out = ArrayList<CanonCounter>()
@@ -126,8 +150,10 @@ class CanonReader(private val session: PtpSession) {
             for ((label, address) in MPU_COUNTERS) {
                 if (!sendFactory(FactoryCommand.monRead(address, 10), expectReply = true)) continue
                 val r = session.transact(OP_FACTORY_RECV, listOf(0L, 0L, 1L))
+                val raw = r.data.joinToString(" ") { "%02x".format(it) }
+                log += "MonRead ${"%04X".format(address)}: ${hex(r.code)} [$raw]"
                 if (!r.ok || r.data.size < 3) continue
-                out += CanonCounter(label, decodeMpuCounter(r.data), r.data.joinToString(" ") { "%02x".format(it) })
+                out += CanonCounter(label, decodeMpuCounter(r.data), raw)
             }
         } finally {
             try { sendFactory(FactoryCommand("MonClose"), expectReply = false) } catch (_: PtpException) { }
@@ -136,7 +162,10 @@ class CanonReader(private val session: PtpSession) {
     }
 
     private fun sendFactory(cmd: FactoryCommand, expectReply: Boolean): Boolean {
-        val r = session.transactOut(OP_FACTORY_SEND, listOf(0L, if (expectReply) 1L else 0L), cmd.marshal())
+        val r = try {
+            session.transactOut(OP_FACTORY_SEND, listOf(0L, if (expectReply) 1L else 0L), cmd.marshal())
+        } catch (e: PtpException) { log += "${cmd.name}: ${e.message}"; return false }
+        if (!r.ok || cmd.name != "MonReadAndGetData") log += "${cmd.name}: ${hex(r.code)}"
         return r.ok
     }
 
@@ -145,6 +174,7 @@ class CanonReader(private val session: PtpSession) {
         const val OP_EOS_SET_REMOTE_MODE = 0x9114
         const val OP_EOS_SET_EVENT_MODE = 0x9115
         const val OP_EOS_GET_EVENT = 0x9116
+        const val OP_EOS_REQUEST_PROP = 0x9127
         const val OP_FACTORY_SEND = 0x9052
         const val OP_FACTORY_RECV = 0x9053
         private const val EVT_PROP_VALUE_CHANGED = 0xC189L

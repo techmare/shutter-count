@@ -153,6 +153,11 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                         Text(raw.joinToString("\n"), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall, color = c.muted)
                     }
                 }
+                if (r.diagnostics.isNotBlank()) {
+                    TextButton(onClick = {
+                        shareText(context, "Shutter Count diagnostic report\n${r.model}\n\n${r.diagnostics}")
+                    }) { Text("Share diagnostic report") }
+                }
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -165,7 +170,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
             text = {
                 Text(
                     "This asks the camera's shutter unit for its counters. It only reads and never writes to the camera.\n\n" +
-                        "It's confirmed on the EOS 5D Mark IV. On other models, check it: read, take exactly 5 photos, read again, and the count should go up by 5.\n\n" +
+                        "It's confirmed on the EOS 5D Mark IV. On other models, check it: read, take exactly 5 photos, read again, and the count should go up by 5. If the camera doesn't answer, nothing happens.\n\n" +
                         "If the camera shows an error, take the battery out and put it back.",
                 )
             },
