@@ -1,0 +1,63 @@
+name: Build Mac app
+
+on:
+  push:
+    branches: [main]
+    paths: ["macos/**", ".github/workflows/mac.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test
+        working-directory: macos
+        run: swift test
+
+      - name: Build universal app
+        working-directory: macos
+        run: |
+          set -e
+          swift build -c release --arch arm64 --arch x86_64
+          BIN="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/ShutterCount"
+          APP="Shutter Count.app"
+          rm -rf "$APP"
+          mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/Fonts"
+          cp "$BIN" "$APP/Contents/MacOS/ShutterCount"
+          cp Resources/Fonts/*.ttf "$APP/Contents/Resources/Fonts/"
+          sed -e "s/__VERSION__/1.0.${{ github.run_number }}/" -e "s/__BUILD__/${{ github.run_number }}/" Resources/Info.plist > "$APP/Contents/Info.plist"
+          # icon
+          mkdir -p AppIcon.iconset
+          for s in 16 32 128 256 512; do
+            sips -z $s $s Resources/AppIcon-1024.png --out AppIcon.iconset/icon_${s}x${s}.png >/dev/null
+            d=$((s*2)); sips -z $d $d Resources/AppIcon-1024.png --out AppIcon.iconset/icon_${s}x${s}@2x.png >/dev/null
+          done
+          iconutil -c icns AppIcon.iconset -o "$APP/Contents/Resources/AppIcon.icns"
+          # ad-hoc signature (no Apple Developer account)
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --verbose "$APP"
+          lipo -info "$APP/Contents/MacOS/ShutterCount"
+          ditto -c -k --keepParent "$APP" ../ShutterCount-mac.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ShutterCount-mac
+          path: ShutterCount-mac.zip
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mac-latest
+          name: Shutter Count for Mac
+          body: |
+            Download **ShutterCount-mac.zip**, unzip it and drag **Shutter Count** to Applications.
+            First launch: right-click the app and choose Open (or System Settings → Privacy & Security → Open Anyway), because it isn't notarized by Apple.
+            Build ${{ github.run_number }}.
+          files: ShutterCount-mac.zip
+          make_latest: false
+          overwrite_files: true

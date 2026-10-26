@@ -13,6 +13,8 @@ Android app to check a camera's shutter count (number of actuations) — for buy
 
 **Seen before:** when a serial number is already in History, the app shows the earlier check and warns if the count went down.
 
+**Mac:** [Shutter Count for Mac](../../releases/download/mac-latest/ShutterCount-mac.zip). Drop photos on the window, or plug in a camera. First launch: right-click the app and choose Open.
+
 **Download:** [latest APK](../../releases/latest/download/ShutterCount.apk) — open it on the phone to install or update.
 
 ## Tips
