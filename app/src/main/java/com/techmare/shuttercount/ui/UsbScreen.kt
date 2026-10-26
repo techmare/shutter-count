@@ -38,6 +38,8 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
     val state by vm.usb.collectAsState()
     val context = LocalContext.current
     val c = LocalAppColors.current
+    val showWear by vm.showWear.collectAsState()
+    val reportWear by vm.reportWear.collectAsState()
     var confirmAdvanced by remember { mutableStateOf(false) }
 
     Column(
@@ -110,6 +112,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     caption = if (count != null) "shutter actuations" else "No count yet",
                     ratedLife = r.ratedLife,
                     badge = if (experimental) "Experimental reading" else null,
+                    showWear = showWear,
                 )
 
                 if (count == null) {
@@ -134,7 +137,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = {
-                                shareText(context, buildReport(r.model, r.serial, count, r.ratedLife, "USB (lecture directe)", experimental = experimental))
+                                shareText(context, buildReport(r.model, r.serial, count, r.ratedLife.takeIf { reportWear }, "USB (lecture directe)", experimental = experimental))
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }

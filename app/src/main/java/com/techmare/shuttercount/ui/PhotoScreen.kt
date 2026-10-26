@@ -32,6 +32,8 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
     val state by vm.photo.collectAsState()
     val context = LocalContext.current
     val c = LocalAppColors.current
+    val showWear by vm.showWear.collectAsState()
+    val reportWear by vm.reportWear.collectAsState()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) vm.readPhoto(uri)
     }
@@ -80,6 +82,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     count = count,
                     caption = if (count != null) "shutter actuations" else "This file doesn't contain a shutter count",
                     ratedLife = r.ratedLife,
+                    showWear = showWear,
                 )
                 if (count == null) Note(r.problem ?: "No shutter count found in this file.", warning = true)
                 r.warnings.forEach { Note(it, warning = true) }
@@ -96,7 +99,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 if (count != null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
-                            onClick = { shareText(context, buildReport(r.displayName, r.serial, count, r.ratedLife, "photo (EXIF)")) },
+                            onClick = { shareText(context, buildReport(r.displayName, r.serial, count, r.ratedLife.takeIf { reportWear }, "photo (EXIF)")) },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }
                         OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }

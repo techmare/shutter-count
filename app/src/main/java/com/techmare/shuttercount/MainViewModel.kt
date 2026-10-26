@@ -62,6 +62,26 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private var pendingAdvanced = false
 
+    private val settings = app.getSharedPreferences("settings", Context.MODE_PRIVATE)
+
+    private val _showWear = MutableStateFlow(settings.getBoolean(KEY_SHOW_WEAR, true))
+    /** Show rated shutter life and wear in the app. */
+    val showWear: StateFlow<Boolean> = _showWear.asStateFlow()
+
+    private val _reportWear = MutableStateFlow(settings.getBoolean(KEY_REPORT_WEAR, true))
+    /** Include rated shutter life and wear in shared reports. */
+    val reportWear: StateFlow<Boolean> = _reportWear.asStateFlow()
+
+    fun setShowWear(on: Boolean) {
+        _showWear.value = on
+        settings.edit().putBoolean(KEY_SHOW_WEAR, on).apply()
+    }
+
+    fun setReportWear(on: Boolean) {
+        _reportWear.value = on
+        settings.edit().putBoolean(KEY_REPORT_WEAR, on).apply()
+    }
+
     private val permissionReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action != ACTION_USB_PERMISSION) return
@@ -229,6 +249,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun latestEntryId(): Long? = _history.value.firstOrNull()?.id
 
     companion object {
+        private const val KEY_SHOW_WEAR = "show_wear"
+        private const val KEY_REPORT_WEAR = "report_wear"
         const val ACTION_USB_PERMISSION = "com.techmare.shuttercount.USB_PERMISSION"
         private const val MAX_PHOTO_BYTES = 12 * 1024 * 1024
     }

@@ -53,6 +53,8 @@ fun HistoryScreen(vm: MainViewModel) {
     val entries by vm.history.collectAsState()
     val context = LocalContext.current
     val c = LocalAppColors.current
+    val showWear by vm.showWear.collectAsState()
+    val reportWear by vm.reportWear.collectAsState()
     var editing by remember { mutableStateOf<HistoryEntry?>(null) }
     var deleting by remember { mutableStateOf<HistoryEntry?>(null) }
 
@@ -71,9 +73,9 @@ fun HistoryScreen(vm: MainViewModel) {
         LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
             itemsIndexed(entries, key = { _, e -> e.id }) { i, e ->
                 HistoryRow(
-                    e,
+                    e, showWear,
                     onShare = {
-                        shareText(context, buildReport(e.camera, e.serial, e.count, e.ratedLife,
+                        shareText(context, buildReport(e.camera, e.serial, e.count, e.ratedLife.takeIf { reportWear },
                             if (e.source == "USB") "USB (lecture directe)" else "photo (EXIF)", e.time, e.experimental))
                     },
                     onNote = { editing = e },
@@ -99,7 +101,7 @@ fun HistoryScreen(vm: MainViewModel) {
 }
 
 @Composable
-private fun HistoryRow(e: HistoryEntry, onShare: () -> Unit, onNote: () -> Unit, onDelete: () -> Unit) {
+private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, onNote: () -> Unit, onDelete: () -> Unit) {
     val c = LocalAppColors.current
     var menu by remember { mutableStateOf(false) }
     Row(
@@ -117,7 +119,7 @@ private fun HistoryRow(e: HistoryEntry, onShare: () -> Unit, onNote: () -> Unit,
                     Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = c.muted,
                 )
                 val rated = e.ratedLife
-                if (rated != null) {
+                if (rated != null && showWear) {
                     val wear = CameraModels.wear(e.count, rated)
                     Box(Modifier.size(8.dp).clip(CircleShape).background(wearColor(wear)))
                     Spacer(Modifier.width(6.dp))

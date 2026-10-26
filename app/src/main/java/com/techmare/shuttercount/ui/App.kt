@@ -1,6 +1,15 @@
 package com.techmare.shuttercount.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -37,23 +46,38 @@ enum class Tab(val label: String, val title: String, val icon: ImageVector) {
 fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
     val c = LocalAppColors.current
     var noteFor by remember { mutableStateOf<Long?>(null) }
+    var settingsOpen by remember { mutableStateOf(false) }
+    BackHandler(enabled = settingsOpen) { settingsOpen = false }
     val addNote = { noteFor = vm.latestEntryId() }
 
     Scaffold(
         containerColor = c.paper,
         topBar = {
-            Text(
-                tab.title,
-                Modifier.statusBarsPadding().padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.headlineMedium, color = c.ink,
-            )
+            Row(
+                Modifier.fillMaxWidth().statusBarsPadding().padding(start = 12.dp, end = 8.dp, top = 12.dp, bottom = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (settingsOpen) {
+                    IconButton(onClick = { settingsOpen = false }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = c.ink) }
+                } else {
+                    Spacer(Modifier.width(12.dp))
+                }
+                Text(
+                    if (settingsOpen) "Settings" else tab.title,
+                    Modifier.weight(1f),
+                    style = MaterialTheme.typography.headlineMedium, color = c.ink,
+                )
+                if (!settingsOpen) {
+                    IconButton(onClick = { settingsOpen = true }) { Icon(Icons.Outlined.Settings, "Settings", tint = c.muted) }
+                }
+            }
         },
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
                 Tab.entries.forEach { t ->
                     NavigationBarItem(
-                        selected = tab == t,
-                        onClick = { onTab(t) },
+                        selected = tab == t && !settingsOpen,
+                        onClick = { settingsOpen = false; onTab(t) },
                         icon = { Icon(t.icon, null) },
                         label = { Text(t.label, style = MaterialTheme.typography.labelMedium) },
                         colors = NavigationBarItemDefaults.colors(
@@ -70,7 +94,7 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             Column {
-                when (tab) {
+                if (settingsOpen) SettingsScreen(vm) else when (tab) {
                     Tab.PHOTO -> PhotoScreen(vm, addNote)
                     Tab.USB -> UsbScreen(vm, addNote)
                     Tab.HISTORY -> HistoryScreen(vm)

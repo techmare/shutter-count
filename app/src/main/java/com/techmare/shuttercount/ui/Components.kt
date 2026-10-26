@@ -69,6 +69,7 @@ fun InstrumentPanel(
     caption: String,
     ratedLife: Int? = null,
     badge: String? = null,
+    showWear: Boolean = true,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val c = LocalAppColors.current
@@ -100,7 +101,7 @@ fun InstrumentPanel(
         Spacer(Modifier.height(8.dp))
         Text(caption, style = MaterialTheme.typography.bodyMedium, color = c.panelMuted)
 
-        if (count != null && ratedLife != null) {
+        if (count != null && ratedLife != null && showWear) {
             Spacer(Modifier.height(16.dp))
             WearScale(count, ratedLife)
             Spacer(Modifier.height(12.dp))
@@ -114,7 +115,7 @@ fun InstrumentPanel(
                     style = MaterialTheme.typography.bodyMedium, color = c.panelMuted,
                 )
             }
-        } else if (count != null) {
+        } else if (count != null && showWear) {
             Spacer(Modifier.height(10.dp))
             Text("Rated shutter life for this model isn't known, so wear can't be estimated.", style = MaterialTheme.typography.bodySmall, color = c.panelMuted)
         }
