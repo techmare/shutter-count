@@ -17,13 +17,22 @@ jobs:
 
       - name: Test
         working-directory: macos
-        run: swift test
+        run: |
+          set -o pipefail
+          if ! swift test 2>&1 | tee test.log; then
+            grep -E "error:|: failed|XCTAssert|fatal" test.log | sort -u | head -45 | while IFS= read -r l; do echo "::error::${l}"; done
+            exit 1
+          fi
 
       - name: Build universal app
         working-directory: macos
         run: |
           set -e
-          swift build -c release --arch arm64 --arch x86_64
+          set -o pipefail
+          if ! swift build -c release --arch arm64 --arch x86_64 2>&1 | tee build.log; then
+            grep -E "error:" build.log | sort -u | head -45 | while IFS= read -r l; do echo "::error::${l}"; done
+            exit 1
+          fi
           BIN="$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/ShutterCount"
           APP="Shutter Count.app"
           rm -rf "$APP"
