@@ -3,6 +3,6 @@
     <style name="Theme.ShutterCount" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/bg</item>
     </style>
-    <color name="bg">#FFFFF8F1</color>
+    <color name="bg">#FFE9EBEE</color>
     <color name="icon_bg">#FF1E1A14</color>
 </resources>

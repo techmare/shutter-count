@@ -3,7 +3,6 @@ package com.techmare.shuttercount.ui
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,21 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -37,78 +31,92 @@ import com.techmare.shuttercount.data.buildReport
 fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
     val state by vm.photo.collectAsState()
     val context = LocalContext.current
+    val c = LocalAppColors.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) vm.readPhoto(uri)
     }
     val pick = { picker.launch(arrayOf("image/*", "application/octet-stream")) }
 
     Column(
-        Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Button(onClick = pick, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-            Icon(Icons.Outlined.Image, null)
-            Spacer(Modifier.width(8.dp))
-            Text("Choose a photo (Nikon or Sony)")
-        }
-
         when (val s = state) {
             PhotoState.Idle -> {
-                StepsCard(
-                    "How to check",
+                InstrumentPanel(
+                    title = "No camera yet", titleDim = true, count = null,
+                    caption = "Pick a photo from a Nikon or Sony to read its count",
+                )
+                Button(onClick = pick, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Choose photo") }
+                Steps(
+                    "Before you start",
                     listOf(
-                        "Take a new photo with the camera (JPEG or RAW). Use the mechanical shutter, not silent mode.",
-                        "Copy the original file to this phone: card reader / OTG, or the camera's app set to \"Original\" size.",
-                        "Tap the button above and pick the file.",
+                        "Take a new photo with the camera, using the mechanical shutter (not silent mode).",
+                        "Copy the original file to this phone with a card reader, or the camera's app set to original size.",
+                        "Tap Choose photo and pick it.",
                     ),
                 )
-                NoticeCard(
-                    "Don't use photos sent by WhatsApp, Messenger or edited apps — they remove the data this app needs.",
-                    warning = false,
+                Note("Photos sent through WhatsApp or edited in an app lose the data this needs.", warning = false)
+                Note("Canon keeps its count inside the camera, not in photos. Use the USB tab.", warning = false)
+            }
+
+            PhotoState.Loading -> {
+                InstrumentPanel(
+                    title = "Reading photo…", titleDim = true, count = null, caption = "Looking for the shutter count",
+                    footer = {
+                        Spacer(Modifier.height(12.dp))
+                        CircularProgressIndicator(Modifier.size(22.dp), color = c.signal, strokeWidth = 2.5.dp)
+                    },
                 )
-                NoticeCard("Canon? Canon doesn't store the count in photos. Use the USB tab.", warning = false)
             }
-            PhotoState.Loading -> Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+
             is PhotoState.Done -> {
                 val r = s.reading
                 val count = r.shutterCount
-                if (count != null) {
-                    CountCard(r.displayName, count, r.ratedLife, s.previous)
-                } else {
-                    NoticeCard(r.problem ?: "No shutter count found in this file.", warning = true)
-                }
-                r.warnings.forEach { NoticeCard(it, warning = true) }
+                InstrumentPanel(
+                    title = if (r.make == null && count == null) "No count found" else r.displayName,
+                    titleDim = count == null,
+                    trailing = r.serial?.let { "S/N $it" },
+                    count = count,
+                    caption = if (count != null) "shutter actuations" else "This file doesn't contain a shutter count",
+                    ratedLife = r.ratedLife,
+                )
+                if (count == null) Note(r.problem ?: "No shutter count found in this file.", warning = true)
+                r.warnings.forEach { Note(it, warning = true) }
 
                 val rows = buildList {
+                    r.dateTaken?.let { add("Photo taken" to prettyExifDate(it)) }
+                    if (count != null) previousLine(count, s.previous)?.let { add(it) }
                     s.fileName?.let { add("File" to it) }
-                    if (r.make != null) add("Camera" to listOfNotNull(r.make, r.model).joinToString(" "))
-                    r.serial?.let { add("Serial no." to it) }
-                    r.dateTaken?.let { add("Photo taken" to it) }
                     r.software?.let { add("Software" to it) }
                     addAll(r.details)
                 }
-                DetailsCard(rows)
-                if (count != null && r.dateTaken != null) {
-                    NoticeCard("The count is from when this photo was taken (${r.dateTaken}). For the current count, use a photo taken just now.", warning = false)
-                }
+                DetailRows(rows)
 
                 if (count != null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = { shareText(context, buildReport(r.displayName, r.serial, count, r.ratedLife, "photo (EXIF)")) },
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Icon(Icons.Outlined.Share, null, Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text("Share report")
-                        }
-                        OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f)) { Text("Add note") }
+                            modifier = Modifier.weight(1f).height(48.dp),
+                        ) { Text("Share report") }
+                        OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
                     }
+                    if (r.dateTaken != null) {
+                        Note("This is the count when the photo was taken. For today's count, use a photo taken just now.", warning = false)
+                    }
+                    TextButton(onClick = pick) { Text("Check another photo") }
+                } else {
+                    Button(onClick = pick, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Choose another photo") }
                 }
-                OutlinedButton(onClick = pick, modifier = Modifier.fillMaxWidth()) { Text("Check another photo") }
             }
         }
+        Spacer(Modifier.height(8.dp))
     }
+}
+
+/** "2025:03:18 14:55:02" -> "18/03/2025 14:55" */
+private fun prettyExifDate(s: String): String {
+    val m = Regex("^(\\d{4}):(\\d{2}):(\\d{2}) (\\d{2}):(\\d{2})").find(s) ?: return s
+    val (y, mo, d, h, mi) = m.destructured
+    return "$d/$mo/$y $h:$mi"
 }

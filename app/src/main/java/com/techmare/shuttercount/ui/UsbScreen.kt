@@ -1,7 +1,6 @@
 package com.techmare.shuttercount.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,16 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.Usb
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -29,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -44,118 +37,122 @@ import com.techmare.shuttercount.ptp.CanonMethod
 fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
     val state by vm.usb.collectAsState()
     val context = LocalContext.current
+    val c = LocalAppColors.current
     var confirmAdvanced by remember { mutableStateOf(false) }
 
     Column(
-        Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        val cameraName = when (val s = state) {
-            is UsbState.Connected -> s.name
-            is UsbState.Reading -> s.name
-            is UsbState.Done -> s.reading.model
-            else -> null
-        }
-        Button(
-            onClick = { vm.readCanon(allowAdvanced = false) },
-            enabled = state !is UsbState.Reading,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-        ) {
-            Icon(Icons.Outlined.Usb, null)
-            Spacer(Modifier.width(8.dp))
-            Text(if (cameraName != null) "Read $cameraName" else "Read Canon over USB")
-        }
-
         when (val s = state) {
             UsbState.NoCamera -> {
-                StepsCard(
-                    "Connect a Canon camera",
+                InstrumentPanel(
+                    title = "No camera connected", titleDim = true, count = null,
+                    caption = "Plug in a Canon with a USB cable to read its count",
+                )
+                Steps(
+                    "Connect a Canon",
                     listOf(
-                        "Turn OFF the camera's Wi-Fi / Bluetooth (it blocks the USB port).",
-                        "Connect the camera to this phone with a USB cable and an OTG adapter if needed.",
-                        "Turn the camera on (photo mode, not movie mode).",
-                        "Tap Read and allow access when Android asks.",
+                        "Turn off the camera's Wi-Fi and Bluetooth. They block the USB port.",
+                        "Connect it to this phone with a USB cable, plus an OTG adapter if needed.",
+                        "Turn the camera on in photo mode, not movie mode.",
+                        "Tap Read camera and allow access when Android asks.",
                     ),
                 )
-                OutlinedButton(onClick = { vm.refreshUsb() }, modifier = Modifier.fillMaxWidth()) { Text("I've connected it") }
-                NoticeCard("Nikon or Sony? Use the Photo tab — it's faster and works on almost every model.", warning = false)
+                Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                    Text("Read camera")
+                }
+                Note("Nikon or Sony? The Photo tab is quicker and works on almost every model.", warning = false)
             }
-            is UsbState.Connected -> NoticeCard("${s.name} is connected. Tap Read.", warning = false)
-            is UsbState.Reading -> Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.height(12.dp))
-                    Text("Reading ${s.name}… don't unplug it.")
+
+            is UsbState.Connected -> {
+                InstrumentPanel(title = s.name, count = null, caption = "Connected and ready")
+                Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                    Text("Read camera")
+                }
+                Note("Keep the camera on and plugged in until the count appears.", warning = false)
+            }
+
+            is UsbState.Reading -> {
+                InstrumentPanel(
+                    title = s.name, count = null, caption = "Reading… keep the camera plugged in",
+                    footer = {
+                        Spacer(Modifier.height(12.dp))
+                        CircularProgressIndicator(Modifier.size(22.dp), color = c.signal, strokeWidth = 2.5.dp)
+                    },
+                )
+            }
+
+            is UsbState.Error -> {
+                InstrumentPanel(title = "Couldn't read the camera", titleDim = true, count = null, caption = "Nothing was changed on the camera")
+                Note(s.message, warning = true)
+                Steps(
+                    "Try this",
+                    listOf(
+                        "Turn the camera's Wi-Fi off and close Canon Camera Connect.",
+                        "Unplug, switch the camera off and on, and plug it in again.",
+                        "Try another cable. Some cables only charge.",
+                    ),
+                )
+                Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                    Text("Read camera again")
                 }
             }
-            is UsbState.Error -> {
-                NoticeCard(s.message, warning = true)
-                StepsCard(
-                    "If it keeps failing",
-                    listOf(
-                        "Turn the camera's Wi-Fi off and close the Canon Camera Connect app.",
-                        "Unplug, turn the camera off and on, plug in again.",
-                        "Try another cable — some cables only charge.",
-                    ),
-                )
-            }
+
             is UsbState.Done -> {
                 val r = s.reading
                 val count = r.shutterCount
-                if (count != null) {
-                    CountCard(
-                        r.model, count, r.ratedLife, s.previous,
-                        badge = if (r.method == CanonMethod.FACTORY && !r.confirmed) "Experimental reading" else null,
-                    )
-                } else {
-                    NoticeCard(r.problem ?: "No shutter count was returned.", warning = !r.canTryAdvanced)
-                }
-                if (r.canTryAdvanced) {
-                    Button(onClick = { confirmAdvanced = true }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Try advanced read (experimental)")
+                val experimental = r.method == CanonMethod.FACTORY && !r.confirmed
+                InstrumentPanel(
+                    title = r.model,
+                    trailing = r.serial?.let { "S/N $it" },
+                    count = count,
+                    caption = if (count != null) "shutter actuations" else "No count yet",
+                    ratedLife = r.ratedLife,
+                    badge = if (experimental) "Experimental reading" else null,
+                )
+
+                if (count == null) {
+                    Note(r.problem ?: "The camera didn't return a count.", warning = !r.canTryAdvanced)
+                    if (r.canTryAdvanced) {
+                        Button(onClick = { confirmAdvanced = true }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                            Text("Try advanced read")
+                        }
                     }
                 }
-                r.notes.forEach { NoticeCard(it, warning = !r.confirmed) }
+                r.notes.forEach { Note(it, warning = experimental) }
 
                 val rows = buildList {
-                    r.serial?.let { add("Serial no." to it) }
-                    r.firmware?.let { add("Firmware" to it) }
-                    r.method?.let { add("Method" to it.label) }
+                    if (count != null) previousLine(count, s.previous)?.let { add(it) }
                     r.counters.drop(1).forEach { add(it.label to formatCount(it.value)) }
+                    r.method?.let { add("Method" to it.label) }
+                    r.firmware?.let { add("Firmware" to it) }
                 }
-                DetailsCard(rows)
-
-                val raw = r.counters.mapNotNull { c -> c.raw?.let { "${c.label}: $it" } }
-                if (raw.isNotEmpty()) {
-                    Text("Raw data (for checking)", style = MaterialTheme.typography.labelMedium)
-                    Text(raw.joinToString("\n"), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
-                }
+                DetailRows(rows)
 
                 if (count != null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = {
-                                shareText(context, buildReport(
-                                    r.model, r.serial, count, r.ratedLife, "USB (lecture directe)",
-                                    experimental = r.method == CanonMethod.FACTORY && !r.confirmed,
-                                ))
+                                shareText(context, buildReport(r.model, r.serial, count, r.ratedLife, "USB (lecture directe)", experimental = experimental))
                             },
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Icon(Icons.Outlined.Share, null, Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text("Share report")
-                        }
-                        OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f)) { Text("Add note") }
+                            modifier = Modifier.weight(1f).height(48.dp),
+                        ) { Text("Share report") }
+                        OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
                     }
-                    if (r.method == CanonMethod.FACTORY) {
-                        OutlinedButton(onClick = { vm.readCanon(allowAdvanced = true) }, modifier = Modifier.fillMaxWidth()) {
-                            Text("Read again")
-                        }
+                    TextButton(onClick = { vm.readCanon(allowAdvanced = r.method == CanonMethod.FACTORY) }) { Text("Read again") }
+                }
+
+                val raw = r.counters.mapNotNull { ct -> ct.raw?.let { "${ct.label}\n$it" } }
+                if (raw.isNotEmpty()) {
+                    Column(Modifier.padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Raw data from the camera", style = MaterialTheme.typography.titleSmall, color = c.muted)
+                        Text(raw.joinToString("\n"), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall, color = c.muted)
                     }
                 }
             }
         }
+        Spacer(Modifier.height(8.dp))
     }
 
     if (confirmAdvanced) {
@@ -164,9 +161,8 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
             title = { Text("Advanced read") },
             text = {
                 Text(
-                    "This asks the camera's shutter unit for its counters using a read-only method that is confirmed on the EOS 5D Mark IV. " +
-                        "It only reads — it never writes to the camera. On other models the numbers may be wrong, so verify: " +
-                        "take exactly 5 photos, read again, and check it went up by 5.\n\n" +
+                    "This asks the camera's shutter unit for its counters. It only reads and never writes to the camera.\n\n" +
+                        "It's confirmed on the EOS 5D Mark IV. On other models, check it: read, take exactly 5 photos, read again, and the count should go up by 5.\n\n" +
                         "If the camera shows an error, take the battery out and put it back.",
                 )
             },
