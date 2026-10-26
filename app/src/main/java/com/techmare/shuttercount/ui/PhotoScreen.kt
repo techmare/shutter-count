@@ -59,7 +59,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     ),
                 )
                 Note("Photos sent through WhatsApp or edited in an app lose the data this needs.", warning = false)
-                Note("Canon: the R50, R8, R6, R6 Mark II and R5 work from a photo here. Older Canons (DIGIC 5 and before) use the USB tab.", warning = false)
+                Note("Canon: the R50, R100, R8, R6, R6 Mark II and R5 work from a photo here. Older Canons (DIGIC 5 and before) use the USB tab.", warning = false)
             }
 
             PhotoState.Loading -> {

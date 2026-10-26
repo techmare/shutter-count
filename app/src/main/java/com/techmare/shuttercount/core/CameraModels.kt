@@ -117,6 +117,8 @@ object CameraModels {
         return when {
             Regex("\\bEOS (R6m2|R6 Mark II|R8|R50)$").containsMatchIn(m) -> 0x0d29
             Regex("\\bEOS R[56]$").containsMatchIn(m) -> 0x0af1
+            // found by comparing two R100 photos 5 shots apart (623 -> 628)
+            Regex("\\bEOS R100$").containsMatchIn(m) -> 0x0acf
             else -> null
         }
     }
