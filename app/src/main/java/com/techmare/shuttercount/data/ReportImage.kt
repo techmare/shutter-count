@@ -171,7 +171,6 @@ fun renderReport(context: Context, r: ReportData): Bitmap {
     }
     val notes = buildList {
         if (r.includesElectronic) add("Le compteur inclut les déclenchements en obturateur électronique.")
-        if (r.experimental) add("Lecture expérimentale.")
     }
     val labelPaint = paint(regular, 32f, MUTED)
     val valuePaint = paint(medium, 34f, TEXT)
