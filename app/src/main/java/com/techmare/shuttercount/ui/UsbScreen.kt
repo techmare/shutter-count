@@ -169,9 +169,9 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
             title = { Text("Advanced read") },
             text = {
                 Text(
-                    "This asks the camera's shutter unit for its counters. It only reads and never writes to the camera.\n\n" +
-                        "It's confirmed on the EOS 5D Mark IV. On other models, check it: read, take exactly 5 photos, read again, and the count should go up by 5. If the camera doesn't answer, nothing happens.\n\n" +
-                        "If the camera shows an error, take the battery out and put it back.",
+                    "This asks the camera's shutter unit for its counters. The commands only read, but a camera can still stop with Err 70 if it doesn't handle them well.\n\n" +
+                        "It's confirmed on the EOS 5D Mark IV. On other models, check it: read, take exactly 5 photos, read again, and the count should go up by 5.\n\n" +
+                        "If that happens, take the battery out for 30 seconds and put it back. Only use this on cameras you can afford to restart.",
                 )
             },
             confirmButton = {

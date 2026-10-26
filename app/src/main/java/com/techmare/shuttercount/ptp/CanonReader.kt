@@ -45,6 +45,7 @@ class CanonReader(private val session: PtpSession) {
 
     /** Step-by-step log of what was tried and how the camera answered, for the diagnostic report. */
     private val log = ArrayList<String>()
+    private var listedFactory = false
 
     fun read(usbProductName: String?, allowAdvanced: Boolean): CanonReading {
         log.clear()
@@ -83,13 +84,18 @@ class CanonReader(private val session: PtpSession) {
 
             // 3. Experimental MPU route. Some bodies answer it without listing the opcodes.
             val listed = info.operations.contains(OP_FACTORY_SEND) && info.operations.contains(OP_FACTORY_RECV)
+            listedFactory = listed
             log += "Shutter-unit channel 9052/9053: " + if (listed) "listed" else "not listed"
+            // Never send these commands to a camera that doesn't list them: an EOS R50 that
+            // didn't list them showed Err 70 when they were sent anyway.
+            if (!listed) {
+                return result(emptyList(), null,
+                    problem = "This Canon doesn't offer a way to read its shutter count over USB that this app can use safely. " +
+                        "For this model, ask a Canon service centre or use a tool that officially supports it.")
+            }
             if (!allowAdvanced) {
                 return result(emptyList(), null,
-                    problem = if (listed)
-                        "This is a newer Canon (DIGIC 6 or later). The standard counter isn't available, but the count can be read from the shutter unit's memory with an experimental method."
-                    else
-                        "The standard counter isn't available on this Canon. The experimental method isn't listed by this camera, but some newer Canons answer it anyway. It only reads, so it's safe to try.",
+                    problem = "This is a newer Canon (DIGIC 6 or later). The standard counter isn't available, but the count can be read from the shutter unit's memory with an experimental method.",
                     canTryAdvanced = true)
             }
 
@@ -145,6 +151,7 @@ class CanonReader(private val session: PtpSession) {
 
     private fun readFactory(): List<CanonCounter> {
         val out = ArrayList<CanonCounter>()
+        check(listedFactory) { "Shutter-unit channel not listed by this camera" }
         if (!sendFactory(FactoryCommand("MonOpen"), expectReply = false)) return out
         try {
             for ((label, address) in MPU_COUNTERS) {
