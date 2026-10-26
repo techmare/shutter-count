@@ -46,7 +46,7 @@ private const val HEADER = 12
 class PtpSession(
     private val transport: PtpTransport,
     private val readChunk: Int = 16384,
-    private val timeoutMs: Int = 5000,
+    private val timeoutMs: Int = 15000,
 ) {
     private var transactionId = 0L
     private var pending = ByteArray(0)

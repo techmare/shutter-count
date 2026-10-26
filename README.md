@@ -9,6 +9,10 @@ Android app to check a camera's shutter count (number of actuations) — for buy
 | **Canon R50, R100, R8, R6, R6 Mark II, R5** | Pick a photo (JPEG / CR3) | Count includes electronic-shutter shots (offsets from ExifTool). |
 | **Canon** | USB cable (OTG) | Older bodies (DIGIC 5 and earlier) via the standard counter. Newer bodies via an experimental method, only on cameras that list it (confirmed on the EOS 5D Mark IV). Not supported: EOS R50 (sending the commands anyway caused Err 70, cleared by a battery pull). |
 
+**Over USB:** plug in any Nikon, Sony or Canon R body and the app reads the count from the newest photo on the card (standard photo-transfer commands only). Older Canons are read from the camera's own counter.
+
+**Seen before:** when a serial number is already in History, the app shows the earlier check and warns if the count went down.
+
 **Download:** [latest APK](../../releases/latest/download/ShutterCount.apk) — open it on the phone to install or update.
 
 ## Tips

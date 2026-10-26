@@ -32,17 +32,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/** This camera was checked before: the latest earlier check, how many checks in total, and the newest note. */
+data class Seen(val last: HistoryEntry, val times: Int, val note: String?)
+
 sealed interface PhotoState {
     data object Idle : PhotoState
     data object Loading : PhotoState
-    data class Done(val reading: PhotoReading, val fileName: String?, val previous: HistoryEntry?) : PhotoState
+    data class Done(val reading: PhotoReading, val fileName: String?, val seen: Seen?) : PhotoState
 }
 
 sealed interface UsbState {
     data object NoCamera : UsbState
     data class Connected(val name: String) : UsbState
     data class Reading(val name: String) : UsbState
-    data class Done(val reading: CanonReading, val previous: HistoryEntry?) : UsbState
+    data class Done(val reading: CanonReading, val seen: Seen?) : UsbState
     data class Error(val message: String) : UsbState
 }
 
@@ -142,9 +145,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 )
                 return@launch
             }
-            var previous: HistoryEntry? = null
+            var previous: Seen? = null
             if (result.shutterCount != null) {
-                previous = previousFor(result.serial, result.displayName)
+                previous = seenBefore(result.serial)
                 addHistory(HistoryEntry(
                     id = System.nanoTime(), time = System.currentTimeMillis(), camera = result.displayName,
                     serial = result.serial, count = result.shutterCount, ratedLife = result.ratedLife, ratedOfficial = result.ratedOfficial, source = "Photo",
@@ -194,10 +197,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             }
             outcome.fold(
                 onSuccess = { reading ->
-                    var previous: HistoryEntry? = null
+                    var previous: Seen? = null
                     val count = reading.shutterCount
                     if (count != null) {
-                        previous = previousFor(reading.serial, reading.model)
+                        previous = seenBefore(reading.serial)
                         addHistory(HistoryEntry(
                             id = System.nanoTime(), time = System.currentTimeMillis(), camera = reading.model,
                             serial = reading.serial, count = count, ratedLife = reading.ratedLife, ratedOfficial = reading.ratedOfficial, source = "USB",
@@ -222,10 +225,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     // ----------------------------------------------------------- history
 
-    private fun previousFor(serial: String?, camera: String): HistoryEntry? =
-        _history.value.firstOrNull { e ->
-            if (!serial.isNullOrBlank()) e.serial == serial else e.camera == camera && e.serial.isNullOrBlank()
-        }
+    /** Earlier checks of the same body, matched by serial number only (model names aren't unique). */
+    private fun seenBefore(serial: String?): Seen? {
+        if (serial.isNullOrBlank()) return null
+        val earlier = _history.value.filter { it.serial == serial }
+        return earlier.firstOrNull()?.let { Seen(it, earlier.size, earlier.firstOrNull { e -> e.note.isNotBlank() }?.note) }
+    }
 
     private fun addHistory(entry: HistoryEntry) {
         val list = listOf(entry) + _history.value

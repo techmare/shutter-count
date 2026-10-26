@@ -311,6 +311,46 @@ fun Steps(title: String, steps: List<String>) {
     }
 }
 
+/**
+ * "Seen before" banner: this serial number is already in History. A count lower than last
+ * time is flagged, since it means a replaced shutter, a reset counter or a different body.
+ */
+@Composable
+fun SeenBefore(seen: com.techmare.shuttercount.Seen, count: Long) {
+    val c = LocalAppColors.current
+    val diff = count - seen.last.count
+    val lower = diff < 0
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+            .background(if (lower) c.high.copy(alpha = 0.14f) else c.signal.copy(alpha = 0.16f))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        Text(
+            if (lower) "Count is lower than last time" else "Seen before",
+            style = MaterialTheme.typography.titleMedium, color = c.ink,
+        )
+        Text(
+            buildString {
+                append(if (seen.times == 1) "Checked once before" else "Checked ${seen.times} times before")
+                append(": ${formatDate(seen.last.time)} at ${formatCount(seen.last.count)} shots")
+                if (diff > 0) append(", ${formatCount(diff)} since then")
+                if (diff == 0L) append(", no new shots since")
+                append(".")
+            },
+            style = MaterialTheme.typography.bodyMedium, color = c.ink,
+        )
+        if (lower) {
+            Text(
+                "It was ${formatCount(seen.last.count)} and is now ${formatCount(count)}. The shutter may have been replaced or the counter reset, or this is a different camera.",
+                style = MaterialTheme.typography.bodyMedium, color = c.ink,
+            )
+        }
+        if (!seen.note.isNullOrBlank()) {
+            Text("Note: ${seen.note}", style = MaterialTheme.typography.bodyMedium, color = c.muted)
+        }
+    }
+}
+
 /** "Last checked …" line comparing with the previous reading of the same camera. */
 fun previousLine(count: Long, previous: HistoryEntry?): Pair<String, String>? {
     previous ?: return null

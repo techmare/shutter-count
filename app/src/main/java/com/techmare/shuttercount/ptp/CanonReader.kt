@@ -2,6 +2,7 @@ package com.techmare.shuttercount.ptp
 
 import com.techmare.shuttercount.core.Brand
 import com.techmare.shuttercount.core.CameraModels
+import com.techmare.shuttercount.core.PhotoShutterReader
 
 data class CanonCounter(val label: String, val value: Long, val raw: String? = null)
 
@@ -9,6 +10,7 @@ enum class CanonMethod(val label: String) {
     PROPERTY("Standard counter (PTP property)"),
     EVENT("Standard counter (EOS event)"),
     FACTORY("Shutter unit memory (experimental)"),
+    PHOTO("Newest photo on the card"),
 }
 
 data class CanonReading(
@@ -25,6 +27,11 @@ data class CanonReading(
     /** True when standard methods failed but the experimental route can still be tried. */
     val canTryAdvanced: Boolean,
     val ratedOfficial: Boolean = false,
+    /** For [CanonMethod.PHOTO]: which file was read and when it was taken. */
+    val photoFile: String? = null,
+    val photoDate: String? = null,
+    /** The counter includes electronic-shutter shots (Canon R bodies read from a photo). */
+    val includesElectronic: Boolean = false,
     /** What was tried and how the camera answered. */
     val diagnostics: String = "",
 ) {
@@ -71,9 +78,11 @@ class CanonReader(private val session: PtpSession) {
                 CameraModels.rating(Brand.CANON, model)?.official ?: false, log.joinToString("\n"),
             )
 
-            if (!info.manufacturer.contains("Canon", ignoreCase = true) && info.vendorExtensionId != 11L) {
-                return result(emptyList(), null,
-                    problem = "This is a ${info.manufacturer.ifBlank { "non-Canon" }} camera. Over USB this app reads Canon only. For Nikon and Sony, use the Photo tab.")
+            // Nikon, Sony and Canon R bodies keep the count in their photos: read the newest one
+            // over USB with standard transfer commands instead of any vendor command.
+            val isCanon = info.manufacturer.contains("Canon", ignoreCase = true) || info.vendorExtensionId == 11L
+            if (!isCanon || CameraModels.canonPhotoOffset(model) != null) {
+                return readNewestPhoto(info, model, serial, firmware)
             }
 
             // 1. Standard property
@@ -131,6 +140,43 @@ class CanonReader(private val session: PtpSession) {
     }
 
     private fun hex(code: Int) = "%04X".format(code)
+
+    private fun readNewestPhoto(info: DeviceInfo, usbModel: String, usbSerial: String?, firmware: String?): CanonReading {
+        val pull = PhotoPull(session, info.operations, log)
+        fun fail(problem: String) = CanonReading(
+            usbModel, usbSerial, firmware, emptyList(), CanonMethod.PHOTO, true, null, emptyList(), problem, false,
+            diagnostics = log.joinToString("\n"),
+        )
+        var got = try { pull.latest() } catch (e: PtpException) { log += "Photo transfer: ${e.message}"; null }
+            ?: return fail("No photo found on the camera's card. Take a photo, then read again.")
+        var reading = PhotoShutterReader.read(got.bytes)
+        if (reading.shutterCount == null && got.partial) {
+            // the camera data wasn't in the first part of the file: fetch all of it
+            try { pull.fullOf(got) } catch (e: PtpException) { null }?.let { got = it; reading = PhotoShutterReader.read(it.bytes) }
+        }
+        val count = reading.shutterCount
+        log += "Photo read: ${reading.displayName}, count ${count ?: "none"}${reading.problem?.let { ", $it" } ?: ""}"
+        val date = got.captureDate?.let { d ->
+            Regex("^(\\d{4})(\\d{2})(\\d{2})T(\\d{2})(\\d{2})").find(d)?.destructured?.let { (y, mo, dd, h, mi) -> "$dd/$mo/$y $h:$mi" } ?: d
+        } ?: reading.dateTaken
+        return CanonReading(
+            model = if (reading.make != null) reading.displayName else usbModel,
+            serial = reading.serial ?: usbSerial,
+            firmware = firmware,
+            counters = count?.let { listOf(CanonCounter("Shutter actuations", it)) } ?: emptyList(),
+            method = CanonMethod.PHOTO,
+            confirmed = true,
+            ratedLife = reading.ratedLife,
+            notes = reading.warnings,
+            problem = if (count == null) reading.problem ?: "No shutter count found in the newest photo." else null,
+            canTryAdvanced = false,
+            ratedOfficial = reading.ratedOfficial,
+            photoFile = got.fileName,
+            photoDate = date,
+            includesElectronic = reading.brand == Brand.CANON || reading.details.any { it.second.contains("includes electronic", true) },
+            diagnostics = log.joinToString("\n"),
+        )
+    }
 
     private fun readProperty(): Long? = try {
         val r = session.transact(OP_GET_DEVICE_PROP_VALUE, listOf(PROP_SHUTTER_COUNTER.toLong()))

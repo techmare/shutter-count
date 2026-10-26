@@ -38,7 +38,7 @@ import com.techmare.shuttercount.MainViewModel
 
 enum class Tab(val label: String, val title: String, val icon: ImageVector) {
     PHOTO("Photo", "Shutter Count", Icons.Outlined.PhotoCamera),
-    USB("USB", "Canon over USB", Icons.Outlined.Usb),
+    USB("USB", "Camera over USB", Icons.Outlined.Usb),
     HISTORY("History", "History", Icons.Outlined.History),
 }
 

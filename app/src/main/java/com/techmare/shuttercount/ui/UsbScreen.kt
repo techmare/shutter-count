@@ -51,21 +51,22 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
             UsbState.NoCamera -> {
                 InstrumentPanel(
                     title = "No camera connected", titleDim = true, count = null,
-                    caption = "Plug in a Canon with a USB cable to read its count",
+                    caption = "Plug in a Nikon, Sony or Canon with a USB cable",
                 )
                 Steps(
-                    "Connect a Canon",
+                    "Connect a camera",
                     listOf(
+                        "Take one photo with the camera first. Nikon, Sony and Canon R models are read from the newest photo on the card.",
                         "Turn off the camera's Wi-Fi and Bluetooth. They block the USB port.",
                         "Connect it to this phone with a USB cable, plus an OTG adapter if needed.",
-                        "Turn the camera on in photo mode, not movie mode.",
+                        "Turn the camera on. On Sony, set USB Connection to MTP in the menu.",
                         "Tap Read camera and allow access when Android asks.",
                     ),
                 )
                 Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                     Text("Read camera")
                 }
-                Note("Nikon, Sony, or a Canon R50, R100, R8, R6 or R5? Use the Photo tab instead.", warning = false)
+                Note("Older Canons (DIGIC 5 and before) are read from the camera's own counter, so no photo is needed.", warning = false)
             }
 
             is UsbState.Connected -> {
@@ -117,6 +118,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     showWear = showWear,
                 )
 
+                if (count != null) s.seen?.let { SeenBefore(it, count) }
                 if (count == null) {
                     Note(r.problem ?: "The camera didn't return a count.", warning = !r.canTryAdvanced)
                     if (r.canTryAdvanced) {
@@ -128,18 +130,26 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 r.notes.forEach { Note(it, warning = experimental) }
 
                 val rows = buildList {
-                    if (count != null) previousLine(count, s.previous)?.let { add(it) }
+                    r.photoFile?.let { add("Photo" to it) }
+                    r.photoDate?.let { add("Photo taken" to it) }
                     r.counters.drop(1).forEach { add(it.label to formatCount(it.value)) }
                     r.method?.let { add("Method" to it.label) }
                     r.firmware?.let { add("Firmware" to it) }
                 }
                 DetailRows(rows)
+                if (count != null && r.method == CanonMethod.PHOTO) {
+                    Note("This is the count when that photo was taken. Take a new photo just before reading to get today's count.", warning = false)
+                }
 
                 if (count != null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = {
-                                shareReport(context, ReportData(r.model, r.serial, count, r.ratedLife.takeIf { reportWear }, "USB (lecture directe)", experimental = experimental, ratedOfficial = r.ratedOfficial))
+                                shareReport(context, ReportData(
+                                    r.model, r.serial, count, r.ratedLife.takeIf { reportWear },
+                                    if (r.method == CanonMethod.PHOTO) "USB (dernière photo)" else "USB (lecture directe)",
+                                    experimental = experimental, includesElectronic = r.includesElectronic, ratedOfficial = r.ratedOfficial,
+                                ))
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }

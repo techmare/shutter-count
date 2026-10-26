@@ -87,12 +87,12 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     ratedOfficial = r.ratedOfficial,
                     showWear = showWear,
                 )
+                if (count != null) s.seen?.let { SeenBefore(it, count) }
                 if (count == null) Note(r.problem ?: "No shutter count found in this file.", warning = true)
                 r.warnings.forEach { Note(it, warning = true) }
 
                 val rows = buildList {
                     r.dateTaken?.let { add("Photo taken" to prettyExifDate(it)) }
-                    if (count != null) previousLine(count, s.previous)?.let { add(it) }
                     s.fileName?.let { add("File" to it) }
                     r.software?.let { add("Software" to it) }
                     addAll(r.details)
