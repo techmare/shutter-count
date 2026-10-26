@@ -204,8 +204,8 @@ final class LegacyCameraManager: NSObject {
             file.requestReadData(atOffset: 0, length: off_t(length)) { data, err in done(data, err) }
         } else {
             pendingRead = done
-            camera.requestReadData(fromFile: file, atOffset: 0, length: off_t(length), readDelegate: self,
-                                   didRead: #selector(didReadData(_:fromFile:error:contextInfo:)), contextInfo: nil)
+            camera.requestReadData(from: file, atOffset: 0, length: off_t(length), readDelegate: self,
+                                   didReadDataSelector: #selector(didReadData(_:fromFile:error:contextInfo:)), contextInfo: nil)
         }
     }
 

@@ -120,7 +120,7 @@ final class ResultPresenter: NSObject, NSTextFieldDelegate {
 
             let share = button("Share…", self, #selector(share(_:)))
             shareButton = share
-            let row = NSStackView(views: [button("Save Report…", self, #selector(save)), button("Copy Report", self, #selector(copy)), share])
+            let row = NSStackView(views: [button("Save Report…", self, #selector(save)), button("Copy Report", self, #selector(copyReport)), share])
             row.spacing = 10
             s.add(row, fill: false)
             s.add(label("The report is a French image for your customer, without shop branding.", Style.text(12), Style.muted), fill: false)
@@ -138,6 +138,6 @@ final class ResultPresenter: NSObject, NSTextFieldDelegate {
                            official: r.ratedOfficial, method: r.method, includesElectronic: r.includesElectronic)
     }
     @objc func save() { if let d = report { Report.saveAs(d, window: NSApp.keyWindow) } }
-    @objc func copy() { if let d = report { Report.copy(d) } }
+    @objc func copyReport() { if let d = report { Report.copy(d) } }
     @objc func share(_ sender: NSButton) { if let d = report { Report.share(d, from: sender) } }
 }
