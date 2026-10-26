@@ -47,7 +47,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
             PhotoState.Idle -> {
                 InstrumentPanel(
                     title = "No camera yet", titleDim = true, count = null,
-                    caption = "Pick a photo from a Nikon or Sony to read its count",
+                    caption = "Pick a photo from a Nikon, Sony or Canon R to read its count",
                 )
                 Button(onClick = pick, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Choose photo") }
                 Steps(
@@ -59,7 +59,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     ),
                 )
                 Note("Photos sent through WhatsApp or edited in an app lose the data this needs.", warning = false)
-                Note("Canon keeps its count inside the camera, not in photos. Use the USB tab.", warning = false)
+                Note("Canon: the R50, R8, R6, R6 Mark II and R5 work from a photo here. Older Canons (DIGIC 5 and before) use the USB tab.", warning = false)
             }
 
             PhotoState.Loading -> {

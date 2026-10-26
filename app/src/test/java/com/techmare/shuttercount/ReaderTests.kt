@@ -37,6 +37,29 @@ class ReaderTests {
         return bb.array()
     }
 
+    private fun canonTiff(model: String, offset: Int, count: Long): ByteArray {
+        val bb = ByteBuffer.allocate(16384).order(ByteOrder.LITTLE_ENDIAN)
+        fun entry(tag: Int, type: Int, n: Int, v: Int) {
+            bb.putShort(tag.toShort()); bb.putShort(type.toShort()); bb.putInt(n); bb.putInt(v)
+        }
+        bb.put("II".toByteArray()); bb.putShort(42); bb.putInt(8)
+        bb.position(8); bb.putShort(3)
+        entry(0x10F, 2, 6, 200); entry(0x110, 2, model.length + 1, 220); entry(0x8769, 4, 1, 300); bb.putInt(0)
+        bb.position(200); bb.put("Canon\u0000".toByteArray())
+        bb.position(220); bb.put((model + "\u0000").toByteArray())
+        bb.position(300); bb.putShort(1); entry(0x927C, 7, 30, 400); bb.putInt(0)
+        bb.position(400); bb.putShort(2); entry(0x000C, 4, 1, 123456789); entry(0x000D, 7, offset + 64, 1000); bb.putInt(0)
+        bb.position(1000 + offset); bb.putInt(count.toInt())
+        return bb.array()
+    }
+
+    @Test fun canonRPhotos() {
+        assertEquals(12345L, PhotoShutterReader.read(canonTiff("Canon EOS R50", 0x0d29, 12345)).shutterCount)
+        assertEquals(777L, PhotoShutterReader.read(canonTiff("Canon EOS R8", 0x0d29, 777)).shutterCount)
+        assertEquals(45678L, PhotoShutterReader.read(canonTiff("Canon EOS R6", 0x0af1, 45678)).shutterCount)
+        assertNull(PhotoShutterReader.read(canonTiff("Canon EOS 5D Mark IV", 0x0d29, 5)).shutterCount)
+    }
+
     @Test fun cipherRoundTrip() {
         val all = ByteArray(256) { it.toByte() }
         assertTrue(SonyCipher.decipher(SonyCipher.encipher(all)).contentEquals(all))

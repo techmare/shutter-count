@@ -34,6 +34,7 @@ object PhotoShutterReader {
     private const val TAG_BODY_SERIAL = 0xA431
 
     fun read(data: ByteArray): PhotoReading {
+        if (isCr3(data)) return readCr3(data)
         val tiffStart = findTiffStart(data)
             ?: return failure("This file has no camera data (EXIF). Use the original JPEG or RAW file straight from the camera.")
 
@@ -69,16 +70,87 @@ object PhotoShutterReader {
         return when (brand) {
             Brand.NIKON -> readNikon(ctx, makerNote, warnings)
             Brand.SONY -> readSony(ctx, makerNote, warnings)
-            Brand.CANON -> ctx.result(
-                null, warnings = warnings,
-                problem = "Canon cameras don't save the shutter count inside photos. Connect the camera with a USB cable and use the USB tab.",
-            )
+            Brand.CANON -> readCanon(ctx, makerNote, warnings)
             Brand.OTHER -> ctx.result(
                 null, warnings = warnings,
                 problem = if (make == null) "This photo has no camera make. It may come from a phone, an editor or a messaging app."
-                else "$make cameras are not supported. This app reads Nikon and Sony photos, and Canon over USB.",
+                else "$make cameras are not supported. This app reads Nikon, Sony and recent Canon R photos, and older Canons over USB.",
             )
         }
+    }
+
+    // ---------------------------------------------------------------- Canon
+
+    /**
+     * Canon R bodies keep a counter in the CameraInfo block (maker note tag 0x000D).
+     * Offsets from ExifTool (Canon.pm, CameraInfoR6 / CameraInfoR6m2). The value
+     * counts mechanical and electronic shutter shots together.
+     */
+    private fun canonOffset(model: String?): Int? = CameraModels.canonPhotoOffset(model)
+
+    private const val CANON_UNSUPPORTED =
+        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R50, R8, R6, R6 Mark II and R5. Older Canons (DIGIC 5 and before) can be read over USB."
+
+    private fun readCanon(ctx: Ctx, mn: IfdEntry?, warnings: MutableList<String>): PhotoReading {
+        val offset = canonOffset(ctx.model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
+        if (mn == null) return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
+        val t = Tiff(ctx.tiff.buf, ctx.tiff.base, ctx.tiff.littleEndian)
+        val pos = mn.valuePos.toInt()
+        if (!t.looksLikeIfd(pos)) t.littleEndian = !t.littleEndian
+        val ifd = t.readIfd(pos) ?: return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
+        return canonResult(ctx, t, ifd, offset, warnings)
+    }
+
+    private fun canonResult(ctx: Ctx, t: Tiff, ifd: List<IfdEntry>, offset: Int, warnings: MutableList<String>): PhotoReading {
+        val info = ifd.find(0x000D)?.let(t::bytes)
+        if (info == null || info.size < offset + 4) {
+            return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
+        }
+        val count = Tiff(info, 0, t.littleEndian).u32(offset)
+        if (count == null || count <= 0 || count > 5_000_000) {
+            return ctx.result(null, warnings = warnings,
+                problem = "Couldn't find a valid shutter count in this Canon photo. Try a JPEG or CR3 taken just now.")
+        }
+        val serial = ifd.find(0x000C)?.let(t::int)?.takeIf { it > 0 }?.toString() ?: ctx.bodySerial
+        return ctx.result(
+            count, serial = serial, warnings = warnings,
+            details = listOf("Note" to "On this Canon the count includes electronic-shutter shots, so wear may look higher than the mechanical shutter's real use."),
+        )
+    }
+
+    private fun isCr3(d: ByteArray) = d.size > 12 && startsWith(d, 4, "ftyp") && startsWith(d, 8, "crx ")
+
+    /** CR3: metadata lives in CMT boxes (CMT1 = IFD0, CMT2 = EXIF, CMT3 = Canon maker note), each a little TIFF. */
+    private fun readCr3(d: ByteArray): PhotoReading {
+        fun box(type: String): Int? {
+            val limit = minOf(d.size - 8, 4 * 1024 * 1024)
+            var i = 4
+            while (i < limit) {
+                if (d[i] == type[0].code.toByte() && startsWith(d, i, type)) return i + 4
+                i++
+            }
+            return null
+        }
+        fun tiffAt(start: Int): Pair<Tiff, List<IfdEntry>>? {
+            if (start + 8 > d.size) return null
+            val little = d[start] == 'I'.code.toByte()
+            val t = Tiff(d, start, little)
+            val off = t.u32(start + 4) ?: return null
+            val ifd = t.readIfd((start + off).toInt()) ?: return null
+            return t to ifd
+        }
+        val (t1, ifd0) = box("CMT1")?.let(::tiffAt) ?: return failure("Couldn't read this CR3 file.")
+        val make = ifd0.find(TAG_MAKE)?.let(t1::string)
+        val model = ifd0.find(TAG_MODEL)?.let(t1::string)
+        val software = ifd0.find(TAG_SOFTWARE)?.let(t1::string)
+        val exif = box("CMT2")?.let(::tiffAt)
+        val dateTaken = exif?.let { (t, ifd) -> ifd.find(TAG_DATE_ORIGINAL)?.let(t::string) }
+        val bodySerial = exif?.let { (t, ifd) -> ifd.find(TAG_BODY_SERIAL)?.let(t::string) }
+        val ctx = Ctx(t1, Brand.CANON, make, model, software, dateTaken, bodySerial)
+        val warnings = mutableListOf<String>()
+        val offset = canonOffset(model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
+        val (t3, mn) = box("CMT3")?.let(::tiffAt) ?: return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
+        return canonResult(ctx, t3, mn, offset, warnings)
     }
 
     // ---------------------------------------------------------------- Nikon

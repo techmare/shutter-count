@@ -111,6 +111,16 @@ object CameraModels {
         }
     }
 
+    /** Where Canon R bodies keep their counter in a photo's CameraInfo block (ExifTool), or null. */
+    fun canonPhotoOffset(model: String?): Int? {
+        val m = model ?: return null
+        return when {
+            Regex("\\bEOS (R6m2|R6 Mark II|R8|R50)$").containsMatchIn(m) -> 0x0d29
+            Regex("\\bEOS R[56]$").containsMatchIn(m) -> 0x0af1
+            else -> null
+        }
+    }
+
     enum class Wear(val label: String) { LIKE_NEW("Like new"), GOOD("Good"), USED("Used"), HIGH("High wear"), BEYOND("Beyond rating") }
 
     fun wear(count: Long, rated: Int): Wear {

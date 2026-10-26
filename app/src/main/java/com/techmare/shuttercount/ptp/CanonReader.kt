@@ -90,8 +90,11 @@ class CanonReader(private val session: PtpSession) {
             // didn't list them showed Err 70 when they were sent anyway.
             if (!listed) {
                 return result(emptyList(), null,
-                    problem = "This Canon doesn't offer a way to read its shutter count over USB that this app can use safely. " +
-                        "For this model, ask a Canon service centre or use a tool that officially supports it.")
+                    problem = if (CameraModels.canonPhotoOffset(model) != null)
+                        "This Canon can't be read safely over USB, but its count is saved in every photo. Take a new photo, copy the original JPEG or CR3 to this phone, and pick it in the Photo tab."
+                    else
+                        "This Canon doesn't offer a way to read its shutter count over USB that this app can use safely. " +
+                            "For this model, ask a Canon service centre or use a tool that officially supports it.")
             }
             if (!allowAdvanced) {
                 return result(emptyList(), null,

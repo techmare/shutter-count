@@ -64,7 +64,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                     Text("Read camera")
                 }
-                Note("Nikon or Sony? The Photo tab is quicker and works on almost every model.", warning = false)
+                Note("Nikon, Sony, or a Canon R50, R8, R6 or R5? Use the Photo tab instead.", warning = false)
             }
 
             is UsbState.Connected -> {
