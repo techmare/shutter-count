@@ -44,6 +44,7 @@ import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.core.CameraModels
 import com.techmare.shuttercount.data.HistoryEntry
 import com.techmare.shuttercount.data.ReportData
+import com.techmare.shuttercount.data.Midox
 import com.techmare.shuttercount.data.shareReport
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.data.formatDate
@@ -58,6 +59,7 @@ fun HistoryScreen(vm: MainViewModel) {
     val reportWear by vm.reportWear.collectAsState()
     var editing by remember { mutableStateOf<HistoryEntry?>(null) }
     var deleting by remember { mutableStateOf<HistoryEntry?>(null) }
+    val midox = remember { Midox.installed(context) }
 
     if (entries.isEmpty()) {
         Box(Modifier.fillMaxSize().padding(40.dp), contentAlignment = Alignment.Center) {
@@ -84,6 +86,7 @@ fun HistoryScreen(vm: MainViewModel) {
                         ))
                     },
                     onNote = { editing = e },
+                    onMidox = if (midox) ({ Midox.addSerial(context, e.camera, e.serial, e.count.toLong()) }) else null,
                     onDelete = { deleting = e },
                 )
                 if (i < entries.lastIndex) HorizontalDivider(color = c.rule)
@@ -106,7 +109,7 @@ fun HistoryScreen(vm: MainViewModel) {
 }
 
 @Composable
-private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, onNote: () -> Unit, onDelete: () -> Unit) {
+private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, onNote: () -> Unit, onMidox: (() -> Unit)?, onDelete: () -> Unit) {
     val c = LocalAppColors.current
     var menu by remember { mutableStateOf(false) }
     Row(
@@ -143,6 +146,7 @@ private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, 
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                 DropdownMenuItem(text = { Text("Share report") }, onClick = { menu = false; onShare() })
                 DropdownMenuItem(text = { Text(if (e.note.isBlank()) "Add note" else "Edit note") }, onClick = { menu = false; onNote() })
+                if (onMidox != null) DropdownMenuItem(text = { Text("Add to Midox") }, onClick = { menu = false; onMidox() })
                 DropdownMenuItem(text = { Text("Delete") }, onClick = { menu = false; onDelete() })
             }
         }

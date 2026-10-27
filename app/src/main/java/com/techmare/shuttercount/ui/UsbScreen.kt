@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.UsbState
 import com.techmare.shuttercount.data.ReportData
+import com.techmare.shuttercount.data.Midox
 import com.techmare.shuttercount.data.shareReport
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.ptp.CanonMethod
@@ -154,6 +155,12 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }
                         OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
+                    }
+                    if (Midox.installed(context)) {
+                        OutlinedButton(
+                            onClick = { Midox.addSerial(context, r.model, r.serial, count.toLong()) },
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                        ) { Text("Add to Midox serial numbers") }
                     }
                     TextButton(onClick = { vm.readCanon(allowAdvanced = r.method == CanonMethod.FACTORY) }) { Text("Read again") }
                 }

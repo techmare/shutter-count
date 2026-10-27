@@ -27,6 +27,7 @@ import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.PhotoState
 import com.techmare.shuttercount.core.Brand
 import com.techmare.shuttercount.data.ReportData
+import com.techmare.shuttercount.data.Midox
 import com.techmare.shuttercount.data.shareReport
 
 @Composable
@@ -112,6 +113,12 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }
                         OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
+                    }
+                    if (Midox.installed(context)) {
+                        OutlinedButton(
+                            onClick = { Midox.addSerial(context, r.displayName, r.serial, count.toLong()) },
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                        ) { Text("Add to Midox serial numbers") }
                     }
                     if (r.dateTaken != null) {
                         Note("This is the count when the photo was taken. For today's count, use a photo taken just now.", warning = false)
