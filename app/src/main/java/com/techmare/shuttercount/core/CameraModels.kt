@@ -141,6 +141,12 @@ object CameraModels {
         }
     }
 
+    /** A Canon EOS R mirrorless body ("Canon EOS RP", "Canon EOS R10"), whatever its photo support. */
+    fun isCanonR(model: String?): Boolean = Regex("\\bEOS R\\w*$", RegexOption.IGNORE_CASE).containsMatchIn(model.orEmpty().trim())
+
+    /** Canon's DeviceInfo "serial" is a long hex ID of the USB connection, not the body serial. */
+    fun isDeviceId(s: String): Boolean = s.length >= 20 && s.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }
+
     enum class Wear(val label: String) { LIKE_NEW("Like new"), GOOD("Good"), USED("Used"), HIGH("High wear"), BEYOND("Beyond rating") }
 
     fun wear(count: Long, rated: Int): Wear {

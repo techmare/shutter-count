@@ -126,6 +126,11 @@ public enum CameraModels {
     }
 
     /// Where Canon R bodies keep their counter in a photo's CameraInfo block, or nil.
+    /// A Canon EOS R mirrorless body ("Canon EOS RP", "Canon EOS R10"), whatever its photo support.
+    public static func isCanonR(_ model: String?) -> Bool {
+        (model ?? "").trimmingCharacters(in: .whitespaces).range(of: #"\bEOS R\w*$"#, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
     public static func canonPhotoOffset(_ model: String?) -> Int? {
         guard let m = model else { return nil }
         if Rx.has("\\bEOS (R6m2|R6 Mark II|R8|R50)$", m) { return 0x0d29 }

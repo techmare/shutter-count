@@ -7,6 +7,7 @@ import com.techmare.shuttercount.core.SonyCipher
 import com.techmare.shuttercount.ptp.CanonReader
 import com.techmare.shuttercount.ptp.FactoryCommand
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -59,6 +60,15 @@ class ReaderTests {
         assertEquals(45678L, PhotoShutterReader.read(canonTiff("Canon EOS R6", 0x0af1, 45678)).shutterCount)
         assertEquals(623L, PhotoShutterReader.read(canonTiff("Canon EOS R100", 0x0acf, 623)).shutterCount)
         assertNull(PhotoShutterReader.read(canonTiff("Canon EOS 5D Mark IV", 0x0d29, 5)).shutterCount)
+    }
+
+    @Test fun canonRAndDeviceIds() {
+        assertTrue(CameraModels.isCanonR("Canon EOS RP"))
+        assertTrue(CameraModels.isCanonR("Canon EOS R10"))
+        assertFalse(CameraModels.isCanonR("Canon EOS 4000D"))
+        assertFalse(CameraModels.isCanonR("Canon EOS REBEL T7"))
+        assertTrue(CameraModels.isDeviceId("937e0ac7efe4c5dae30b2abb474e81c"))
+        assertFalse(CameraModels.isDeviceId("283032001879"))
     }
 
     @Test fun cipherRoundTrip() {

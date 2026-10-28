@@ -61,9 +61,9 @@ class CanonReader(private val session: PtpSession) {
         try {
             val info = session.getDeviceInfo()
             val model = info.model.ifBlank { usbProductName ?: "Canon camera" }
-            // DeviceInfo's serial on Canon is a 32-character ID, not the body serial. The real one
-            // comes from the EOS event stream (property D1AF); without it, show nothing.
-            var serial: String? = info.serialNumber.trim().takeIf { it.isNotEmpty() && !it.matches(Regex("[0-9a-fA-F]{32}")) }
+            // DeviceInfo's serial on Canon is a long hex ID (31 or 32 characters), not the body serial.
+            // The real one comes from the EOS event stream (property D1AF); without it, show nothing.
+            var serial: String? = info.serialNumber.trim().takeIf { it.isNotEmpty() && !CameraModels.isDeviceId(it) }
             val firmware = info.deviceVersion.ifBlank { null }
             val rated = CameraModels.ratedLife(Brand.CANON, model)
             log += "Camera: ${info.manufacturer} / $model / firmware ${firmware ?: "?"} / vendor ext ${info.vendorExtensionId}"
@@ -83,6 +83,14 @@ class CanonReader(private val session: PtpSession) {
             val isCanon = info.manufacturer.contains("Canon", ignoreCase = true) || info.vendorExtensionId == 11L
             if (!isCanon || CameraModels.canonPhotoOffset(model) != null) {
                 return readNewestPhoto(info, model, serial, firmware)
+            }
+
+            // Canon R bodies we can't decode yet: don't send them the older bodies' status commands
+            // (an EOS RP stopped answering after them). Their count is in their photos instead.
+            if (CameraModels.isCanonR(model)) {
+                return result(emptyList(), null,
+                    problem = "Canon R cameras keep their shutter count inside their photos, not where older Canons do. " +
+                        "Reading the ${model.removePrefix("Canon ").trim()} isn't supported yet: support is added by comparing two of its photos taken a few shots apart.")
             }
 
             // 1. Standard property
