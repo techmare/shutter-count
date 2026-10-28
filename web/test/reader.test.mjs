@@ -47,6 +47,7 @@ for (const [m, o, c] of [['ILCE-7M3', 0x3a, 23456], ['ILCE-7M4', 0x3a, 777], ['I
 assert.equal(read(sony('ILCE-9M3', 0x3a, 10)).count, null);
 assert.equal(read(canon('Canon EOS R50', 0x0d29, 12345)).count, 12345);
 assert.equal(read(canon('Canon EOS R100', 0x0acf, 623)).count, 623);
+assert.equal(read(canon('Canon EOS RP', 0x0960, 2347)).count, 2347);
 assert.equal(read(canon('Canon EOS R6', 0x0af1, 45678)).count, 45678);
 assert.equal(read(canon('Canon EOS R8', 0x0d29, 777)).serial, '123456789');
 assert.equal(read(canon('Canon EOS 5D Mark IV', 0x0d29, 5)).count, null);

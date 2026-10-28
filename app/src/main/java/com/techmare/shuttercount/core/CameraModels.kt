@@ -137,6 +137,8 @@ object CameraModels {
             // found by comparing two R100 photos 5 shots apart (623 -> 628); confirmed it keeps
             // counting after a card format (632, 633), so it is the lifetime counter
             Regex("\\bEOS R100$").containsMatchIn(m) -> 0x0acf
+            // found by comparing two RP photos 4 shots apart (2343 -> 2347)
+            Regex("\\bEOS RP$").containsMatchIn(m) -> 0x0960
             else -> null
         }
     }
