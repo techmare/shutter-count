@@ -136,7 +136,8 @@ public enum CameraModels {
         if Rx.has("\\bEOS (R6m2|R6 Mark II|R8|R50)$", m) { return 0x0d29 }
         if Rx.has("\\bEOS R[56]$", m) { return 0x0af1 }
         // R100: found by comparing photos 5 shots apart (623 -> 628), survives a card format
-        if Rx.has("\\bEOS R100$", m) { return 0x0acf }
+        // M50 Mark II: same spot, two photos 4 shots apart went 8908 -> 8912
+        if Rx.has("\\bEOS (R100|M50m2|M50 Mark II)$", m) { return 0x0acf }
         // RP: found by comparing two photos 4 shots apart (2343 -> 2347)
         if Rx.has("\\bEOS RP$", m) { return 0x0960 }
         return nil

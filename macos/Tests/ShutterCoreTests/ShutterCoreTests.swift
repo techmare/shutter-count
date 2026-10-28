@@ -64,6 +64,7 @@ final class ShutterCoreTests: XCTestCase {
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R50", 0x0d29, 12345)).shutterCount, 12345)
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R100", 0x0acf, 623)).shutterCount, 623)
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS RP", 0x0960, 2347)).shutterCount, 2347)
+        XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS M50m2", 0x0acf, 8912)).shutterCount, 8912)
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R6", 0x0af1, 45678)).shutterCount, 45678)
         let r = PhotoReader.read(canonTiff("Canon EOS R8", 0x0d29, 777))
         XCTAssertEqual(r.serial, "123456789")

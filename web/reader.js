@@ -102,7 +102,8 @@ export function canonPhotoOffset(model) {
   if (/\bEOS (R6m2|R6 Mark II|R8|R50)$/.test(m)) return 0x0d29;
   if (/\bEOS R[56]$/.test(m)) return 0x0af1;
   // found by comparing two R100 photos 5 shots apart (623 -> 628), kept counting after a card format
-  if (/\bEOS R100$/.test(m)) return 0x0acf;
+  // the M50 Mark II uses the same spot: two of its photos 4 shots apart went 8908 -> 8912
+  if (/\bEOS (R100|M50m2|M50 Mark II)$/.test(m)) return 0x0acf;
   // found by comparing two RP photos 4 shots apart (2343 -> 2347)
   if (/\bEOS RP$/.test(m)) return 0x0960;
   return null;
@@ -192,7 +193,7 @@ const TAG_MAKE = 0x010f, TAG_MODEL = 0x0110, TAG_SOFTWARE = 0x0131, TAG_EXIF = 0
 const TAG_MAKERNOTE = 0x927c, TAG_DATE = 0x9003, TAG_BODY_SERIAL = 0xa431;
 
 const MISSING_MAKERNOTE = "This photo is missing the camera's private data (maker notes). That usually means it was converted, resized or sent through an app like WhatsApp. On iPhone, pick the photo with “Choose File” from the Files app, not from Photos.";
-const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R50, R100, RP, R8, R6, R6 Mark II and R5. Older Canons need the Android or Mac app with a USB cable.";
+const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R50, R100, RP, R8, R6, R6 Mark II, R5 and M50 Mark II. Older Canons need the Android or Mac app with a USB cable.";
 
 function failure(problem) {
   return { brand: 'Other', make: null, model: null, displayName: 'Unknown camera', count: null, rated: null, ratedOfficial: false,

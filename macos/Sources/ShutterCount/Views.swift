@@ -137,7 +137,7 @@ struct PhotoView: View {
                         "Drop it on this window, or click Open photos.",
                     ])
                     Note(text: "Photos sent through WhatsApp or edited in an app lose the data this needs.")
-                    Note(text: "Canon: the R50, R100, RP, R8, R6, R6 Mark II and R5 work from a photo. Older Canons are read in Camera.")
+                    Note(text: "Canon: the R50, R100, RP, R8, R6, R6 Mark II, R5 and M50 Mark II work from a photo. Older Canons are read in Camera.")
                 } else {
                     ForEach(model.photoResults) { r in
                         ResultView(reading: r)
