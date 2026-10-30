@@ -141,6 +141,8 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 .verdict { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
 .verdict strong { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; color: #fff; }
 .verdict span { color: var(--on-dark-muted); }
+.by { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(243,239,228,.14); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .85rem; color: var(--on-dark-muted); }
+.by b { color: var(--gold); font-weight: 600; letter-spacing: .02em; }
 
 .out { display: grid; gap: 14px; }
 .out[hidden] { display: none; }
@@ -234,7 +236,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
   <section class="hero">
     <div class="wrap">
       <div>
-        <div class="eyebrow">Outil gratuit</div>
+        <div class="eyebrow">Un outil gratuit Midox Shop</div>
         <h1>Nombre de déclenchements de votre appareil photo</h1>
         <p class="lead">Le « kilométrage » d'un appareil photo, lu en quelques secondes à partir d'une seule photo. Idéal avant d'acheter ou de vendre d'occasion.</p>
         <ul class="promises">
@@ -324,7 +326,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.</div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop.</div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -414,7 +416,8 @@ function panel(r) {
   const caption = count == null ? 'Pas de compteur dans ce fichier' : r.includesElectronic ? 'déclenchements, obturateur électronique compris' : 'déclenchements';
   return `<div class="panel"><div class="head"><div class="cam${count == null ? ' dim' : ''}">${esc(title)}</div>${r.serial ? `<div class="sn num">N° de série ${esc(r.serial)}</div>` : ''}</div>
     <div class="odo num" role="img" aria-label="${count == null ? 'Pas de compteur' : fmtCount(count) + ' déclenchements'}">${wheels}</div>
-    <div class="caption">${caption}</div>${scale}</div>`;
+    <div class="caption">${caption}</div>${scale}
+    <div class="by"><span>Contrôle réalisé avec l'outil</span><b>MIDOX SHOP</b></div></div>`;
 }
 
 function render() {
@@ -446,8 +449,12 @@ function render() {
 }
 
 // ---------- report image: the shop's colours, in French, with the site at the bottom
+// The shop's logo for the report (same site, so the canvas can still be exported); text only if it doesn't load.
+const logoReady = new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = '/assets/images/logo.png'; });
+
 async function renderReport() {
   const { r, time } = current;
+  const logo = await logoReady;
   await Promise.all(['600 84px Kanit', '700 84px Kanit', '400 36px Figtree', '600 36px Figtree'].map(f => document.fonts.load(f).catch(() => {})));
   const W = 1080, H = 1350, P = 72, inner = W - 2 * P;
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
@@ -457,7 +464,12 @@ async function renderReport() {
   const TEXT = '#f3efe4', MUTED = '#b9bccb', GOLD = '#c59a3c';
   c.fillStyle = '#1d2742'; c.fillRect(0, 0, W, H);
   let y = 128;
-  text('RAPPORT DE DÉCLENCHEMENTS', P, y, font(600, 30, 'Figtree'), GOLD);
+  text('MIDOX SHOP · RAPPORT DE DÉCLENCHEMENTS', P, y, font(600, 28, 'Figtree'), GOLD);
+  if (logo) {   // the shop's logo on a white badge, top right
+    const lh = 64, lw = Math.min(220, logo.naturalWidth * lh / logo.naturalHeight), bx = W - P - lw - 28, byy = 58;
+    c.fillStyle = '#ffffff'; c.beginPath(); c.roundRect ? c.roundRect(bx, byy, lw + 28, lh + 20, 12) : c.rect(bx, byy, lw + 28, lh + 20); c.fill();
+    c.drawImage(logo, bx + 14, byy + 10, lw, lh);
+  }
   y += 96;
   let size = 84; c.font = font(600, size, 'Kanit');
   while (c.measureText(r.displayName).width > inner && size > 48) { size -= 2; c.font = font(600, size, 'Kanit'); }
@@ -498,7 +510,7 @@ async function renderReport() {
     text(rest, P + lw + 24, y - 6, font(400, rs, 'Figtree'), MUTED);
   }
   const rows = [['Méthode', 'Photo (données EXIF)'], ['Date du contrôle', fmtDate(time)]];
-  let by = H - P - 60 - rows.length * 72 - (r.includesElectronic ? 56 : 0);
+  let by = H - P - 84 - rows.length * 72 - (r.includesElectronic ? 56 : 0);
   for (const [k, v] of rows) {
     c.fillStyle = '#37446b'; c.fillRect(P, by, inner, 2);
     text(k, P, by + 48, font(400, 32, 'Figtree'), MUTED);
@@ -506,8 +518,9 @@ async function renderReport() {
     by += 72;
   }
   if (r.includesElectronic) { text('Le compteur inclut les déclenchements en obturateur électronique.', P, by + 36, font(400, 28, 'Figtree'), MUTED); by += 56; }
-  c.fillStyle = GOLD; c.fillRect(P, H - P - 18, 48, 4);
-  text('midoxshop.ma', P + 64, H - P - 6, font(600, 30, 'Figtree'), GOLD);
+  c.fillStyle = '#37446b'; c.fillRect(P, H - P - 52, inner, 2);
+  text('Contrôlé avec l\u2019outil Midox Shop', P, H - P - 6, font(400, 28, 'Figtree'), MUTED);
+  text('midoxshop.ma', P + inner, H - P - 6, font(600, 30, 'Figtree'), GOLD, 'right');
   return new Promise(res => cv.toBlob(res, 'image/png'));
 }
 
