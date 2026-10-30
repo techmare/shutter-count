@@ -277,6 +277,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         store.save(list)
     }
 
+    /** History search, kept while a check is open so going back shows the same results. */
+    private val _historyQuery = MutableStateFlow("")
+    val historyQuery: StateFlow<String> = _historyQuery.asStateFlow()
+    fun setHistoryQuery(q: String) { _historyQuery.value = q }
+
     /** The History check open in full (its panel, note and actions), or null for the list. */
     private val _openCheck = MutableStateFlow<Long?>(null)
     val openCheck: StateFlow<Long?> = _openCheck.asStateFlow()

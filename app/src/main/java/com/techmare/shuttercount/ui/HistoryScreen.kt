@@ -22,6 +22,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Close
+import com.techmare.shuttercount.data.matches
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -78,8 +81,36 @@ fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
             }
         }
     } else {
+        val query by vm.historyQuery.collectAsState()
+        val shown = remember(entries, query) { entries.filter { it.matches(query) } }
         LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-            itemsIndexed(entries, key = { _, e -> e.id }) { i, e ->
+            item(key = "search") {
+                OutlinedTextField(
+                    value = query, onValueChange = vm::setHistoryQuery,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                    placeholder = { Text("Search camera, serial or note") },
+                    leadingIcon = { Icon(Icons.Outlined.Search, null, tint = c.muted) },
+                    trailingIcon = if (query.isNotEmpty()) ({
+                        IconButton(onClick = { vm.setHistoryQuery("") }) { Icon(Icons.Outlined.Close, "Clear search", tint = c.muted) }
+                    }) else null,
+                    singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
+                )
+            }
+            if (shown.isEmpty()) item(key = "none") {
+                Text(
+                    "No check matches “${query.trim()}”.",
+                    Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                    textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium, color = c.muted,
+                )
+            } else if (query.isNotBlank()) item(key = "count") {
+                Text(
+                    if (shown.size == 1) "1 check" else "${shown.size} checks",
+                    Modifier.padding(start = 4.dp, top = 4.dp, bottom = 2.dp), style = MaterialTheme.typography.labelMedium, color = c.muted,
+                )
+            }
+            itemsIndexed(shown, key = { _, e -> e.id }) { i, e ->
                 HistoryRow(
                     e, showWear,
                     onShare = { shareReport(context, reportFor(e, reportWear)) },
@@ -88,7 +119,7 @@ fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
                     onMidox = if (midox) ({ Midox.addSerial(context, e.camera, e.serial, e.count.toLong()) }) else null,
                     onDelete = { deleting = e },
                 )
-                if (i < entries.lastIndex) HorizontalDivider(color = c.rule)
+                if (i < shown.lastIndex) HorizontalDivider(color = c.rule)
             }
         }
     }
@@ -210,7 +241,6 @@ fun CheckScreen(vm: MainViewModel, id: Long) {
         }
 
         DetailRows(buildList {
-            add("Checked" to formatDate(e.time))
             add("From" to if (e.source == "USB") "USB cable" else "Photo")
             e.ratedLife?.let { add((if (e.ratedOfficial) "Rated life" else "Estimated life") to formatCount(it.toLong())) }
         })

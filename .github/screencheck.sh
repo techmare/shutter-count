@@ -33,7 +33,14 @@ ls -la shots
 # tap the first History row: the check opens; back returns to the list
 adb shell cmd uimode night no; sleep 1
 adb shell am start -S -W -n $PKG/.MainActivity --es check history >/dev/null; sleep 2
-adb shell input tap 300 330; sleep 2
+adb shell input tap 300 520; sleep 2
 adb exec-out screencap -p > shots/tap-open.png
 adb shell input keyevent KEYCODE_BACK; sleep 2
 adb exec-out screencap -p > shots/tap-back.png
+# search
+adb shell am start -S -W -n $PKG/.MainActivity --es check history >/dev/null; sleep 2
+adb shell input tap 540 330; sleep 1; adb shell input text "canon"; sleep 2
+adb exec-out screencap -p > shots/search-canon.png
+adb shell input keyevent KEYCODE_MOVE_END; for i in 1 2 3 4 5; do adb shell input keyevent KEYCODE_DEL; done
+adb shell input text "zzz"; sleep 2
+adb exec-out screencap -p > shots/search-none.png

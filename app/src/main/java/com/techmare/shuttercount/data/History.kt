@@ -64,3 +64,16 @@ class HistoryStore(context: Context) {
         const val MAX = 500
     }
 }
+
+/**
+ * History search: every word must appear in the camera, serial or note (any case). A serial
+ * matches with or without its spaces, and "R50" finds "Canon EOS R50".
+ */
+fun HistoryEntry.matches(query: String): Boolean {
+    val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    if (words.isEmpty()) return true
+    val hay = "$camera ${serial.orEmpty()} $note ${if (source == "USB") "usb" else "photo"}".lowercase()
+    val digits = serial.orEmpty().filter { it.isLetterOrDigit() }.lowercase()
+    val joined = query.lowercase().filter { it.isLetterOrDigit() }
+    return words.all { hay.contains(it) } || (joined.length >= 4 && digits.contains(joined))
+}

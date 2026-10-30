@@ -4,6 +4,7 @@ import com.techmare.shuttercount.core.Brand
 import com.techmare.shuttercount.core.CameraModels
 import com.techmare.shuttercount.core.PhotoShutterReader
 import com.techmare.shuttercount.core.SonyCipher
+import com.techmare.shuttercount.data.matches
 import com.techmare.shuttercount.ptp.CanonReader
 import com.techmare.shuttercount.ptp.FactoryCommand
 import org.junit.Assert.assertEquals
@@ -71,6 +72,17 @@ class ReaderTests {
         assertFalse(CameraModels.isCanonR("Canon EOS REBEL T7"))
         assertTrue(CameraModels.isDeviceId("937e0ac7efe4c5dae30b2abb474e81c"))
         assertFalse(CameraModels.isDeviceId("283032001879"))
+    }
+
+    @Test fun historySearch() {
+        val e = com.techmare.shuttercount.data.HistoryEntry(1, 0, "Canon EOS R50", "373029001497", 12345, 100000, "USB", note = "Youssef, small scratch")
+        assertTrue(e.matches(""))
+        assertTrue(e.matches("r50"))
+        assertTrue(e.matches("canon youssef"))
+        assertTrue(e.matches("3730 2900"))
+        assertTrue(e.matches("usb"))
+        assertFalse(e.matches("nikon"))
+        assertFalse(e.matches("r50 karim"))
     }
 
     @Test fun cipherRoundTrip() {
