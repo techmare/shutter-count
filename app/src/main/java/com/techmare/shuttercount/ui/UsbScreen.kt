@@ -110,7 +110,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     title = r.model,
                     trailing = r.serial?.let { "S/N $it" },
                     count = count,
-                    caption = if (count != null) "shutter actuations" else "No count yet",
+                    caption = if (count != null) "shutter actuations" else "No count read",
                     ratedLife = r.ratedLife,
                     ratedOfficial = r.ratedOfficial,
                     badge = if (experimental) "Experimental reading" else null,
@@ -123,6 +123,10 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     if (r.canTryAdvanced) {
                         Button(onClick = { confirmAdvanced = true }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                             Text("Try advanced read")
+                        }
+                    } else {
+                        Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                            Text("Read again")
                         }
                     }
                 }

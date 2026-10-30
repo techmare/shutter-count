@@ -201,7 +201,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun readCanon(allowAdvanced: Boolean) {
         val device = findCamera(usbManager)
         if (device == null) {
-            _usb.value = UsbState.NoCamera
+            _usb.value = UsbState.Error("No camera found. Check that it's switched on and the cable is plugged in on both ends.")
             return
         }
         if (!usbManager.hasPermission(device)) {

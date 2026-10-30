@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -50,7 +51,7 @@ import com.techmare.shuttercount.data.formatDate
 import com.techmare.shuttercount.data.wearPercent
 
 @Composable
-fun HistoryScreen(vm: MainViewModel) {
+fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
     val entries by vm.history.collectAsState()
     val context = LocalContext.current
     val c = LocalAppColors.current
@@ -69,6 +70,8 @@ fun HistoryScreen(vm: MainViewModel) {
                     "Each camera you read is saved here with its date. Add a note to keep the customer, price or condition with it.",
                     textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium, color = c.muted,
                 )
+                Spacer(Modifier.size(20.dp))
+                androidx.compose.material3.Button(onClick = onCheck, modifier = Modifier.height(48.dp)) { Text("Check a photo") }
             }
         }
     } else {

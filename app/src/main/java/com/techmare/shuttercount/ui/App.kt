@@ -97,7 +97,7 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
                 if (settingsOpen) SettingsScreen(vm) else when (tab) {
                     Tab.PHOTO -> PhotoScreen(vm, addNote)
                     Tab.USB -> UsbScreen(vm, addNote)
-                    Tab.HISTORY -> HistoryScreen(vm)
+                    Tab.HISTORY -> HistoryScreen(vm, onCheck = { onTab(Tab.PHOTO) })
                 }
             }
         }

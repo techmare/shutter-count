@@ -94,9 +94,10 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     r.dateTaken?.let { add("Photo taken" to prettyExifDate(it)) }
                     s.fileName?.let { add("File" to it) }
                     r.software?.let { add("Software" to it) }
-                    addAll(r.details)
+                    addAll(r.details.filter { it.first != "Note" })
                 }
                 DetailRows(rows)
+                r.details.filter { it.first == "Note" }.forEach { Note(it.second, warning = false) }
 
                 if (count != null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
