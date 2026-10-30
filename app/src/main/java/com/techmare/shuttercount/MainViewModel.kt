@@ -271,10 +271,20 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun deleteEntry(id: Long) {
+        if (_openCheck.value == id) _openCheck.value = null
         val list = _history.value.filterNot { it.id == id }
         _history.value = list
         store.save(list)
     }
+
+    /** The History check open in full (its panel, note and actions), or null for the list. */
+    private val _openCheck = MutableStateFlow<Long?>(null)
+    val openCheck: StateFlow<Long?> = _openCheck.asStateFlow()
+    fun openCheck(id: Long?) { _openCheck.value = id }
+
+    /** Earlier and later checks of the same body as [entry], newest first. */
+    fun otherChecks(entry: HistoryEntry): List<HistoryEntry> =
+        if (entry.serial.isNullOrBlank()) emptyList() else _history.value.filter { it.serial == entry.serial && it.id != entry.id }
 
     /** Most recent entry for the reading currently on screen, so a note can be attached. */
     fun latestEntryId(): Long? = _history.value.firstOrNull()?.id

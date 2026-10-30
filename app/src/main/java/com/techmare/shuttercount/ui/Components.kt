@@ -99,6 +99,8 @@ fun InstrumentPanel(
     ratedOfficial: Boolean = false,
     badge: String? = null,
     showWear: Boolean = true,
+    /** False for a saved check: the count is shown still, no roll and no tick. */
+    roll: Boolean = true,
     footer: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val c = LocalAppColors.current
@@ -129,7 +131,7 @@ fun InstrumentPanel(
             )
         }
         Spacer(Modifier.height(14.dp))
-        Odometer(count)
+        Odometer(count, roll)
         Spacer(Modifier.height(8.dp))
         Text(caption, style = MaterialTheme.typography.bodyMedium, color = c.panelMuted)
 
@@ -174,11 +176,11 @@ private object OdometerMemory { var lastRolled: Long? = null }
  * with a confirm tick; with no count the wheels show dashes, never a misleading 000000.
  */
 @Composable
-fun Odometer(value: Long?) {
+fun Odometer(value: Long?, roll: Boolean = true) {
     val c = LocalAppColors.current
     val reduced = rememberReducedMotion()
     val view = LocalView.current
-    val fresh = value != null && value != OdometerMemory.lastRolled
+    val fresh = roll && value != null && value != OdometerMemory.lastRolled
     val anim = remember { Animatable(if (fresh) 0f else (value ?: 0L).toFloat()) }
     LaunchedEffect(value) {
         if (value == null) {

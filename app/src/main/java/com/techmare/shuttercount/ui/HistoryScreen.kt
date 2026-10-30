@@ -1,5 +1,8 @@
 package com.techmare.shuttercount.ui
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -79,14 +82,8 @@ fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
             itemsIndexed(entries, key = { _, e -> e.id }) { i, e ->
                 HistoryRow(
                     e, showWear,
-                    onShare = {
-                        shareReport(context, ReportData(
-                            e.camera, e.serial, e.count, e.ratedLife.takeIf { reportWear },
-                            if (e.source == "USB") "USB (lecture directe)" else "Photo (données EXIF)", e.time, e.experimental,
-                            includesElectronic = e.source != "USB" && e.camera.startsWith("Canon"),
-                            ratedOfficial = e.ratedOfficial,
-                        ))
-                    },
+                    onShare = { shareReport(context, reportFor(e, reportWear)) },
+                    onOpen = { vm.openCheck(e.id) },
                     onNote = { editing = e },
                     onMidox = if (midox) ({ Midox.addSerial(context, e.camera, e.serial, e.count.toLong()) }) else null,
                     onDelete = { deleting = e },
@@ -111,11 +108,11 @@ fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
 }
 
 @Composable
-private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, onNote: () -> Unit, onMidox: (() -> Unit)?, onDelete: () -> Unit) {
+private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, onOpen: () -> Unit, onNote: () -> Unit, onMidox: (() -> Unit)?, onDelete: () -> Unit) {
     val c = LocalAppColors.current
     var menu by remember { mutableStateOf(false) }
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onNote).padding(vertical = 12.dp),
+        Modifier.fillMaxWidth().clickable(onClick = onOpen).padding(vertical = 12.dp),
         verticalAlignment = Alignment.Top,
     ) {
         Column(Modifier.weight(1f).padding(start = 4.dp)) {
@@ -152,6 +149,117 @@ private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, 
                 DropdownMenuItem(text = { Text("Delete") }, onClick = { menu = false; onDelete() })
             }
         }
+    }
+}
+
+/** The customer report for a saved check. */
+private fun reportFor(e: HistoryEntry, reportWear: Boolean) = ReportData(
+    e.camera, e.serial, e.count, e.ratedLife.takeIf { reportWear },
+    if (e.source == "USB") "USB (lecture directe)" else "Photo (données EXIF)", e.time, e.experimental,
+    includesElectronic = e.source != "USB" && e.camera.startsWith("Canon"),
+    ratedOfficial = e.ratedOfficial,
+)
+
+/**
+ * One saved check in full: the same panel as a fresh reading, its note (add or edit right
+ * here), its other checks of the same body, and the actions from the row's menu.
+ */
+@Composable
+fun CheckScreen(vm: MainViewModel, id: Long) {
+    val entries by vm.history.collectAsState()
+    val e = entries.firstOrNull { it.id == id } ?: return
+    val context = LocalContext.current
+    val c = LocalAppColors.current
+    val showWear by vm.showWear.collectAsState()
+    val reportWear by vm.reportWear.collectAsState()
+    var editing by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf(false) }
+    val midox = remember { Midox.installed(context) }
+    val others = remember(entries, e) { vm.otherChecks(e) }
+
+    Column(
+        Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        InstrumentPanel(
+            title = e.camera,
+            trailing = e.serial?.let { "S/N $it" },
+            count = e.count,
+            caption = "shutter actuations on ${formatDate(e.time)}",
+            ratedLife = e.ratedLife,
+            ratedOfficial = e.ratedOfficial,
+            badge = if (e.experimental) "Experimental reading" else null,
+            showWear = showWear,
+            roll = false,
+        )
+
+        // the note, editable in place
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .clickable { editing = true }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text("Note", style = MaterialTheme.typography.titleSmall, color = c.muted)
+            Text(
+                e.note.ifBlank { "Add the customer, price or condition…" },
+                style = MaterialTheme.typography.bodyLarge, color = if (e.note.isBlank()) c.muted else c.ink,
+            )
+            Text(if (e.note.isBlank()) "Tap to add" else "Tap to edit", style = MaterialTheme.typography.labelMedium, color = c.muted)
+        }
+
+        DetailRows(buildList {
+            add("Checked" to formatDate(e.time))
+            add("From" to if (e.source == "USB") "USB cable" else "Photo")
+            e.ratedLife?.let { add((if (e.ratedOfficial) "Rated life" else "Estimated life") to formatCount(it.toLong())) }
+        })
+
+        if (others.isNotEmpty()) {
+            Column(Modifier.padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Other checks of this camera", style = MaterialTheme.typography.titleMedium, color = c.ink)
+                others.forEach { o ->
+                    val diff = e.count - o.count
+                    Row(Modifier.fillMaxWidth().clickable { vm.openCheck(o.id) }.padding(vertical = 6.dp)) {
+                        Text(formatDate(o.time), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = c.muted)
+                        Text(formatCount(o.count), style = MaterialTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"), color = c.ink)
+                        Text(
+                            when { diff > 0 -> "  (+${formatCount(diff)})"; diff < 0 -> "  (−${formatCount(-diff)})"; else -> "  (same)" },
+                            style = MaterialTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+                            color = if (diff < 0) c.high else c.muted,
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            androidx.compose.material3.Button(
+                onClick = { shareReport(context, reportFor(e, reportWear)) },
+                modifier = Modifier.weight(1f).height(48.dp),
+            ) { Text("Share report") }
+            GhostButton(onClick = { editing = true }, modifier = Modifier.weight(1f).height(48.dp)) {
+                Text(if (e.note.isBlank()) "Add note" else "Edit note")
+            }
+        }
+        if (midox) {
+            GhostButton(onClick = { Midox.addSerial(context, e.camera, e.serial, e.count) }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Text("Add to Midox serial numbers")
+            }
+        }
+        QuietButton(onClick = { deleting = true }) { Text("Delete this check", color = c.high) }
+        Spacer(Modifier.height(8.dp))
+    }
+
+    if (editing) NoteDialog(initial = e.note, onDismiss = { editing = false }, onSave = { vm.updateNote(e.id, it); editing = false })
+    if (deleting) {
+        AlertDialog(
+            onDismissRequest = { deleting = false },
+            title = { Text("Delete this check?") },
+            text = { Text("${e.camera}, ${formatCount(e.count)} shots on ${formatDate(e.time)}") },
+            confirmButton = { QuietButton(onClick = { deleting = false; vm.deleteEntry(e.id) }) { Text("Delete") } },
+            dismissButton = { QuietButton(onClick = { deleting = false }) { Text("Cancel") } },
+        )
     }
 }
 

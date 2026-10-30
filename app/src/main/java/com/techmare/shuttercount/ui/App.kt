@@ -26,6 +26,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +48,10 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
     val c = LocalAppColors.current
     var noteFor by remember { mutableStateOf<Long?>(null) }
     var settingsOpen by remember { mutableStateOf(false) }
+    val openCheck by vm.openCheck.collectAsState()
+    val checkOpen = openCheck != null && tab == Tab.HISTORY && !settingsOpen
     BackHandler(enabled = settingsOpen) { settingsOpen = false }
+    BackHandler(enabled = checkOpen) { vm.openCheck(null) }
     val addNote = { noteFor = vm.latestEntryId() }
 
     Scaffold(
@@ -57,13 +61,15 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
                 Modifier.fillMaxWidth().statusBarsPadding().padding(start = 12.dp, end = 8.dp, top = 12.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (settingsOpen) {
-                    IconButton(onClick = { settingsOpen = false }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = c.ink) }
+                if (settingsOpen || checkOpen) {
+                    IconButton(onClick = { if (settingsOpen) settingsOpen = false else vm.openCheck(null) }) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = c.ink)
+                    }
                 } else {
                     Spacer(Modifier.width(12.dp))
                 }
                 Text(
-                    if (settingsOpen) "Settings" else tab.title,
+                    if (settingsOpen) "Settings" else if (checkOpen) "Check" else tab.title,
                     Modifier.weight(1f),
                     style = MaterialTheme.typography.headlineMedium, color = c.ink,
                 )
@@ -77,7 +83,12 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
                 Tab.entries.forEach { t ->
                     NavigationBarItem(
                         selected = tab == t && !settingsOpen,
-                        onClick = { settingsOpen = false; onTab(t) },
+                        onClick = {
+                            settingsOpen = false
+                            // the History tab again from a check goes back to the list
+                            if (t == Tab.HISTORY && tab == Tab.HISTORY) vm.openCheck(null)
+                            onTab(t)
+                        },
                         icon = { Icon(t.icon, null) },
                         label = { Text(t.label, style = MaterialTheme.typography.labelMedium) },
                         colors = NavigationBarItemDefaults.colors(
@@ -97,7 +108,7 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
                 if (settingsOpen) SettingsScreen(vm) else when (tab) {
                     Tab.PHOTO -> PhotoScreen(vm, addNote)
                     Tab.USB -> UsbScreen(vm, addNote)
-                    Tab.HISTORY -> HistoryScreen(vm, onCheck = { onTab(Tab.PHOTO) })
+                    Tab.HISTORY -> if (checkOpen) CheckScreen(vm, openCheck!!) else HistoryScreen(vm, onCheck = { onTab(Tab.PHOTO) })
                 }
             }
         }

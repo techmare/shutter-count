@@ -14,7 +14,7 @@ shot() {  # state, file name, scroll (0/1)
     adb exec-out screencap -p > "shots/$2-b.png"
   fi
 }
-STATES="photo-idle:0 photo-ok:1 photo-seen:1 photo-high:1 photo-fail:1 usb-idle:1 usb-ok:1 usb-fail:1 usb-error:0 history:0 history-empty:0"
+STATES="photo-idle:0 photo-ok:1 photo-seen:1 photo-high:1 photo-fail:1 usb-idle:1 usb-ok:1 usb-fail:1 usb-error:0 history:0 history-empty:0 history-detail:1 history-detail-empty:0"
 for theme in light dark; do
   [ $theme = dark ] && adb shell cmd uimode night yes || adb shell cmd uimode night no
   sleep 2
@@ -30,3 +30,10 @@ adb shell settings put system font_scale 1.0
 # crashes?
 adb logcat -d -b crash > shots/crashes.txt || true
 ls -la shots
+# tap the first History row: the check opens; back returns to the list
+adb shell cmd uimode night no; sleep 1
+adb shell am start -S -W -n $PKG/.MainActivity --es check history >/dev/null; sleep 2
+adb shell input tap 300 330; sleep 2
+adb exec-out screencap -p > shots/tap-open.png
+adb shell input keyevent KEYCODE_BACK; sleep 2
+adb exec-out screencap -p > shots/tap-back.png

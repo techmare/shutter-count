@@ -45,6 +45,7 @@ object ScreenCheck {
             }
             "usb-error" -> { vm.showUsbState(UsbState.Error("USB access was not allowed. Tap Read again and choose Allow.")); Tab.USB }
             "history" -> {
+                vm.openCheck(null)
                 vm.replaceHistory(listOf(
                     HistoryEntry(5, now - 2 * 3_600_000, "Canon EOS R50", "123456789", 12_345, 100_000, "Photo", note = "Customer: Youssef, 6 500 dh"),
                     HistoryEntry(4, now - day, "Sony α7 III", null, 48_633, 200_000, "Photo"),
@@ -53,7 +54,19 @@ object ScreenCheck {
                     HistoryEntry(1, now - 30 * day, "Canon EOS 5D Mark IV with a very long name that needs to wrap", "012345678901", 233_870, 150_000, "Photo", ratedOfficial = true),
                 )); Tab.HISTORY
             }
-            "history-empty" -> { vm.replaceHistory(emptyList()); Tab.HISTORY }
+            "history-empty" -> { vm.replaceHistory(emptyList()); vm.openCheck(null); Tab.HISTORY }
+            "history-detail" -> {
+                vm.replaceHistory(listOf(
+                    HistoryEntry(5, now - 2 * 3_600_000, "Canon EOS R50", "123456789", 12_345, 100_000, "Photo", note = "Customer: Youssef, 6 500 dh"),
+                    HistoryEntry(4, now - day, "Sony α7 III", null, 48_633, 200_000, "Photo"),
+                    HistoryEntry(3, now - 40 * day, "Canon EOS R50", "123456789", 11_980, 100_000, "USB", note = "Bought from Karim"),
+                ))
+                vm.openCheck(5); Tab.HISTORY
+            }
+            "history-detail-empty" -> {
+                vm.replaceHistory(listOf(HistoryEntry(4, now - day, "Sony α7 III", null, 48_633, 200_000, "Photo")))
+                vm.openCheck(4); Tab.HISTORY
+            }
             else -> null
         }
     }
