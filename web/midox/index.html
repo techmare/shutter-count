@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nombre de déclenchements : vérifiez votre appareil photo gratuitement | Midox Shop</title>
+<meta name="description" content="Vérifiez gratuitement le nombre de déclenchements (shutter count) d'un appareil photo Canon, Nikon ou Sony à partir d'une photo. Rien n'est envoyé : la photo est lue sur votre téléphone.">
+<link rel="canonical" href="https://www.midoxshop.ma/declenchements/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Midox Shop">
+<meta property="og:locale" content="fr_MA">
+<meta property="og:title" content="Nombre de déclenchements : vérifiez votre appareil photo">
+<meta property="og:description" content="Gratuit, sans inscription : choisissez une photo de l'appareil et voyez son nombre de déclenchements et son usure.">
+<meta property="og:url" content="https://www.midoxshop.ma/declenchements/">
+<meta name="theme-color" content="#1d2742">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Nombre de déclenchements – Midox Shop",
+      "url": "https://www.midoxshop.ma/declenchements/",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Tous",
+      "inLanguage": "fr",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MAD" },
+      "publisher": { "@type": "Store", "name": "Midox Shop", "url": "https://www.midoxshop.ma/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Qu'est-ce que le nombre de déclenchements ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "C'est le nombre de photos prises par l'appareil depuis sa fabrication, l'équivalent du kilométrage d'une voiture. Il indique l'usure de l'obturateur, la pièce qui s'ouvre et se ferme à chaque photo." } },
+        { "@type": "Question", "name": "À partir de combien de déclenchements un appareil est-il usé ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Cela dépend du modèle : un appareil d'entrée de gamme est prévu pour environ 100 000 déclenchements, un boîtier expert pour 150 000 à 200 000, un boîtier professionnel pour 300 000 à 500 000. En dessous de 10 % de cette durée, l'appareil est comme neuf." } },
+        { "@type": "Question", "name": "Ma photo est-elle envoyée sur internet ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop." } },
+        { "@type": "Question", "name": "Pourquoi ma photo ne donne pas de résultat ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root {
+  --navy: #1d2742; --navy-2: #2b3758; --navy-3: #37446b;
+  --gold: #c59a3c; --gold-ink: #8a6517; --gold-soft: #f4ead3;
+  --bg: #f6f5f1; --surface: #ffffff; --line: #e4e1d8;
+  --text: #1d2742; --muted: #5c6378;
+  --on-dark: #f3efe4; --on-dark-muted: #b9bccb;
+  --wa: #1fa855; --ok: #2f9a5a; --mid: #d98a1f; --high: #d4493a;
+  --f-display: "Kanit", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius: 10px; --radius-lg: 14px; --wrap: 1080px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.55 var(--f-body); -webkit-tap-highlight-color: transparent; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; margin: 0; letter-spacing: -.005em; text-wrap: balance; }
+p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* header: same as the shop */
+.header { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.header .wrap { display: flex; align-items: center; gap: 16px; min-height: 64px; }
+.logo { display: flex; align-items: center; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--navy); }
+.logo img { height: 40px; width: auto; }
+.nav { display: none; gap: 22px; margin-left: auto; font-weight: 500; }
+.nav a { text-decoration: none; color: var(--muted); }
+.nav a:hover, .nav a[aria-current] { color: var(--navy); }
+.header .wa { margin-left: auto; }
+@media (min-width: 860px) { .nav { display: flex; } .header .wa { margin-left: 8px; } }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 999px; border: 1.5px solid transparent; font-weight: 600; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
+.btn:active { transform: scale(.97); }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold:hover { background: #d4aa4f; }
+.btn-wa { background: var(--wa); color: #fff; }
+.btn-wa:hover { background: #1a9449; }
+.btn-line { background: var(--surface); border-color: var(--line); color: var(--navy); }
+.btn-line:hover { border-color: var(--navy); }
+.btn-sm { min-height: 40px; padding: .45rem .9rem; font-size: .92rem; }
+
+/* hero with the tool in it */
+.hero { background: var(--navy); color: var(--on-dark); padding: 36px 0 40px; }
+.hero .wrap { display: grid; gap: 26px; }
+.eyebrow { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+.hero h1 { color: #fff; font-size: clamp(2rem, 1.4rem + 3vw, 3.1rem); font-weight: 600; margin-top: 8px; }
+.hero .lead { color: var(--on-dark-muted); font-size: 1.06rem; margin-top: 12px; max-width: 46ch; }
+.promises { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .92rem; color: var(--on-dark); }
+.promises li { display: flex; align-items: center; gap: 7px; }
+.promises svg { color: var(--gold); flex: none; }
+@media (min-width: 900px) { .hero { padding: 56px 0; } .hero .wrap { grid-template-columns: 1fr 1.05fr; align-items: start; gap: 44px; } }
+
+.tool { background: var(--surface); color: var(--text); border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 18px 40px rgba(10, 16, 34, .28); }
+.drop { display: block; border: 1.5px dashed #cfcab9; border-radius: var(--radius); padding: 26px 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+.drop:hover, .drop.hot { border-color: var(--gold); background: var(--gold-soft); }
+.drop b { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; display: block; }
+.drop p { color: var(--muted); font-size: .94rem; margin: 6px auto 16px; max-width: 38ch; }
+.drop[hidden] { display: none; }
+input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.privacy { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: .85rem; margin-top: 12px; }
+.privacy svg { flex: none; margin-top: 2px; color: var(--gold-ink); }
+
+/* result panel */
+.panel { background: var(--navy); color: var(--on-dark); border-radius: var(--radius-lg); padding: 18px 18px 20px; }
+.tool .panel { margin: -2px; }
+.panel .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.panel .cam { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; color: #fff; }
+.panel .cam.dim { color: var(--on-dark-muted); }
+.panel .sn { color: var(--on-dark-muted); font-size: .88rem; }
+.odo { display: flex; margin: 16px 0 10px; }
+.wheel { flex: 1; max-height: 88px; aspect-ratio: .72; margin-right: 5px; border-radius: 8px; display: grid; place-items: center; overflow: hidden;
+  background: linear-gradient(#121a30, #26314f 22%, #313d62 50%, #26314f 78%, #121a30);
+  font-family: var(--f-display); font-weight: 600; font-size: clamp(30px, 9vw, 54px); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+.wheel:last-child { margin-right: 0; }
+.wheel.group { margin-right: 13px; }
+.wheel.dim { color: #5d6788; }
+.wheel span { display: block; }
+.wheel.roll span { animation: roll .45s cubic-bezier(.23,1,.32,1) both; }
+@keyframes roll { from { transform: translateY(-75%); opacity: 0; } to { transform: none; opacity: 1; } }
+.caption { color: var(--on-dark-muted); }
+.scale { margin-top: 16px; }
+.ticks { display: flex; justify-content: space-between; align-items: flex-end; height: 18px; }
+.ticks i { width: 2px; height: 9px; border-radius: 1px; background: #4b5678; }
+.ticks i.major { height: 18px; }
+.marker { position: relative; height: 12px; }
+.marker b { position: absolute; top: 3px; width: 0; height: 0; transform: translateX(-6px); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 9px solid var(--gold); }
+.scale-labels { display: flex; justify-content: space-between; font-size: .8rem; color: var(--on-dark-muted); }
+.verdict { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.verdict strong { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; color: #fff; }
+.verdict span { color: var(--on-dark-muted); }
+
+.out { display: grid; gap: 14px; }
+.out[hidden] { display: none; }
+.notice { border-radius: var(--radius); padding: 12px 14px; font-size: .95rem; border: 1px solid; }
+.notice b { display: block; font-weight: 600; margin-bottom: 2px; }
+.notice.bad { background: #fbeeec; border-color: #efc5bf; }
+.notice.warn { background: #fdf4e5; border-color: #f1d9ad; }
+.notice.info { background: var(--bg); border-color: var(--line); color: var(--muted); }
+dl.details { margin: 0; border-top: 1px solid var(--line); }
+dl.details div { display: flex; justify-content: space-between; gap: 16px; padding: 9px 2px; border-bottom: 1px solid var(--line); font-size: .94rem; }
+dl.details dt { color: var(--muted); }
+dl.details dd { margin: 0; text-align: right; font-weight: 500; overflow-wrap: anywhere; }
+.actions { display: grid; gap: 10px; }
+.actions .link { justify-self: center; color: var(--gold-ink); font-weight: 600; text-decoration: none; padding: 8px; min-height: 44px; display: inline-flex; align-items: center; }
+.actions .link:hover { text-decoration: underline; }
+.again { justify-self: start; background: none; border: 0; color: var(--gold-ink); font-weight: 600; padding: 8px 2px; cursor: pointer; min-height: 44px; }
+.busy { display: flex; align-items: center; gap: 10px; color: var(--muted); padding: 18px 4px; }
+.spin { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--line); border-top-color: var(--gold); animation: s .8s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+
+/* content sections */
+.section { padding: 48px 0; }
+.section h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem); font-weight: 600; }
+.section .intro { color: var(--muted); margin-top: 8px; max-width: 60ch; }
+.steps { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; counter-reset: s; }
+.steps li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 16px 16px 58px; position: relative; counter-increment: s; }
+.steps li::before { content: counter(s); position: absolute; left: 16px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: var(--gold); font-family: var(--f-display); font-weight: 600; display: grid; place-items: center; }
+.steps b { display: block; font-weight: 600; }
+.steps span { color: var(--muted); font-size: .94rem; }
+@media (min-width: 860px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+
+.models { display: grid; gap: 12px; margin-top: 22px; }
+.model { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.model h3 { font-size: 1.2rem; font-weight: 600; }
+.model p { color: var(--muted); font-size: .93rem; margin-top: 4px; }
+.model.no { background: transparent; border-style: dashed; }
+@media (min-width: 860px) { .models { grid-template-columns: repeat(4, 1fr); } }
+
+.scaletable { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.scaletable div { display: grid; grid-template-columns: 14px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); }
+.scaletable div:first-child { border-top: 0; }
+.scaletable i { width: 10px; height: 10px; border-radius: 50%; }
+.scaletable span { color: var(--muted); font-size: .93rem; }
+
+details.faq { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-top: 10px; }
+details.faq summary { cursor: pointer; list-style: none; padding: 16px 48px 16px 16px; font-weight: 600; position: relative; min-height: 48px; }
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq summary::after { content: "+"; position: absolute; right: 18px; top: 12px; font-size: 1.4rem; color: var(--gold-ink); transition: transform .2s ease-out; }
+details.faq[open] summary::after { transform: rotate(45deg); }
+details.faq p { padding: 0 16px 16px; color: var(--muted); }
+
+.cta { background: var(--navy); color: var(--on-dark); border-radius: var(--radius-lg); padding: 28px 22px; display: grid; gap: 14px; }
+.cta h2 { color: #fff; }
+.cta p { color: var(--on-dark-muted); max-width: 56ch; }
+.cta .row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-ghost { border-color: rgba(243,239,228,.45); color: var(--on-dark); }
+.btn-ghost:hover { border-color: var(--on-dark); }
+@media (min-width: 860px) { .cta { padding: 40px; grid-template-columns: 1.4fr auto; align-items: center; } }
+
+.footer { background: var(--navy); color: var(--on-dark-muted); margin-top: 48px; padding: 36px 0 calc(28px + env(safe-area-inset-bottom)); font-size: .93rem; }
+.footer .wrap { display: grid; gap: 22px; }
+.footer b { color: var(--on-dark); display: block; font-weight: 600; }
+.footer a { text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+@media (min-width: 860px) { .footer .wrap { grid-template-columns: 1.3fr 1fr 1fr 1fr; } }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: .94rem; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 30; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="Midox Shop, accueil">
+      <img src="/assets/images/logo.png" alt="Midox Shop" width="120" height="48" onerror="this.replaceWith(document.createTextNode('Midox Shop'))">
+    </a>
+    <nav class="nav" aria-label="Menu">
+      <a href="/products">Catalogue</a>
+      <a href="/showroom">Showroom</a>
+      <a href="/formations">Formations</a>
+      <a href="/declenchements/" aria-current="page">Déclenchements</a>
+      <a href="/contact">Contact</a>
+    </nav>
+    <a class="btn btn-wa btn-sm wa" href="https://wa.me/212621319882" rel="noopener">WhatsApp</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Outil gratuit</div>
+        <h1>Nombre de déclenchements de votre appareil photo</h1>
+        <p class="lead">Le « kilométrage » d'un appareil photo, lu en quelques secondes à partir d'une seule photo. Idéal avant d'acheter ou de vendre d'occasion.</p>
+        <ul class="promises">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Canon, Nikon et Sony</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Gratuit, sans inscription</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Rien n'est envoyé</li>
+        </ul>
+      </div>
+
+      <div class="tool" id="tool">
+        <label class="drop" id="drop" for="file">
+          <b>Choisissez une photo prise par l'appareil</b>
+          <p>Le fichier original JPG, NEF, ARW ou CR3, tel qu'il sort de l'appareil. Pas une capture d'écran ni une photo envoyée par WhatsApp.</p>
+          <span class="btn btn-gold">Choisir une photo</span>
+        </label>
+        <input type="file" id="file" accept="image/jpeg,.jpg,.jpeg,.nef,.nrw,.arw,.sr2,.srf,.cr2,.cr3,.tif,.tiff,.dng">
+        <div class="out" id="out" hidden></div>
+        <p class="privacy" id="privacy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>La photo est lue sur votre appareil. Elle n'est ni envoyée ni enregistrée.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Comment faire</h2>
+      <ol class="steps">
+        <li><b>Prenez une photo</b><span>Avec l'appareil à vérifier, obturateur mécanique (pas en mode silencieux).</span></li>
+        <li><b>Récupérez le fichier original</b><span>Avec un lecteur de carte SD, AirDrop ou l'app de l'appareil en taille originale. Sur iPhone, enregistrez-la dans Fichiers.</span></li>
+        <li><b>Choisissez-la ici</b><span>Le nombre de déclenchements et l'usure s'affichent tout de suite.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2>Appareils compatibles</h2>
+      <p class="intro">Le nombre de déclenchements est enregistré dans les photos de ces appareils.</p>
+      <div class="models">
+        <div class="model"><h3>Nikon</h3><p>Reflex D3000 à D850 et hybrides Z (Z5, Z6, Z7, Z50, Zf…).</p></div>
+        <div class="model"><h3>Sony</h3><p>Hybrides α (α6000 à α6700, α7 et α7R, α7S, α9, α1) et reflex SLT / α99.</p></div>
+        <div class="model"><h3>Canon</h3><p>EOS R50, R100, RP, R8, R6, R6 Mark II, R5 et M50 Mark II.</p></div>
+        <div class="model no"><h3>Autres Canon</h3><p>Les reflex Canon (4000D, 2000D, 77D…) gardent le compteur dans l'appareil : passez au showroom, on le vérifie pour vous.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2>Combien de déclenchements, c'est beaucoup ?</h2>
+      <p class="intro">Chaque modèle a une durée de vie prévue : environ 100 000 déclenchements pour un appareil d'entrée de gamme, 150 000 à 200 000 pour un boîtier expert, 300 000 à 500 000 pour un professionnel. L'outil compare le compteur à celle de votre modèle.</p>
+      <div class="scaletable">
+        <div><i style="background:var(--ok)"></i><b>Comme neuf</b><span>moins de 10 %</span></div>
+        <div><i style="background:var(--ok)"></i><b>Bon état</b><span>10 à 40 %</span></div>
+        <div><i style="background:var(--mid)"></i><b>Usure moyenne</b><span>40 à 75 %</span></div>
+        <div><i style="background:var(--high)"></i><b>Usure élevée</b><span>75 à 100 %</span></div>
+        <div><i style="background:var(--high)"></i><b>Au-delà de la durée nominale</b><span>plus de 100 %</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2>Questions fréquentes</h2>
+      <details class="faq"><summary>Qu'est-ce que le nombre de déclenchements ?</summary><p>C'est le nombre de photos prises par l'appareil depuis sa fabrication, l'équivalent du kilométrage d'une voiture. Il indique l'usure de l'obturateur, la pièce qui s'ouvre et se ferme à chaque photo.</p></details>
+      <details class="faq"><summary>Ma photo est-elle envoyée sur internet ?</summary><p>Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop.</p></details>
+      <details class="faq"><summary>Pourquoi ma photo ne donne pas de résultat ?</summary><p>Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos.</p></details>
+      <details class="faq"><summary>Le compteur compte-t-il aussi l'obturateur électronique ?</summary><p>Sur les Canon R et les Nikon Z, oui : le chiffre inclut les photos en obturateur électronique, l'usure réelle de l'obturateur peut donc être plus faible. Sur les Sony récents, seules les photos en obturateur mécanique sont comptées.</p></details>
+      <details class="faq"><summary>Mon appareil n'est pas compatible, que faire ?</summary><p>Passez dans l'un de nos showrooms à Casablanca ou écrivez-nous sur WhatsApp : nous vérifions le compteur des autres modèles avec un câble.</p></details>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta">
+        <div>
+          <h2>Vendre, échanger ou acheter d'occasion ?</h2>
+          <p>Chez Midox Shop, chaque appareil d'occasion est vérifié, compteur compris. Vous pouvez aussi faire reprendre le vôtre en échange d'un neuf.</p>
+        </div>
+        <div class="row">
+          <a class="btn btn-gold" href="/products">Voir le catalogue</a>
+          <a class="btn btn-ghost" href="https://wa.me/212621319882?text=Bonjour%20Midox%20Shop%2C%20je%20voudrais%20vendre%20ou%20%C3%A9changer%20mon%20appareil%20photo." rel="noopener">Faire reprendre mon appareil</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.</div>
+    <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
+    <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
+    <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+import { read, wear, wearPercent, prettyExifDate, fmtCount } from './reader.js';
+
+const WA = '212621319882';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const tone = t => ({ ok: 'var(--ok)', mid: 'var(--mid)', high: 'var(--high)' }[t]);
+const toneHex = t => ({ ok: '#2f9a5a', mid: '#d98a1f', high: '#d4493a' }[t]);
+const fmtDate = t => { const d = new Date(t), p = n => String(n).padStart(2, '0'); return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+let toastTimer;
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400); };
+
+// The reader speaks English (it's shared with the apps): its messages in French for the site.
+const FR = [
+  [/^This file has no camera data/, "Ce fichier ne contient pas les données de l'appareil (EXIF). Choisissez le fichier JPG ou RAW original, tel qu'il sort de l'appareil."],
+  [/^This is a HEIC\/HEIF file/, "C'est un fichier HEIC, que cet outil ne lit pas. Choisissez le fichier JPG ou RAW de l'appareil."],
+  [/^This is a PNG/, "C'est un fichier PNG (une capture d'écran ou une image exportée). Choisissez la photo originale de l'appareil."],
+  [/^This is an iPhone photo/, "C'est une photo prise avec un iPhone. Choisissez une photo prise par l'appareil photo."],
+  [/^This photo has no camera make/, "Cette photo n'indique pas d'appareil. Elle vient sans doute d'un téléphone, d'un logiciel de retouche ou d'une messagerie."],
+  [/cameras are not supported/, "Cette marque n'est pas prise en charge. L'outil lit les Nikon, les Sony et les Canon R récents."],
+  [/is missing the camera's private data/, "Cette photo a perdu les données internes de l'appareil : elle a été convertie, réduite ou envoyée par une app comme WhatsApp. Sur iPhone, choisissez la photo dans l'app Fichiers, pas dans Photos."],
+  [/^This Canon doesn't store a readable shutter count/, "Ce Canon n'enregistre pas son compteur dans les photos. Les reflex Canon se vérifient avec un câble : passez au showroom ou écrivez-nous sur WhatsApp."],
+  [/^Couldn't find a valid shutter count in this Canon/, "Pas de compteur valide dans cette photo Canon. Essayez avec une photo JPG ou CR3 prise à l'instant."],
+  [/^This older Nikon model/, "Ce Nikon ancien n'enregistre pas de compteur."],
+  [/^This Nikon photo does not contain/, "Cette photo Nikon ne contient pas de compteur (certains modèles anciens ou compacts ne l'enregistrent pas)."],
+  [/^Sony compact cameras/, "Les compacts Sony (RX100, ZV-1…) n'enregistrent pas de compteur dans les photos."],
+  [/^This Sony photo has no shutter-count block/, "Cette photo Sony n'a pas de bloc compteur : le modèle ne l'enregistre pas, ou la photo a été réduite par une app. Utilisez le fichier original."],
+  [/does not store a readable shutter count in photos \(or uses/, "Ce Sony n'enregistre pas de compteur lisible dans les photos (ou n'a qu'un obturateur électronique)."],
+  [/^Couldn't find a shutter count in this Sony/, "Pas de compteur dans cette photo Sony. Si l'obturateur silencieux était activé, reprenez une photo avec l'obturateur mécanique."],
+  [/^Unrecognised photo format/, "Format de photo non reconnu."],
+  [/^Corrupt photo data/, "Les données de la photo sont abîmées."],
+  [/^Couldn't read this CR3/, "Impossible de lire ce fichier CR3."],
+  [/^This photo was edited with (.*?)\./, (m, app) => `Cette photo a été modifiée avec ${app}. Les données peuvent manquer ou être faussées : utilisez le fichier original de l'appareil.`],
+  [/^The flash fired/, "Le flash s'est déclenché sur cette photo : sur ce modèle, le compteur le plus précis est alors ignoré. Reprenez une photo sans flash."],
+  [/can roll over after 65,536/, "Sur ce modèle, le compteur peut repartir de zéro après 65 536. Si l'appareil semble très utilisé, ajoutez 65 536."],
+  [/^On this Canon the count includes electronic-shutter/, "Sur ce Canon, le compteur inclut les photos en obturateur électronique : l'usure réelle de l'obturateur peut être plus faible."],
+  [/^On Nikon Z cameras/, "Sur les Nikon Z, le compteur inclut les photos en obturateur électronique."],
+  [/^Counts mechanical-shutter shots only/, "Seules les photos en obturateur mécanique sont comptées (pas celles en mode silencieux)."],
+];
+const fr = s => { for (const [re, out] of FR) { const m = s.match(re); if (m) return typeof out === 'function' ? out(...m) : out; } return s; };
+
+// ---------- reading
+const drop = $('#drop'), input = $('#file'), out = $('#out');
+input.onchange = () => { const f = input.files[0]; input.value = ''; if (f) readFile(f); };
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('hot'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('hot'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('hot'); const f = e.dataTransfer.files[0]; if (f) readFile(f); });
+
+let current = null;
+
+async function readFile(file) {
+  drop.hidden = true; out.hidden = false;
+  out.innerHTML = `<div class="busy"><div class="spin"></div>Lecture de ${esc(file.name)}…</div>`;
+  let r;
+  try { r = read(new Uint8Array(await file.slice(0, 12 * 1024 * 1024).arrayBuffer())); }
+  catch { r = { count: null, problem: "Impossible d'ouvrir ce fichier.", displayName: 'Appareil inconnu', details: [], warnings: [] }; }
+  current = { r, fileName: file.name, time: Date.now() };
+  render();
+  $('#tool').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function panel(r) {
+  const count = r.count, digits = count == null ? '' : String(count), n = Math.max(6, digits.length), padded = digits.padStart(n, '0');
+  let wheels = '';
+  for (let i = 0; i < n; i++) {
+    const rem = n - 1 - i, dim = count == null || i < n - digits.length;
+    wheels += `<div class="wheel${dim ? ' dim' : ''}${rem > 0 && rem % 3 === 0 ? ' group' : ''}${count != null ? ' roll' : ''}"><span style="animation-delay:${i * 50}ms">${count == null ? '–' : padded[i]}</span></div>`;
+  }
+  let scale = '';
+  if (count != null && r.rated) {
+    const w = wear(count, r.rated), f = Math.min(1, count / r.rated), pct = wearPercent(count, r.rated);
+    let ticks = '';
+    for (let t = 0; t <= 40; t++) ticks += `<i class="${t % 10 === 0 ? 'major' : ''}"${count > 0 && t / 40 <= f ? ` style="background:${tone(w.tone)}"` : ''}></i>`;
+    scale = `<div class="scale"><div class="ticks">${ticks}</div><div class="marker"><b style="left:${(f * 100).toFixed(2)}%"></b></div>
+      <div class="scale-labels num"><span>0</span><span>${fmtCount(r.rated / 2)}</span><span>${fmtCount(r.rated)} ${r.ratedOfficial ? '(nominale)' : '(estimée)'}</span></div></div>
+      <div class="verdict"><strong>${w.fr}</strong><span>${pct === 0 && count > 0 ? 'moins de 1 %' : pct + ' %'} de la durée de vie ${r.ratedOfficial ? 'nominale' : 'estimée'}</span></div>`;
+  }
+  const title = r.make == null && count == null ? 'Aucun compteur trouvé' : r.displayName;
+  const caption = count == null ? 'Pas de compteur dans ce fichier' : r.includesElectronic ? 'déclenchements, obturateur électronique compris' : 'déclenchements';
+  return `<div class="panel"><div class="head"><div class="cam${count == null ? ' dim' : ''}">${esc(title)}</div>${r.serial ? `<div class="sn num">N° de série ${esc(r.serial)}</div>` : ''}</div>
+    <div class="odo num" role="img" aria-label="${count == null ? 'Pas de compteur' : fmtCount(count) + ' déclenchements'}">${wheels}</div>
+    <div class="caption">${caption}</div>${scale}</div>`;
+}
+
+function render() {
+  const { r, fileName } = current;
+  let h = panel(r);
+  if (r.problem) h += `<div class="notice bad"><b>Pas de résultat</b>${esc(fr(r.problem))}</div>`;
+  for (const w of r.warnings || []) h += `<div class="notice warn">${esc(fr(w))}</div>`;
+  for (const [, v] of (r.details || []).filter(d => d[0] === 'Note')) h += `<div class="notice info">${esc(fr(v))}</div>`;
+  const rows = [];
+  if (r.dateTaken) rows.push(['Photo prise le', prettyExifDate(r.dateTaken)]);
+  rows.push(['Fichier', fileName]);
+  if (r.rated) rows.push([r.ratedOfficial ? 'Durée de vie nominale' : 'Durée de vie estimée', fmtCount(r.rated) + ' déclenchements']);
+  h += `<dl class="details">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd class="num">${esc(v)}</dd></div>`).join('')}</dl>`;
+  if (r.count != null) {
+    const msg = `Bonjour Midox Shop, je voudrais vendre ou échanger mon ${r.displayName} (${fmtCount(r.count).replace(/ /g, ' ')} déclenchements).`;
+    h += `<div class="actions">
+      <button class="btn btn-gold" id="share">Partager le rapport</button>
+      <a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" rel="noopener">Vendre ou échanger cet appareil</a>
+      <a class="link" href="/products">Voir nos appareils →</a>
+    </div>`;
+    if (r.dateTaken) h += `<p class="privacy" style="margin-top:0">C'est le compteur au moment de la photo. Pour le chiffre du jour, utilisez une photo prise à l'instant.</p>`;
+  } else {
+    h += `<a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Midox Shop, je voudrais vérifier le nombre de déclenchements de mon appareil photo.')}" rel="noopener">Demander une vérification sur WhatsApp</a>`;
+  }
+  h += `<button class="again" id="again">Choisir une autre photo</button>`;
+  out.innerHTML = h;
+  $('#again').onclick = () => input.click();
+  if (r.count != null) $('#share').onclick = shareReport;
+}
+
+// ---------- report image: the shop's colours, in French, with the site at the bottom
+async function renderReport() {
+  const { r, time } = current;
+  await Promise.all(['600 84px Kanit', '700 84px Kanit', '400 36px Figtree', '600 36px Figtree'].map(f => document.fonts.load(f).catch(() => {})));
+  const W = 1080, H = 1350, P = 72, inner = W - 2 * P;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d');
+  const font = (w, s, fam) => `${w} ${s}px ${fam}, sans-serif`;
+  const text = (s, x, y, f, col, align = 'left') => { c.font = f; c.fillStyle = col; c.textAlign = align; c.fillText(s, x, y); };
+  const TEXT = '#f3efe4', MUTED = '#b9bccb', GOLD = '#c59a3c';
+  c.fillStyle = '#1d2742'; c.fillRect(0, 0, W, H);
+  let y = 128;
+  text('RAPPORT DE DÉCLENCHEMENTS', P, y, font(600, 30, 'Figtree'), GOLD);
+  y += 96;
+  let size = 84; c.font = font(600, size, 'Kanit');
+  while (c.measureText(r.displayName).width > inner && size > 48) { size -= 2; c.font = font(600, size, 'Kanit'); }
+  text(r.displayName, P, y, font(600, size, 'Kanit'), '#ffffff');
+  if (r.serial) { y += 58; text('N° de série ' + r.serial, P, y, font(400, 36, 'Figtree'), MUTED); }
+  y += 56;
+  const digits = String(r.count), n = Math.max(6, digits.length), groups = Math.floor((n - 1) / 3);
+  const gap = 12, gg = 28, ww = (inner - gap * (n - 1 - groups) - gg * groups) / n, wh = 220, padded = digits.padStart(n, '0');
+  let x = P;
+  for (let i = 0; i < n; i++) {
+    const g = c.createLinearGradient(0, y, 0, y + wh);
+    [['#121a30', 0], ['#26314f', .22], ['#313d62', .5], ['#26314f', .78], ['#121a30', 1]].forEach(([col, s]) => g.addColorStop(s, col));
+    c.fillStyle = g; c.beginPath(); c.roundRect ? c.roundRect(x, y, ww, wh, 14) : c.rect(x, y, ww, wh); c.fill();
+    c.font = font(600, 170, 'Kanit'); c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = i < n - digits.length ? '#5d6788' : '#ffffff'; c.fillText(padded[i], x + ww / 2, y + wh / 2 + 8);
+    c.textBaseline = 'alphabetic';
+    const rem = n - 1 - i; x += ww + (rem > 0 && rem % 3 === 0 ? gg : gap);
+  }
+  y += wh + 58;
+  text('déclenchements', P, y, font(400, 38, 'Figtree'), MUTED);
+  if (r.rated) {
+    const w = wear(r.count, r.rated), f = Math.min(1, r.count / r.rated), col = toneHex(w.tone);
+    y += 64; const base = y + 44;
+    for (let t = 0; t <= 40; t++) { const tx = P + t * (inner - 4) / 40, h = t % 10 === 0 ? 44 : 24; c.fillStyle = r.count > 0 && t / 40 <= f ? col : '#4b5678'; c.fillRect(tx, base - h, 4, h); }
+    const mx = P + f * (inner - 4) + 2;
+    c.fillStyle = GOLD; c.beginPath(); c.moveTo(mx, base + 8); c.lineTo(mx - 16, base + 30); c.lineTo(mx + 16, base + 30); c.closePath(); c.fill();
+    y = base + 74;
+    const sm = font(400, 30, 'Figtree');
+    text('0', P, y, sm, MUTED); text(fmtCount(r.rated / 2), P + inner / 2, y, sm, MUTED, 'center');
+    text(`${fmtCount(r.rated)} ${r.ratedOfficial ? '(nominale)' : '(estimée)'}`, P + inner, y, sm, MUTED, 'right');
+    y += 96;
+    const pct = wearPercent(r.count, r.rated);
+    c.font = font(600, 62, 'Kanit'); const lw = c.measureText(w.fr).width;
+    text(w.fr, P, y, font(600, 62, 'Kanit'), '#ffffff');
+    const rest = (pct === 0 && r.count > 0 ? 'moins de 1 %' : pct + ' %') + (r.ratedOfficial ? ' de la durée de vie nominale' : ' de la durée de vie estimée');
+    let rs = 34; c.font = font(400, rs, 'Figtree');
+    while (P + lw + 24 + c.measureText(rest).width > W - P && rs > 22) { rs -= 1; c.font = font(400, rs, 'Figtree'); }
+    text(rest, P + lw + 24, y - 6, font(400, rs, 'Figtree'), MUTED);
+  }
+  const rows = [['Méthode', 'Photo (données EXIF)'], ['Date du contrôle', fmtDate(time)]];
+  let by = H - P - 60 - rows.length * 72 - (r.includesElectronic ? 56 : 0);
+  for (const [k, v] of rows) {
+    c.fillStyle = '#37446b'; c.fillRect(P, by, inner, 2);
+    text(k, P, by + 48, font(400, 32, 'Figtree'), MUTED);
+    text(v, P + inner, by + 48, font(600, 32, 'Figtree'), TEXT, 'right');
+    by += 72;
+  }
+  if (r.includesElectronic) { text('Le compteur inclut les déclenchements en obturateur électronique.', P, by + 36, font(400, 28, 'Figtree'), MUTED); by += 56; }
+  c.fillStyle = GOLD; c.fillRect(P, H - P - 18, 48, 4);
+  text('midoxshop.ma', P + 64, H - P - 6, font(600, 30, 'Figtree'), GOLD);
+  return new Promise(res => cv.toBlob(res, 'image/png'));
+}
+
+async function shareReport() {
+  const blob = await renderReport();
+  const name = `rapport-${current.r.displayName.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${current.r.count}.png`;
+  const file = new File([blob], name, { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file] }); } catch (e) { if (e.name !== 'AbortError') toast("Impossible de partager le rapport"); }
+    return;
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  toast('Rapport enregistré');
+}
+
+window.__test = { readFile, renderReport, get current() { return current; } };
+</script>
+</body>
+</html>
