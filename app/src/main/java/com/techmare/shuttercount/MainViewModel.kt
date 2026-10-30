@@ -114,6 +114,26 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     // ------------------------------------------------------------- photo
 
+    /** Debug screen check: show a reading made from bytes, as if the photo had been picked. */
+    internal fun showPhotoBytes(bytes: ByteArray, name: String) {
+        val result = PhotoShutterReader.read(bytes)
+        var previous: Seen? = null
+        if (result.shutterCount != null) {
+            previous = seenBefore(result.serial)
+            addHistory(HistoryEntry(
+                id = System.nanoTime(), time = System.currentTimeMillis(), camera = result.displayName,
+                serial = result.serial, count = result.shutterCount, ratedLife = result.ratedLife, ratedOfficial = result.ratedOfficial, source = "Photo",
+            ))
+        }
+        _photo.value = PhotoState.Done(result, name, previous)
+    }
+
+    /** Debug screen check: put the USB tab in a given state. */
+    internal fun showUsbState(state: UsbState) { _usb.value = state }
+
+    /** Debug screen check: replace History with sample checks. */
+    internal fun replaceHistory(list: List<HistoryEntry>) { _history.value = list; store.save(list) }
+
     fun readPhoto(uri: Uri) {
         _photo.value = PhotoState.Loading
         viewModelScope.launch {
@@ -166,8 +186,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     // --------------------------------------------------------------- USB
 
-    fun refreshUsb() {
-        if (_usb.value is UsbState.Reading) return
+    /**
+     * Connected / not connected. A finished reading or error stays on screen (coming back from
+     * sharing the report, or unplugging after a read, must not wipe it) unless [keepResult] is false.
+     */
+    fun refreshUsb(keepResult: Boolean = true) {
+        val now = _usb.value
+        if (now is UsbState.Reading) return
+        if (keepResult && (now is UsbState.Done || now is UsbState.Error)) return
         val device = findCamera(usbManager)
         _usb.value = if (device == null) UsbState.NoCamera else UsbState.Connected(cameraName(device))
     }

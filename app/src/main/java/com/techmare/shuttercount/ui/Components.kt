@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -38,6 +39,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
@@ -53,6 +56,31 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.roundToInt
+
+// ---------------------------------------------------------------- buttons
+
+/** Secondary action: outlined, ink text (the yellow is kept for the one main action). */
+@Composable
+fun GhostButton(onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+    val c = LocalAppColors.current
+    androidx.compose.material3.OutlinedButton(
+        onClick = onClick, modifier = modifier,
+        colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(contentColor = c.ink),
+        border = androidx.compose.foundation.BorderStroke(1.dp, c.muted.copy(alpha = 0.45f)),
+        content = content,
+    )
+}
+
+/** Quiet text action (Read again, Cancel…), ink in both themes. */
+@Composable
+fun QuietButton(onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+    val c = LocalAppColors.current
+    androidx.compose.material3.TextButton(
+        onClick = onClick, modifier = modifier,
+        colors = androidx.compose.material3.ButtonDefaults.textButtonColors(contentColor = c.ink),
+        content = content,
+    )
+}
 
 // ------------------------------------------------------------------ panel
 
@@ -77,7 +105,7 @@ fun InstrumentPanel(
     Column(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(c.panel)
             .padding(horizontal = 18.dp, vertical = 16.dp),
     ) {
@@ -137,23 +165,33 @@ private fun rememberReducedMotion(): Boolean {
     }
 }
 
+/** The last count the odometer rolled to, so coming back to a tab shows it still instead of rolling again. */
+private object OdometerMemory { var lastRolled: Long? = null }
+
 /**
  * Mechanical counter: each wheel rolls like a real odometer, higher wheels only
- * turning as the one below passes 9. Rolls up once when a new count arrives.
+ * turning as the one below passes 9. Rolls up once when a new count arrives, ends
+ * with a confirm tick; with no count the wheels show dashes, never a misleading 000000.
  */
 @Composable
 fun Odometer(value: Long?) {
     val c = LocalAppColors.current
     val reduced = rememberReducedMotion()
-    val anim = remember { Animatable(0f) }
+    val view = LocalView.current
+    val fresh = value != null && value != OdometerMemory.lastRolled
+    val anim = remember { Animatable(if (fresh) 0f else (value ?: 0L).toFloat()) }
     LaunchedEffect(value) {
         if (value == null) {
             anim.snapTo(0f)
-        } else if (reduced) {
+        } else if (!fresh || reduced) {
             anim.snapTo(value.toFloat())
+            if (fresh) confirmTick(view)
+            OdometerMemory.lastRolled = value
         } else {
+            OdometerMemory.lastRolled = value
             anim.snapTo(0f)
-            anim.animateTo(value.toFloat(), tween(durationMillis = 1500, easing = FastOutSlowInEasing))
+            anim.animateTo(value.toFloat(), tween(durationMillis = 1100, easing = CubicBezierEasing(0.23f, 1f, 0.32f, 1f)))
+            confirmTick(view)
         }
     }
     val target = value ?: 0L
@@ -169,14 +207,14 @@ fun Odometer(value: Long?) {
                 val rem = v - base * unit
                 base + max(0.0, rem - (unit - 1))
             }
-            Wheel(pos, dim = i >= significant, modifier = Modifier.weight(1f), colors = c)
+            Wheel(pos, dim = i >= significant, blank = value == null, modifier = Modifier.weight(1f), colors = c)
             if (i % 3 == 0 && i != 0) Spacer(Modifier.width(6.dp))
         }
     }
 }
 
 @Composable
-private fun Wheel(position: Double, dim: Boolean, modifier: Modifier, colors: AppColors) {
+private fun Wheel(position: Double, dim: Boolean, blank: Boolean, modifier: Modifier, colors: AppColors) {
     val height = 64.dp
     val hPx = with(LocalDensity.current) { height.toPx() }
     val whole = floor(position)
@@ -197,6 +235,10 @@ private fun Wheel(position: Double, dim: Boolean, modifier: Modifier, colors: Ap
             .clipToBounds(),
         contentAlignment = Alignment.Center,
     ) {
+        if (blank) {
+            Text("–", fontFamily = Fonts.condensed, fontWeight = FontWeight.Bold, fontSize = 40.sp, color = textColor)
+            return@Box
+        }
         DigitText(digit, textColor, Modifier.offset { IntOffset(0, (-frac * hPx).roundToInt()) })
         if (frac > 0.001f) DigitText(next, textColor, Modifier.offset { IntOffset(0, ((1 - frac) * hPx).roundToInt()) })
     }
@@ -207,6 +249,14 @@ private fun DigitText(d: Int, color: Color, modifier: Modifier) {
     Text(
         d.toString(), modifier,
         fontFamily = Fonts.condensed, fontWeight = FontWeight.Bold, fontSize = 46.sp, lineHeight = 46.sp, color = color,
+    )
+}
+
+/** Haptic punctuation for "the count is in": one tick, on the frame the wheels settle. */
+private fun confirmTick(view: android.view.View) {
+    view.performHapticFeedback(
+        if (android.os.Build.VERSION.SDK_INT >= 30) android.view.HapticFeedbackConstants.CONFIRM
+        else android.view.HapticFeedbackConstants.KEYBOARD_TAP,
     )
 }
 
@@ -275,7 +325,7 @@ fun DetailRows(rows: List<Pair<String, String>>) {
         rows.forEachIndexed { i, (k, v) ->
             Row(Modifier.fillMaxWidth().padding(vertical = 9.dp)) {
                 Text(k, Modifier.width(112.dp), style = MaterialTheme.typography.bodyMedium, color = c.muted)
-                Text(v, style = MaterialTheme.typography.bodyMedium, color = c.ink)
+                Text(v, style = MaterialTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"), color = c.ink)
             }
             if (i < rows.lastIndex) HorizontalDivider(color = c.rule)
         }

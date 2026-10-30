@@ -50,10 +50,11 @@ class MainActivity : ComponentActivity() {
 
     private fun handleIntent(intent: Intent?) {
         if (intent == null) return
+        ScreenCheck.handle(intent, vm)?.let { tab = it; return }
         when (intent.action) {
             UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
                 tab = Tab.USB
-                vm.refreshUsb()
+                vm.refreshUsb(keepResult = false)
             }
             Intent.ACTION_SEND -> {
                 val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)

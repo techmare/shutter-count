@@ -14,9 +14,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -100,7 +98,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     ),
                 )
                 Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
-                    Text("Read camera again")
+                    Text("Read again")
                 }
             }
 
@@ -154,15 +152,15 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }
-                        OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
+                        GhostButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
                     }
                     if (Midox.installed(context)) {
-                        OutlinedButton(
+                        GhostButton(
                             onClick = { Midox.addSerial(context, r.model, r.serial, count.toLong()) },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                         ) { Text("Add to Midox serial numbers") }
                     }
-                    TextButton(onClick = { vm.readCanon(allowAdvanced = r.method == CanonMethod.FACTORY) }) { Text("Read again") }
+                    QuietButton(onClick = { vm.readCanon(allowAdvanced = r.method == CanonMethod.FACTORY) }) { Text("Read again") }
                 }
 
                 val raw = r.counters.mapNotNull { ct -> ct.raw?.let { "${ct.label}\n$it" } }
@@ -173,7 +171,7 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     }
                 }
                 if (r.diagnostics.isNotBlank()) {
-                    TextButton(onClick = {
+                    QuietButton(onClick = {
                         shareText(context, "Shutter Count diagnostic report\n${r.model}\n\n${r.diagnostics}")
                     }) { Text("Share diagnostic report") }
                 }
@@ -194,9 +192,9 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 )
             },
             confirmButton = {
-                TextButton(onClick = { confirmAdvanced = false; vm.readCanon(allowAdvanced = true) }) { Text("Read") }
+                QuietButton(onClick = { confirmAdvanced = false; vm.readCanon(allowAdvanced = true) }) { Text("Read") }
             },
-            dismissButton = { TextButton(onClick = { confirmAdvanced = false }) { Text("Cancel") } },
+            dismissButton = { QuietButton(onClick = { confirmAdvanced = false }) { Text("Cancel") } },
         )
     }
 }

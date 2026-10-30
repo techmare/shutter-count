@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import com.techmare.shuttercount.R
 
 /**
+ * Shapes, one rule: cards and the panel 16 dp, odometer wheels and small tags 6 dp, buttons are pills.
+ *
  * Camera-body palette: aluminium paper, graphite instrument panel,
  * and the shop's signal yellow as the single accent.
  */
@@ -96,7 +98,7 @@ fun ShutterTheme(content: @Composable () -> Unit) {
         surfaceContainer = Color(0xFF25292E), surfaceContainerHigh = Color(0xFF2C3137),
         error = c.high,
     ) else lightColorScheme(
-        primary = c.ink, onPrimary = Color.White,
+        primary = c.signal, onPrimary = Color(0xFF1C1F23),
         background = c.paper, surface = c.paper, onBackground = c.ink, onSurface = c.ink,
         surfaceVariant = c.rule, onSurfaceVariant = c.muted, outline = Color(0xFF9AA0A7),
         surfaceContainer = Color(0xFFF6F7F8), surfaceContainerHigh = Color(0xFFFFFFFF),

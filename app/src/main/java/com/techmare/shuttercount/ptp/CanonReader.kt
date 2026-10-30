@@ -75,7 +75,8 @@ class CanonReader(private val session: PtpSession) {
                 notes: List<String> = emptyList(), problem: String? = null, canTryAdvanced: Boolean = false,
             ) = CanonReading(
                 model, serial, firmware, counters, method, confirmed, rated, notes, problem, canTryAdvanced,
-                CameraModels.rating(Brand.CANON, model)?.official ?: false, log.joinToString("\n"),
+                ratedOfficial = CameraModels.rating(Brand.CANON, model)?.official ?: false,
+                diagnostics = log.joinToString("\n"),
             )
 
             // Nikon, Sony and Canon R bodies keep the count in their photos: read the newest one

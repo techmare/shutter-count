@@ -14,9 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -112,10 +110,10 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                             },
                             modifier = Modifier.weight(1f).height(48.dp),
                         ) { Text("Share report") }
-                        OutlinedButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
+                        GhostButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
                     }
                     if (Midox.installed(context)) {
-                        OutlinedButton(
+                        GhostButton(
                             onClick = { Midox.addSerial(context, r.displayName, r.serial, count.toLong()) },
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                         ) { Text("Add to Midox serial numbers") }
@@ -123,7 +121,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     if (r.dateTaken != null) {
                         Note("This is the count when the photo was taken. For today's count, use a photo taken just now.", warning = false)
                     }
-                    TextButton(onClick = pick) { Text("Check another photo") }
+                    QuietButton(onClick = pick) { Text("Choose another photo") }
                 } else {
                     Button(onClick = pick, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Choose another photo") }
                 }

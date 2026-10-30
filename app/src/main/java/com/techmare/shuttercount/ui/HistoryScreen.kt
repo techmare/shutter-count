@@ -27,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -102,8 +101,8 @@ fun HistoryScreen(vm: MainViewModel) {
             onDismissRequest = { deleting = null },
             title = { Text("Delete this check?") },
             text = { Text("${e.camera}, ${formatCount(e.count)} shots on ${formatDate(e.time)}") },
-            confirmButton = { TextButton(onClick = { vm.deleteEntry(e.id); deleting = null }) { Text("Delete") } },
-            dismissButton = { TextButton(onClick = { deleting = null }) { Text("Cancel") } },
+            confirmButton = { QuietButton(onClick = { vm.deleteEntry(e.id); deleting = null }) { Text("Delete") } },
+            dismissButton = { QuietButton(onClick = { deleting = null }) { Text("Cancel") } },
         )
     }
 }
@@ -119,7 +118,7 @@ private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, 
         Column(Modifier.weight(1f).padding(start = 4.dp)) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(e.camera, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, color = c.ink)
-                Text(formatCount(e.count), style = MaterialTheme.typography.titleLarge, color = c.ink)
+                Text(formatCount(e.count), style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"), color = c.ink)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -166,7 +165,7 @@ fun NoteDialog(initial: String, onDismiss: () -> Unit, onSave: (String) -> Unit)
                 modifier = Modifier.fillMaxWidth(), minLines = 2,
             )
         },
-        confirmButton = { TextButton(onClick = { onSave(text.trim()) }) { Text("Save note") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        confirmButton = { QuietButton(onClick = { onSave(text.trim()) }) { Text("Save note") } },
+        dismissButton = { QuietButton(onClick = onDismiss) { Text("Cancel") } },
     )
 }
