@@ -127,7 +127,12 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 .privacy svg { flex: none; margin-top: 2px; color: var(--gold-ink); }
 
 /* result panel */
-.panel { background: var(--navy); color: var(--on-dark); border-radius: var(--radius-lg); padding: 18px 18px 20px; }
+.panel { background: var(--navy); color: var(--on-dark); border-radius: var(--radius-lg); padding: 18px 18px 20px; position: relative; overflow: hidden; }
+/* Brand that can't be cropped away from the number: a faint diagonal pattern over the whole panel, digits included */
+.panel::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; opacity: .12;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='120'%3E%3Ctext x='0' y='70' transform='rotate(-24 130 60)' font-family='Kanit,Arial' font-weight='700' font-size='19' letter-spacing='2' fill='%23d4a74b'%3EMIDOX SHOP · midoxshop.ma%3C/text%3E%3C/svg%3E");
+  background-size: 260px 120px; }
+.panel > * { position: relative; z-index: 1; }
 .tool .panel { margin: -2px; }
 .panel .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .panel .cam { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; color: #fff; }
@@ -141,6 +146,10 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 .wheel.group { margin-right: 13px; }
 .wheel.dim { color: #5c5c5c; }
 .wheel span { display: block; }
+.wheel { position: relative; }
+/* "MIDOX" engraved on every wheel, under the digit */
+.wheel::before { content: "midoxshop.ma"; position: absolute; left: 0; right: 0; top: 4px; text-align: center; font-size: clamp(5px, 1.3vw, 7px); font-weight: 500; color: var(--gold); opacity: .55; }
+.wheel::after { content: "MIDOX"; position: absolute; left: 0; right: 0; bottom: 5px; text-align: center; font-size: clamp(6px, 1.6vw, 9px); font-weight: 600; letter-spacing: .14em; color: var(--gold); opacity: .75; }
 .wheel.roll span { animation: roll .45s cubic-bezier(.23,1,.32,1) both; }
 @keyframes roll { from { transform: translateY(-75%); opacity: 0; } to { transform: none; opacity: 1; } }
 .caption { color: var(--on-dark-muted); }
@@ -1316,8 +1325,12 @@ async function renderReport() {
     [['#0e0e0e', 0], ['#262626', .22], ['#333333', .5], ['#262626', .78], ['#0e0e0e', 1]].forEach(([col, s]) => g.addColorStop(s, col));
     c.fillStyle = g; c.beginPath(); c.roundRect ? c.roundRect(x, y, ww, wh, 14) : c.rect(x, y, ww, wh); c.fill();
     c.font = font(600, 170, 'Kanit'); c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillStyle = i < n - digits.length ? '#5c5c5c' : '#ffffff'; c.fillText(padded[i], x + ww / 2, y + wh / 2 + 8);
+    c.fillStyle = i < n - digits.length ? '#5c5c5c' : '#ffffff'; c.fillText(padded[i], x + ww / 2, y + wh / 2 - 4);
     c.textBaseline = 'alphabetic';
+    // "MIDOX" engraved on each wheel: no crop of the digits without the brand
+    c.font = font(600, 20, 'Kanit'); c.fillStyle = 'rgba(212,167,75,.8)'; c.textAlign = 'center';
+    c.save(); c.translate(x + ww / 2, y + wh - 16); c.fillText('M I D O X', 0, 0); c.restore();
+    c.font = font(500, 15, 'Kanit'); c.fillStyle = 'rgba(212,167,75,.55)'; c.fillText('midoxshop.ma', x + ww / 2, y + 26);
     const rem = n - 1 - i; x += ww + (rem > 0 && rem % 3 === 0 ? gg : gap);
   }
   y += wh + 58;
@@ -1353,6 +1366,11 @@ async function renderReport() {
   c.fillStyle = '#3a3a3a'; c.fillRect(P, H - P - 52, inner, 2);
   text('Contrôlé avec l\u2019outil Midox Shop', P, H - P - 6, font(300, 28, 'Kanit'), MUTED);
   text('midoxshop.ma', P + inner, H - P - 6, font(500, 30, 'Kanit'), GOLD, 'right');
+  // a faint diagonal "MIDOX SHOP · midoxshop.ma" over the whole card, the number included
+  c.save(); c.globalAlpha = .11; c.fillStyle = GOLD; c.font = font(600, 30, 'Kanit'); c.textAlign = 'left';
+  c.translate(W / 2, H / 2); c.rotate(-24 * Math.PI / 180);
+  for (let row = -14; row <= 14; row++) for (let col = -4; col <= 4; col++) c.fillText('MIDOX SHOP · midoxshop.ma', col * 470 + (row % 2) * 235 - 235, row * 92);
+  c.restore();
   return new Promise(res => cv.toBlob(res, 'image/png'));
 }
 
