@@ -25,6 +25,9 @@ logo = 'data:image/webp;base64,' + base64.b64encode((here / 'logo.webp').read_by
 assert page.count('/assets/images/logo.png') == 2, 'logo spots'
 page = page.replace('/assets/images/logo.png', logo)
 
+import subprocess, datetime
+ver = datetime.date.today().strftime('%Y.%m.%d') + '-' + subprocess.run(['git', 'rev-list', '--count', 'HEAD'], capture_output=True, text=True, cwd=here).stdout.strip()
+page = page.replace('__VERSION__', ver)
 (here / 'dist').mkdir(exist_ok=True)
 (here / 'dist' / 'index.html').write_text(page)
-print('dist/index.html', len(page) // 1024, 'KB')
+print('dist/index.html', ver, len(page) // 1024, 'KB')

@@ -360,7 +360,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop.</div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version __VERSION__</span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -502,6 +502,13 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
+const VERSION = '__VERSION__';
+let lastLog = '';
+async function copyDiag() {
+  try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }
+  catch { if (navigator.share) navigator.share({ text: lastLog }).catch(() => {}); }
+}
+
 async function readUsb() {
   let conn;
   try {
@@ -526,6 +533,9 @@ async function readUsb() {
     if (res.photoDate) r.dateTaken = null;
     current = { r, fileName: res.photoFile || null, time: Date.now(), usb: true, method: res.method };
     render();
+    lastLog = `Midox déclenchements ${VERSION}\n${res.camera}\n\n${res.log.join('\n')}`;
+    out.insertAdjacentHTML('beforeend', '<button class="again" id="diag" style="font-weight:500;font-size:.85rem">Copier le diagnostic</button>');
+    $('#diag').onclick = copyDiag;
     if (res.photoDate && r.count != null) out.insertAdjacentHTML('beforeend', `<p class="privacy">Compteur lu dans la dernière photo, prise le ${esc(res.photoDate)}. Pour le chiffre du jour, prenez une photo juste avant de brancher.</p>`);
   } catch (e) {
     showUsbError(e);
