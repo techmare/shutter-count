@@ -19,5 +19,6 @@ Rien n'est envoyé à un serveur : la photo est lue dans le navigateur du visite
 ## USB (Chrome et Edge)
 
 `ptp-usb.js` ajoute « Brancher l'appareil en USB » : le bouton n'apparaît que dans les navigateurs
-qui le permettent (Chrome / Edge sur Android, Mac, PC). Seules des commandes de lecture sont envoyées.
+qui le permettent. Seules des commandes de lecture sont envoyées.
+Le bouton n'apparaît que sur Android (Chrome), où rien n'est à régler. Pour l'activer ailleurs (au magasin) : ajouter `?usb=1` à l'adresse.
 La page doit être servie en HTTPS (c'est le cas sur midoxshop.ma).

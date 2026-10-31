@@ -261,7 +261,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
         <div class="usb" id="usbBox" hidden>
           <span>ou</span>
           <button class="btn btn-line" id="usbBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v14M12 3l-3 3M12 3l3 3M7 10v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19" r="2"/></svg>Brancher l'appareil en USB</button>
-          <small id="usbHint">Chrome ou Edge · câble USB, appareil allumé, Wi-Fi de l'appareil coupé</small>
+          <small id="usbHint">Câble USB-C ou OTG, appareil allumé, Wi-Fi de l'appareil coupé</small>
         </div>
         <div class="out" id="out" hidden></div>
         <p class="privacy" id="privacy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>La photo est lue sur votre appareil. Elle n'est ni envoyée ni enregistrée.</p>
@@ -314,7 +314,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <details class="faq"><summary>Ma photo est-elle envoyée sur internet ?</summary><p>Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop.</p></details>
       <details class="faq"><summary>Pourquoi ma photo ne donne pas de résultat ?</summary><p>Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos.</p></details>
       <details class="faq"><summary>Le compteur compte-t-il aussi l'obturateur électronique ?</summary><p>Sur les Canon R et les Nikon Z, oui : le chiffre inclut les photos en obturateur électronique, l'usure réelle de l'obturateur peut donc être plus faible. Sur les Sony récents, seules les photos en obturateur mécanique sont comptées.</p></details>
-      <details class="faq"><summary>Peut-on brancher l'appareil en USB ?</summary><p>Oui, avec Chrome ou Edge sur Android, Mac ou PC : « Brancher l'appareil en USB » lit la dernière photo de la carte (Nikon, Sony, Canon R) ou le compteur des reflex Canon plus anciens (4000D, 2000D, 1300D…). Seules des commandes de lecture sont envoyées. Sur Mac, il faut d'abord libérer l'appareil (la page explique comment) ; sur iPhone, l'USB n'est pas possible.</p></details>
+      <details class="faq"><summary>Peut-on brancher l'appareil en USB ?</summary><p>Oui, depuis un téléphone Android avec Chrome : branchez l'appareil avec un câble USB-C ou OTG et touchez « Brancher l'appareil en USB ». La page lit la dernière photo de la carte (Nikon, Sony, Canon R) ou le compteur des reflex Canon plus anciens (4000D, 2000D, 1300D…), avec des commandes de lecture uniquement. Sur ordinateur et sur iPhone, choisissez simplement une photo de l'appareil.</p></details>
       <details class="faq"><summary>Mon appareil n'est pas compatible, que faire ?</summary><p>Passez dans l'un de nos showrooms à Casablanca ou écrivez-nous sur WhatsApp : nous vérifions le compteur des autres modèles avec un câble.</p></details>
     </div>
   </section>
@@ -456,7 +456,7 @@ function render() {
   } else {
     h += `<a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Midox Shop, je voudrais vérifier le nombre de déclenchements de mon appareil photo.')}" rel="noopener">Demander une vérification sur WhatsApp</a>`;
   }
-  h += `<div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="again">Choisir une photo</button>${usb.supported ? '<button class="again" id="usbAgain">Lire en USB</button>' : ''}</div>`;
+  h += `<div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="again">Choisir une photo</button>${usbOn ? '<button class="again" id="usbAgain">Lire en USB</button>' : ''}</div>`;
   out.innerHTML = h;
   $('#again').onclick = () => input.click();
   if ($('#usbAgain')) $('#usbAgain').onclick = readUsb;
@@ -522,7 +522,11 @@ function showUsbError(e) {
   $('#usbAgain').onclick = readUsb; $('#again').onclick = () => input.click();
 }
 
-if (usb.supported) { $('#usbBox').hidden = false; $('#usbBtn').onclick = readUsb; }
+// Only where it works without any setup: Android with Chrome. Mac and Windows keep the camera for
+// themselves (freeing it needs Terminal or a driver change), so visitors there use a photo instead.
+// The shop can still turn it on anywhere with ?usb=1 at the end of the address.
+const usbOn = usb.supported && (usb.platform() === 'android' || new URLSearchParams(location.search).has('usb'));
+if (usbOn) { $('#usbBox').hidden = false; $('#usbBtn').onclick = readUsb; }
 
 // ---------- report image: the shop's colours, in French, with the site at the bottom
 // The shop's logo for the report (same site, so the canvas can still be exported); text only if it doesn't load.
