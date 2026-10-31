@@ -266,7 +266,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <div>
         <div class="eyebrow">Un outil gratuit Midox Shop</div>
         <h1>Nombre de déclenchements de votre appareil photo</h1>
-        <p class="lead">Le « kilométrage » d'un appareil photo, lu en quelques secondes à partir d'une seule photo. Idéal avant d'acheter ou de vendre d'occasion.</p>
+        <p class="lead">Le « kilométrage » d'un appareil photo, lu en quelques secondes à partir d'une seule photo. Utile avant d'acheter ou de vendre un appareil d'occasion.</p>
         <ul class="promises">
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Canon, Nikon et Sony</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Gratuit, sans inscription</li>
@@ -311,7 +311,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
         <div class="model"><h3>Nikon</h3><p>Reflex D3000 à D850 et hybrides Z (Z5, Z6, Z7, Z50, Zf…).</p></div>
         <div class="model"><h3>Sony</h3><p>Hybrides α (α6000 à α6700, α7 et α7R, α7S, α9, α1) et reflex SLT / α99.</p></div>
         <div class="model"><h3>Canon</h3><p>EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100 et RP, le reflex 250D, les M50, M50 Mark II et M6 Mark II, et le PowerShot G5 X Mark II.</p></div>
-        <div class="model no"><h3>Autres Canon</h3><p>Les autres reflex Canon (4000D, 2000D, 77D…) gardent le compteur dans l'appareil : passez au showroom, on le vérifie pour vous.</p></div>
+        <div class="model no"><h3>Autres Canon</h3><p>Les reflex plus anciens (4000D, 2000D, 1300D…) gardent le compteur dans l'appareil : il se lit par câble USB depuis un téléphone Android avec Chrome.</p></div>
       </div>
     </div>
   </section>
@@ -338,7 +338,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <details class="faq"><summary>Pourquoi ma photo ne donne pas de résultat ?</summary><p>Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos.</p></details>
       <details class="faq"><summary>Le compteur compte-t-il aussi l'obturateur électronique ?</summary><p>Sur les Canon R et les Nikon Z, oui : le chiffre inclut les photos en obturateur électronique, l'usure réelle de l'obturateur peut donc être plus faible. Sur les Sony récents, seules les photos en obturateur mécanique sont comptées.</p></details>
       <details class="faq"><summary>Peut-on brancher l'appareil en USB ?</summary><p>Oui, depuis un téléphone Android avec Chrome : branchez l'appareil avec un câble USB-C ou OTG et touchez « Brancher l'appareil en USB ». La page lit la dernière photo de la carte (Nikon, Sony, Canon R) ou le compteur des reflex Canon plus anciens (4000D, 2000D, 1300D…), avec des commandes de lecture uniquement. Sur ordinateur et sur iPhone, choisissez simplement une photo de l'appareil.</p></details>
-      <details class="faq"><summary>Mon appareil n'est pas compatible, que faire ?</summary><p>Passez dans l'un de nos showrooms à Casablanca ou écrivez-nous sur WhatsApp : nous vérifions le compteur des autres modèles avec un câble.</p></details>
+      <details class="faq"><summary>Mon appareil n'est pas compatible, que faire ?</summary><p>De nouveaux modèles sont ajoutés régulièrement. En attendant, le compteur des autres appareils se lit avec un logiciel du fabricant ou en service après-vente.</p></details>
     </div>
   </section>
 
@@ -346,12 +346,11 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
     <div class="wrap">
       <div class="cta">
         <div>
-          <h2>Vendre, échanger ou acheter d'occasion ?</h2>
-          <p>Chez Midox Shop, chaque appareil d'occasion est vérifié, compteur compris. Vous pouvez aussi faire reprendre le vôtre en échange d'un neuf.</p>
+          <h2>Midox Shop, matériel photo et vidéo</h2>
+          <p>Appareils photo, objectifs, éclairage, son et accessoires, neufs et d'occasion, avec deux showrooms à Casablanca et la livraison partout au Maroc.</p>
         </div>
         <div class="row">
           <a class="btn btn-gold" href="/products">Voir le catalogue</a>
-          <a class="btn btn-ghost" href="https://wa.me/212621319882?text=Bonjour%20Midox%20Shop%2C%20je%20voudrais%20vendre%20ou%20%C3%A9changer%20mon%20appareil%20photo." rel="noopener">Faire reprendre mon appareil</a>
         </div>
       </div>
     </div>
@@ -391,7 +390,7 @@ const FR = [
   [/^This photo has no camera make/, "Cette photo n'indique pas d'appareil. Elle vient sans doute d'un téléphone, d'un logiciel de retouche ou d'une messagerie."],
   [/cameras are not supported/, "Cette marque n'est pas prise en charge. L'outil lit les Nikon, les Sony et les Canon R récents."],
   [/is missing the camera's private data/, "Cette photo a perdu les données internes de l'appareil : elle a été convertie, réduite ou envoyée par une app comme WhatsApp. Sur iPhone, choisissez la photo dans l'app Fichiers, pas dans Photos."],
-  [/^This Canon doesn't store a readable shutter count/, "Ce Canon n'enregistre pas son compteur dans les photos. Les reflex Canon se vérifient avec un câble : passez au showroom ou écrivez-nous sur WhatsApp."],
+  [/^This Canon doesn't store a readable shutter count/, "Ce Canon n'enregistre pas son compteur dans les photos. Les reflex Canon plus anciens se lisent par câble USB, depuis un téléphone Android avec Chrome."],
   [/^Couldn't find a valid shutter count in this Canon/, "Pas de compteur valide dans cette photo Canon. Essayez avec une photo JPG ou CR3 prise à l'instant."],
   [/^This older Nikon model/, "Ce Nikon ancien n'enregistre pas de compteur."],
   [/^This Nikon photo does not contain/, "Cette photo Nikon ne contient pas de compteur (certains modèles anciens ou compacts ne l'enregistrent pas)."],
@@ -469,15 +468,11 @@ function render() {
   if (r.rated) rows.push([r.ratedOfficial ? 'Durée de vie nominale' : 'Durée de vie estimée', fmtCount(r.rated) + ' déclenchements']);
   h += `<dl class="details">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd class="num">${esc(v)}</dd></div>`).join('')}</dl>`;
   if (r.count != null) {
-    const msg = `Bonjour Midox Shop, je voudrais vendre ou échanger mon ${r.displayName} (${fmtCount(r.count).replace(/ /g, ' ')} déclenchements).`;
     h += `<div class="actions">
       <button class="btn btn-gold" id="share">Partager le rapport</button>
-      <a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" rel="noopener">Vendre ou échanger cet appareil</a>
-      <a class="link" href="/products">Voir nos appareils →</a>
+      <a class="link" href="/products">Découvrir le catalogue Midox Shop →</a>
     </div>`;
     if (r.dateTaken) h += `<p class="privacy" style="margin-top:0">C'est le compteur au moment de la photo. Pour le chiffre du jour, utilisez une photo prise à l'instant.</p>`;
-  } else {
-    h += `<a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Midox Shop, je voudrais vérifier le nombre de déclenchements de mon appareil photo.')}" rel="noopener">Demander une vérification sur WhatsApp</a>`;
   }
   h += `<div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="again">Choisir une photo</button>${usbOn ? '<button class="again" id="usbAgain">Lire en USB</button>' : ''}</div>`;
   out.innerHTML = h;
@@ -488,8 +483,8 @@ function render() {
 
 // ---------- USB (Chrome / Edge): the same read-only steps as the Android app
 const USB_PROBLEMS = {
-  'canon-r-unknown': "Ce Canon n'est pas encore pris en charge : il garde son compteur dans ses photos JPG et nous ne connaissons pas encore son emplacement pour ce modèle. Écrivez-nous sur WhatsApp, nous le vérifions au showroom.",
-  'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre. Passez au showroom ou écrivez-nous sur WhatsApp.",
+  'canon-r-unknown': "Ce Canon n'est pas encore pris en charge : il garde son compteur dans ses photos JPG, à un emplacement que l'outil ne connaît pas encore pour ce modèle.",
+  'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre, l'outil ne peut donc pas le lire.",
   'no-photo': "Aucune photo sur la carte de l'appareil. Prenez une photo, puis lisez à nouveau.",
   'no-transfer': "L'appareil n'a pas envoyé sa dernière photo. Débranchez, rallumez l'appareil et réessayez.",
 };
