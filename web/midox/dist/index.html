@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nombre de déclenchements : vérifiez votre appareil photo gratuitement | Midox Shop</title>
+<meta name="description" content="Vérifiez gratuitement le nombre de déclenchements (shutter count) d'un appareil photo Canon, Nikon ou Sony à partir d'une photo. Rien n'est envoyé : la photo est lue sur votre téléphone.">
+<link rel="canonical" href="https://www.midoxshop.ma/declenchements/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Midox Shop">
+<meta property="og:locale" content="fr_MA">
+<meta property="og:title" content="Nombre de déclenchements : vérifiez votre appareil photo">
+<meta property="og:description" content="Gratuit, sans inscription : choisissez une photo de l'appareil et voyez son nombre de déclenchements et son usure.">
+<meta property="og:url" content="https://www.midoxshop.ma/declenchements/">
+<meta name="theme-color" content="#1f2937">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Nombre de déclenchements – Midox Shop",
+      "url": "https://www.midoxshop.ma/declenchements/",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Tous",
+      "inLanguage": "fr",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MAD" },
+      "publisher": { "@type": "Store", "name": "Midox Shop", "url": "https://www.midoxshop.ma/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Qu'est-ce que le nombre de déclenchements ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "C'est le nombre de photos prises par l'appareil depuis sa fabrication, l'équivalent du kilométrage d'une voiture. Il indique l'usure de l'obturateur, la pièce qui s'ouvre et se ferme à chaque photo." } },
+        { "@type": "Question", "name": "À partir de combien de déclenchements un appareil est-il usé ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Cela dépend du modèle : un appareil d'entrée de gamme est prévu pour environ 100 000 déclenchements, un boîtier expert pour 150 000 à 200 000, un boîtier professionnel pour 300 000 à 500 000. En dessous de 10 % de cette durée, l'appareil est comme neuf." } },
+        { "@type": "Question", "name": "Ma photo est-elle envoyée sur internet ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop." } },
+        { "@type": "Question", "name": "Pourquoi ma photo ne donne pas de résultat ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos." } }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root {
+  /* midoxshop.ma: Kanit, slate text, copper/gold accents, charcoal blocks */
+  --navy: #1f1f1f; --navy-2: #2b2b2b; --navy-3: #3a3a3a;     /* the site's charcoal (footer, dark blocks) */
+  --gold: #d4a74b; --gold-ink: #955228; --gold-soft: #faf3e3; --copper: #cb8c35;
+  --bg: #ffffff; --soft: #f3f4f6; --surface: #ffffff; --line: #e5e7eb;
+  --text: #334155; --heading: #475569; --muted: #64748b; --topbar: #1f2937; --ink: #171717;
+  --on-dark: #fafafa; --on-dark-muted: #a3a3a3;
+  --wa: #1fa855; --ok: #2f9a5a; --mid: #d98a1f; --high: #d4493a;
+  --f-display: "Kanit", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Kanit", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius: 8px; --radius-lg: 8px; --wrap: 1180px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 1rem/1.55 var(--f-body); -webkit-tap-highlight-color: transparent; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; margin: 0; letter-spacing: -.005em; text-wrap: balance; }
+p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* header: same as the shop */
+.topbar { background: var(--topbar); color: #fff; font-size: .8rem; }
+.topbar ul { list-style: none; margin: 0 auto; padding: 5px 16px; display: flex; gap: 22px; justify-content: safe center; overflow-x: auto; white-space: nowrap; scrollbar-width: none; max-width: var(--wrap); }
+.topbar li { display: flex; align-items: center; gap: 6px; }
+@media (max-width: 640px) { .topbar ul { justify-content: flex-start; gap: 16px; } .topbar li:nth-child(3) { display: none; } }
+.header { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.header .wrap { display: flex; align-items: center; gap: 16px; min-height: 64px; }
+.logo { display: flex; align-items: center; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--navy); }
+.logo img { height: 46px; width: auto; }
+.nav { display: none; gap: 22px; margin-left: auto; font-weight: 500; }
+.nav a { text-decoration: none; color: #374151; font-size: .86rem; font-weight: 500; }
+.nav a:hover, .nav a[aria-current] { color: var(--gold-ink); }
+.header .wa { margin-left: auto; }
+@media (min-width: 860px) { .nav { display: flex; } .header .wa { margin-left: 8px; } }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 6px; border: 1px solid transparent; font-weight: 500; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
+.btn:active { transform: scale(.97); }
+.btn-gold { background: var(--gold); color: #1c1c1c; }
+.btn-gold:hover { background: #c99a3c; }
+.btn-dark { background: var(--ink); color: var(--on-dark); text-transform: uppercase; letter-spacing: .02em; }
+.btn-dark:hover { background: #000; }
+.btn-wa { background: var(--wa); color: #fff; }
+.btn-wa:hover { background: #1a9449; }
+.btn-line { background: var(--surface); border-color: var(--line); color: var(--navy); }
+.btn-line:hover { border-color: var(--text); }
+.btn-sm { min-height: 40px; padding: .45rem .9rem; font-size: .92rem; }
+
+/* hero with the tool in it */
+.hero { background: var(--soft); color: var(--text); padding: 32px 0 40px; border-bottom: 1px solid var(--line); }
+.hero .wrap { display: grid; gap: 26px; }
+.eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-ink); font-weight: 500; }
+.hero h1 { color: var(--heading); font-size: clamp(2rem, 1.4rem + 3vw, 3.2rem); font-weight: 700; letter-spacing: .03em; margin-top: 8px; padding-bottom: 12px; position: relative; }
+.hero h1::after { content: ""; position: absolute; left: 0; bottom: 0; width: 80px; height: 2px; background: var(--gold-ink); }
+.hero .lead { color: var(--text); font-weight: 300; font-size: 1.06rem; margin-top: 12px; max-width: 46ch; }
+.promises { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .92rem; color: var(--text); }
+.promises li { display: flex; align-items: center; gap: 7px; }
+.promises svg { color: var(--copper); flex: none; }
+@media (min-width: 900px) { .hero { padding: 56px 0; } .hero .wrap { grid-template-columns: 1fr 1.05fr; align-items: start; gap: 44px; } }
+
+.tool { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 10px 30px rgba(15, 23, 42, .08); }
+.drop { display: block; border: 1.5px dashed #d1d5db; border-radius: var(--radius); padding: 26px 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+.drop:hover, .drop.hot { border-color: var(--gold); background: var(--gold-soft); }
+.drop b { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; display: block; }
+.drop p { color: var(--muted); font-size: .94rem; margin: 6px auto 16px; max-width: 38ch; }
+.drop[hidden] { display: none; }
+.usb { display: grid; justify-items: center; gap: 6px; margin-top: 12px; text-align: center; }
+.usb[hidden] { display: none; }
+.usb > span { color: var(--muted); font-size: .85rem; }
+.usb small { color: var(--muted); font-size: .8rem; max-width: 40ch; }
+.notice code { background: rgba(0,0,0,.06); padding: 2px 6px; border-radius: 4px; font-size: .92em; user-select: all; }
+input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.privacy { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: .85rem; margin-top: 12px; }
+.privacy svg { flex: none; margin-top: 2px; color: var(--gold-ink); }
+
+/* result panel */
+.panel { background: var(--navy); color: var(--on-dark); border-radius: var(--radius-lg); padding: 18px 18px 20px; }
+.tool .panel { margin: -2px; }
+.panel .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.panel .cam { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; color: #fff; }
+.panel .cam.dim { color: var(--on-dark-muted); }
+.panel .sn { color: var(--on-dark-muted); font-size: .88rem; }
+.odo { display: flex; margin: 16px 0 10px; }
+.wheel { flex: 1; max-height: 88px; aspect-ratio: .72; margin-right: 5px; border-radius: 8px; display: grid; place-items: center; overflow: hidden;
+  background: linear-gradient(#0e0e0e, #262626 22%, #333333 50%, #262626 78%, #0e0e0e);
+  font-family: var(--f-display); font-weight: 600; font-size: clamp(30px, 9vw, 54px); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
+.wheel:last-child { margin-right: 0; }
+.wheel.group { margin-right: 13px; }
+.wheel.dim { color: #5c5c5c; }
+.wheel span { display: block; }
+.wheel.roll span { animation: roll .45s cubic-bezier(.23,1,.32,1) both; }
+@keyframes roll { from { transform: translateY(-75%); opacity: 0; } to { transform: none; opacity: 1; } }
+.caption { color: var(--on-dark-muted); }
+.scale { margin-top: 16px; }
+.ticks { display: flex; justify-content: space-between; align-items: flex-end; height: 18px; }
+.ticks i { width: 2px; height: 9px; border-radius: 1px; background: #4a4a4a; }
+.ticks i.major { height: 18px; }
+.marker { position: relative; height: 12px; }
+.marker b { position: absolute; top: 3px; width: 0; height: 0; transform: translateX(-6px); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 9px solid var(--gold); }
+.scale-labels { display: flex; justify-content: space-between; font-size: .8rem; color: var(--on-dark-muted); }
+.verdict { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.verdict strong { font-family: var(--f-display); font-weight: 600; font-size: 1.5rem; color: #fff; }
+.verdict span { color: var(--on-dark-muted); }
+.by { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(243,239,228,.14); display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .85rem; color: var(--on-dark-muted); }
+.by b { color: var(--gold); font-weight: 600; letter-spacing: .02em; }
+
+.out { display: grid; gap: 14px; }
+.out[hidden] { display: none; }
+.notice { border-radius: var(--radius); padding: 12px 14px; font-size: .95rem; border: 1px solid; }
+.notice b { display: block; font-weight: 600; margin-bottom: 2px; }
+.notice.bad { background: #fbeeec; border-color: #efc5bf; }
+.notice.warn { background: #fdf4e5; border-color: #f1d9ad; }
+.notice.info { background: var(--bg); border-color: var(--line); color: var(--muted); }
+dl.details { margin: 0; border-top: 1px solid var(--line); }
+dl.details div { display: flex; justify-content: space-between; gap: 16px; padding: 9px 2px; border-bottom: 1px solid var(--line); font-size: .94rem; }
+dl.details dt { color: var(--muted); }
+dl.details dd { margin: 0; text-align: right; font-weight: 500; overflow-wrap: anywhere; }
+.actions { display: grid; gap: 10px; }
+.actions .link { justify-self: center; color: var(--gold-ink); font-weight: 600; text-decoration: none; padding: 8px; min-height: 44px; display: inline-flex; align-items: center; }
+.actions .link:hover { text-decoration: underline; }
+.again { justify-self: start; background: none; border: 0; color: var(--gold-ink); font-weight: 600; padding: 8px 2px; cursor: pointer; min-height: 44px; }
+.busy { display: flex; align-items: center; gap: 10px; color: var(--muted); padding: 18px 4px; }
+.spin { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--line); border-top-color: var(--gold); animation: s .8s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+
+/* content sections */
+.section { padding: 48px 0; }
+.section h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 1.95rem); font-weight: 700; color: var(--heading); letter-spacing: .035em; padding-bottom: 8px; position: relative; }
+.section h2::after { content: ""; position: absolute; left: 0; bottom: 0; width: 80px; height: 2px; background: var(--gold-ink); }
+.section .intro { color: var(--muted); margin-top: 8px; max-width: 60ch; }
+.steps { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; counter-reset: s; }
+.steps li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 16px 16px 58px; position: relative; counter-increment: s; }
+.steps li::before { content: counter(s); position: absolute; left: 16px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--gold); color: #1c1c1c; font-family: var(--f-display); font-weight: 600; display: grid; place-items: center; }
+.steps b { display: block; font-weight: 600; }
+.steps span { color: var(--muted); font-size: .94rem; }
+@media (min-width: 860px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+
+.models { display: grid; gap: 12px; margin-top: 22px; }
+.model { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.model h3 { font-size: 1.2rem; font-weight: 600; }
+.model p { color: var(--muted); font-size: .93rem; margin-top: 4px; }
+.model.no { background: transparent; border-style: dashed; }
+@media (min-width: 860px) { .models { grid-template-columns: repeat(4, 1fr); } }
+
+.scaletable { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.scaletable div { display: grid; grid-template-columns: 14px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); }
+.scaletable div:first-child { border-top: 0; }
+.scaletable i { width: 10px; height: 10px; border-radius: 50%; }
+.scaletable span { color: var(--muted); font-size: .93rem; }
+
+details.faq { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-top: 10px; }
+details.faq summary { cursor: pointer; list-style: none; padding: 16px 48px 16px 16px; font-weight: 600; position: relative; min-height: 48px; }
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq summary::after { content: "+"; position: absolute; right: 18px; top: 12px; font-size: 1.4rem; color: var(--gold-ink); transition: transform .2s ease-out; }
+details.faq[open] summary::after { transform: rotate(45deg); }
+details.faq p { padding: 0 16px 16px; color: var(--muted); }
+
+.cta { background: var(--ink); color: var(--on-dark); border-radius: var(--radius-lg); padding: 28px 22px; display: grid; gap: 14px; }
+.cta h2 { color: #fff; }
+.cta p { color: var(--on-dark-muted); max-width: 56ch; }
+.cta .row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn-ghost { border-color: rgba(243,239,228,.45); color: var(--on-dark); }
+.btn-ghost:hover { border-color: var(--on-dark); }
+@media (min-width: 860px) { .cta { padding: 40px; grid-template-columns: 1.4fr auto; align-items: center; } }
+
+.footer { background: var(--navy); color: var(--on-dark-muted); margin-top: 48px; padding: 36px 0 calc(28px + env(safe-area-inset-bottom)); font-size: .93rem; }
+.footer .wrap { display: grid; gap: 22px; }
+.footer b { color: var(--on-dark); display: block; font-weight: 600; }
+.footer a { text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+@media (min-width: 860px) { .footer .wrap { grid-template-columns: 1.3fr 1fr 1fr 1fr; } }
+
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: .94rem; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 30; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="topbar"><ul>
+  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Livraison partout au Maroc</li>
+  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Paiement sécurisé</li>
+  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>2 showrooms à Casablanca</li>
+</ul></div>
+<header class="header">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="Midox Shop, accueil">
+      <img src="data:image/webp;base64,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" alt="Midox Shop" width="120" height="48" onerror="this.replaceWith(document.createTextNode('Midox Shop'))">
+    </a>
+    <nav class="nav" aria-label="Menu">
+      <a href="/products">Catalogue</a>
+      <a href="/showroom">Showroom</a>
+      <a href="/formations">Formations</a>
+      <a href="/declenchements/" aria-current="page">Déclenchements</a>
+      <a href="/contact">Contact</a>
+    </nav>
+    <a class="btn btn-wa btn-sm wa" href="https://wa.me/212621319882" rel="noopener">WhatsApp</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Un outil gratuit Midox Shop</div>
+        <h1>Nombre de déclenchements de votre appareil photo</h1>
+        <p class="lead">Le « kilométrage » d'un appareil photo, lu en quelques secondes à partir d'une seule photo. Idéal avant d'acheter ou de vendre d'occasion.</p>
+        <ul class="promises">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Canon, Nikon et Sony</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Gratuit, sans inscription</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Rien n'est envoyé</li>
+        </ul>
+      </div>
+
+      <div class="tool" id="tool">
+        <label class="drop" id="drop" for="file">
+          <b>Choisissez une photo prise par l'appareil</b>
+          <p>Le fichier original JPG, NEF, ARW ou CR3, tel qu'il sort de l'appareil. Pas une capture d'écran ni une photo envoyée par WhatsApp.</p>
+          <span class="btn btn-gold">Choisir une photo</span>
+        </label>
+        <input type="file" id="file" accept="image/jpeg,.jpg,.jpeg,.nef,.nrw,.arw,.sr2,.srf,.cr2,.cr3,.tif,.tiff,.dng">
+        <div class="usb" id="usbBox" hidden>
+          <span>ou</span>
+          <button class="btn btn-line" id="usbBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v14M12 3l-3 3M12 3l3 3M7 10v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19" r="2"/></svg>Brancher l'appareil en USB</button>
+          <small id="usbHint">Câble USB-C ou OTG, appareil allumé, Wi-Fi de l'appareil coupé</small>
+        </div>
+        <div class="out" id="out" hidden></div>
+        <p class="privacy" id="privacy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>La photo est lue sur votre appareil. Elle n'est ni envoyée ni enregistrée.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Comment faire</h2>
+      <ol class="steps">
+        <li><b>Prenez une photo</b><span>Avec l'appareil à vérifier, obturateur mécanique (pas en mode silencieux).</span></li>
+        <li><b>Récupérez le fichier original</b><span>Avec un lecteur de carte SD, AirDrop ou l'app de l'appareil en taille originale. Sur iPhone, enregistrez-la dans Fichiers.</span></li>
+        <li><b>Choisissez-la ici</b><span>Le nombre de déclenchements et l'usure s'affichent tout de suite.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2>Appareils compatibles</h2>
+      <p class="intro">Le nombre de déclenchements est enregistré dans les photos de ces appareils.</p>
+      <div class="models">
+        <div class="model"><h3>Nikon</h3><p>Reflex D3000 à D850 et hybrides Z (Z5, Z6, Z7, Z50, Zf…).</p></div>
+        <div class="model"><h3>Sony</h3><p>Hybrides α (α6000 à α6700, α7 et α7R, α7S, α9, α1) et reflex SLT / α99.</p></div>
+        <div class="model"><h3>Canon</h3><p>EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100 et RP, M50, M50 Mark II, M6 Mark II, et le PowerShot G5 X Mark II.</p></div>
+        <div class="model no"><h3>Autres Canon</h3><p>Les reflex Canon (4000D, 2000D, 77D…) gardent le compteur dans l'appareil : passez au showroom, on le vérifie pour vous.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2>Combien de déclenchements, c'est beaucoup ?</h2>
+      <p class="intro">Chaque modèle a une durée de vie prévue : environ 100 000 déclenchements pour un appareil d'entrée de gamme, 150 000 à 200 000 pour un boîtier expert, 300 000 à 500 000 pour un professionnel. L'outil compare le compteur à celle de votre modèle.</p>
+      <div class="scaletable">
+        <div><i style="background:var(--ok)"></i><b>Comme neuf</b><span>moins de 10 %</span></div>
+        <div><i style="background:var(--ok)"></i><b>Bon état</b><span>10 à 40 %</span></div>
+        <div><i style="background:var(--mid)"></i><b>Usure moyenne</b><span>40 à 75 %</span></div>
+        <div><i style="background:var(--high)"></i><b>Usure élevée</b><span>75 à 100 %</span></div>
+        <div><i style="background:var(--high)"></i><b>Au-delà de la durée nominale</b><span>plus de 100 %</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2>Questions fréquentes</h2>
+      <details class="faq"><summary>Qu'est-ce que le nombre de déclenchements ?</summary><p>C'est le nombre de photos prises par l'appareil depuis sa fabrication, l'équivalent du kilométrage d'une voiture. Il indique l'usure de l'obturateur, la pièce qui s'ouvre et se ferme à chaque photo.</p></details>
+      <details class="faq"><summary>Ma photo est-elle envoyée sur internet ?</summary><p>Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop.</p></details>
+      <details class="faq"><summary>Pourquoi ma photo ne donne pas de résultat ?</summary><p>Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos.</p></details>
+      <details class="faq"><summary>Le compteur compte-t-il aussi l'obturateur électronique ?</summary><p>Sur les Canon R et les Nikon Z, oui : le chiffre inclut les photos en obturateur électronique, l'usure réelle de l'obturateur peut donc être plus faible. Sur les Sony récents, seules les photos en obturateur mécanique sont comptées.</p></details>
+      <details class="faq"><summary>Peut-on brancher l'appareil en USB ?</summary><p>Oui, depuis un téléphone Android avec Chrome : branchez l'appareil avec un câble USB-C ou OTG et touchez « Brancher l'appareil en USB ». La page lit la dernière photo de la carte (Nikon, Sony, Canon R) ou le compteur des reflex Canon plus anciens (4000D, 2000D, 1300D…), avec des commandes de lecture uniquement. Sur ordinateur et sur iPhone, choisissez simplement une photo de l'appareil.</p></details>
+      <details class="faq"><summary>Mon appareil n'est pas compatible, que faire ?</summary><p>Passez dans l'un de nos showrooms à Casablanca ou écrivez-nous sur WhatsApp : nous vérifions le compteur des autres modèles avec un câble.</p></details>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta">
+        <div>
+          <h2>Vendre, échanger ou acheter d'occasion ?</h2>
+          <p>Chez Midox Shop, chaque appareil d'occasion est vérifié, compteur compris. Vous pouvez aussi faire reprendre le vôtre en échange d'un neuf.</p>
+        </div>
+        <div class="row">
+          <a class="btn btn-gold" href="/products">Voir le catalogue</a>
+          <a class="btn btn-ghost" href="https://wa.me/212621319882?text=Bonjour%20Midox%20Shop%2C%20je%20voudrais%20vendre%20ou%20%C3%A9changer%20mon%20appareil%20photo." rel="noopener">Faire reprendre mon appareil</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop.</div>
+    <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
+    <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
+    <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script type="module">
+// ---- reader.js
+// Shutter count from a photo file (JPEG, NEF, ARW, CR2/CR3, TIFF). Port of the Android app's
+// PhotoShutterReader + CameraModels. Runs in the browser and in Node (tests). Nothing leaves the phone.
+
+// ------------------------------------------------------------------ models
+
+function brandOf(make) {
+  const m = (make || '').toUpperCase();
+  if (m.includes('NIKON')) return 'Nikon';
+  if (m.includes('SONY')) return 'Sony';
+  if (m.includes('CANON')) return 'Canon';
+  return 'Other';
+}
+
+const roman = s => s.replace(/M2$/, ' II').replace(/M3$/, ' III').replace(/M4$/, ' IV').replace(/M5$/, ' V').replace(/M6$/, ' VI');
+
+function displayName(brand, model) {
+  const raw = (model || '').trim();
+  if (!raw) return brand === 'Other' ? 'Unknown camera' : brand;
+  if (brand === 'Sony') {
+    let n = raw;
+    if (raw.startsWith('ILCE-')) n = 'α' + roman(raw.slice(5));
+    else if (raw.startsWith('ILCA-')) n = 'α' + roman(raw.slice(5));
+    else if (raw.startsWith('SLT-')) n = 'α' + raw.slice(4).replace(/^A/, '');
+    else if (raw.startsWith('ILME-')) n = raw.slice(5);
+    return 'Sony ' + n;
+  }
+  if (brand === 'Nikon') {
+    let m = raw.replace(/^NIKON/, '').trim().replace(/^Z\s+/, 'Z').replace('_2', ' II').replace('_3', ' III');
+    return 'Nikon ' + m;
+  }
+  if (brand === 'Canon') return raw.toUpperCase().startsWith('CANON') ? raw : 'Canon ' + raw;
+  return raw;
+}
+
+const off = v => ({ value: v, official: true });
+const est = v => ({ value: v, official: false });
+
+function nikonRated(m) {
+  const z = m.replace(/ /g, '');
+  if (z === 'Z9' || z === 'Z8') return null;
+  if (/^Z(6|7|6_2|7_2)$/.test(z)) return off(200000);
+  if (/^Z(5|5_2|6_3|F)$/.test(z)) return est(200000);
+  if (/^Z(30|50|50_2|FC)$/.test(z)) return est(100000);
+  if (/^D(3|3S|3X)$/.test(m)) return off(300000);
+  if (/^D(4|4S|5|6)$/.test(m)) return off(400000);
+  if (/^D(500|800|800E|810|810A|850)$/.test(m)) return off(200000);
+  if (m === 'DF' || /^D(300|300S|600|610|700|750|780|7000|7100|7200|7500)$/.test(m)) return off(150000);
+  if (/^D(200|90|80)$/.test(m)) return off(100000);
+  if (/^D(5\d00|3\d00|40|40X|60)$/.test(m)) return est(100000);
+  if (/^D(2H|2HS|2X|2XS)$/.test(m)) return off(150000);
+  if (/^D(70|70S|50|100|1|1H|1X)$/.test(m)) return est(50000);
+  return null;
+}
+
+function sonyRated(m) {
+  if (m === 'ILCE-9M3') return null;
+  if (/^ILCE-(7RM2|7RM3A?|9)$/.test(m)) return off(500000);
+  if (/^ILCE-(1|1M2|9M2|7RM4A?|7RM5|7SM3)$/.test(m)) return est(500000);
+  if (/^ILCA-99M2$/.test(m)) return est(300000);
+  if (/^ILCE-(7|7R|7S|7M2|7SM2|7M3|7M4|7M5|7C|7CM2|7CR)$/.test(m)) return est(200000);
+  if (/^ILCE-(6300|6400|6500|6600|6700)$/.test(m)) return est(200000);
+  if (/^ILCE-(5000|5100|6000|6100|3000|3500|QX1)$/.test(m)) return est(100000);
+  if (m.startsWith('ZV-E10')) return est(100000);
+  if (m.startsWith('NEX-') || m.startsWith('SLT-') || m.startsWith('ILCA-')) return est(100000);
+  return null;
+}
+
+function canonRated(m) {
+  const s = m.replace(/^EOS/, '').trim().replace(/\s+/g, ' ').replace('R6M2', 'R6 MARK II');
+  if (/^-?1D X MARK (II|III)$/.test(s)) return off(500000);
+  if (/^-?1D X$/.test(s)) return off(400000);
+  if (/^-?1D MARK IV$/.test(s)) return off(300000);
+  if (/^R(1|3|5|5 MARK II)$/.test(s)) return off(500000);
+  if (s === 'R5 C') return est(500000);
+  if (s === 'R6') return off(300000);
+  if (/^R6 MARK (II|III)$/.test(s)) return est(300000);
+  if (s === 'R') return off(200000);
+  if (s === 'RP') return off(100000);
+  if (s === 'R7') return est(200000);
+  if (/^R(8|10|50|50 V|100)$/.test(s)) return est(100000);
+  if (/^(5D( MARK (II|III|IV))?|5DS R?)$/.test(s)) return off(150000);
+  if (s === '7D MARK II') return off(200000);
+  if (s === '7D') return off(150000);
+  if (/^(6D( MARK II)?|60D|70D|80D|750D|760D)$/.test(s)) return off(100000);
+  if (s === '90D') return est(100000);
+  if (/^(\d{2}D|\d{3}D|\d{4}D|M\d.*|REBEL.*|KISS.*)$/.test(s)) return est(100000);
+  return null;
+}
+
+function rating(brand, model) {
+  const m = (model || '').toUpperCase().trim();
+  if (!m) return null;
+  if (brand === 'Nikon') return nikonRated(m.replace(/^NIKON/, '').trim());
+  if (brand === 'Sony') return sonyRated(m);
+  if (brand === 'Canon') return canonRated(m.replace(/^CANON/, '').trim());
+  return null;
+}
+
+/** Where Canon R bodies keep their counter in CameraInfo (maker note 0x000D). */
+function canonPhotoOffset(model) {
+  const m = model || '';
+  if (/\bEOS (R6m2|R6 Mark II|R8|R50)$/.test(m)) return 0x0d29;
+  if (/\bEOS R[56]$/.test(m)) return 0x0af1;
+  // found by comparing two R100 photos 5 shots apart (623 -> 628), kept counting after a card format
+  // the M50 Mark II uses the same spot: two of its photos 4 shots apart went 8908 -> 8912
+  if (/\bEOS (R100|M50m2|M50 Mark II)$/.test(m)) return 0x0acf;
+  // found by comparing two RP photos 4 shots apart (2343 -> 2347)
+  if (/\bEOS RP$/.test(m)) return 0x0960;
+  // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8 spots
+  if (/\bEOS (R7|R10)$/.test(m)) return 0x0c93;
+  if (/\bEOS M6 Mark II$/.test(m)) return 0x0ac7;
+  if (/\bEOS (M50|Kiss M)$/.test(m)) return 0x0188;
+  if (/\bEOS R3$/.test(m)) return 0x0fa9;
+  // ExifTool (CameraInfoG5XII), JPEG files
+  if (/\bPowerShot G5 X Mark II$/.test(m)) return 0x0293;
+  return null;
+}
+
+const WEAR = [
+  { key: 'likeNew', en: 'Like new', fr: 'Comme neuf', below: 0.10, tone: 'ok' },
+  { key: 'good', en: 'Good', fr: 'Bon état', below: 0.40, tone: 'ok' },
+  { key: 'used', en: 'Used', fr: 'Usure moyenne', below: 0.75, tone: 'mid' },
+  { key: 'high', en: 'High wear', fr: 'Usure élevée', below: 1.0000001, tone: 'high' },
+  { key: 'beyond', en: 'Beyond rating', fr: 'Au-delà de la durée nominale', below: Infinity, tone: 'high' },
+];
+const wear = (count, rated) => WEAR.find(w => count / rated < w.below);
+const wearPercent = (count, rated) => Math.floor(count * 100 / rated);
+
+// ------------------------------------------------------------------- TIFF
+
+const typeSize = t => ([1, 2, 6, 7].includes(t) ? 1 : [3, 8].includes(t) ? 2 : [4, 9, 11, 13].includes(t) ? 4 : [5, 10, 12].includes(t) ? 8 : 1);
+
+class Tiff {
+  constructor(buf, base, little) { this.buf = buf; this.base = base; this.little = little; }
+  u8(p) { return p >= 0 && p < this.buf.length ? this.buf[p] : null; }
+  u16(p) {
+    if (p < 0 || p + 2 > this.buf.length) return null;
+    const a = this.buf[p], b = this.buf[p + 1];
+    return this.little ? a | (b << 8) : (a << 8) | b;
+  }
+  u32(p) {
+    if (p < 0 || p + 4 > this.buf.length) return null;
+    const b = this.buf;
+    return this.little ? (b[p] | (b[p + 1] << 8) | (b[p + 2] << 16)) + b[p + 3] * 0x1000000
+      : b[p] * 0x1000000 + ((b[p + 1] << 16) | (b[p + 2] << 8) | b[p + 3]);
+  }
+  readIfd(pos) {
+    const count = this.u16(pos);
+    if (!count || count > 1000 || pos + 2 + count * 12 > this.buf.length) return null;
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const e = pos + 2 + i * 12;
+      const tag = this.u16(e), type = this.u16(e + 2), n = this.u32(e + 4);
+      if (tag == null || type == null || n == null) return null;
+      const size = typeSize(type) * n;
+      let valuePos;
+      if (size <= 4) valuePos = e + 8;
+      else { const o = this.u32(e + 8); if (o == null) return null; valuePos = this.base + o; }
+      out.push({ tag, type, n, valuePos, size });
+    }
+    return out;
+  }
+  looksLikeIfd(pos) { const e = this.readIfd(pos); return !!e && e.length > 0 && e.every(x => x.type >= 1 && x.type <= 13); }
+  bytes(e) {
+    if (!e || e.size <= 0 || e.valuePos < 0 || e.valuePos + e.size > this.buf.length) return null;
+    return this.buf.subarray(e.valuePos, e.valuePos + e.size);
+  }
+  string(e) {
+    const b = this.bytes(e); if (!b) return null;
+    let end = b.indexOf(0); if (end < 0) end = b.length;
+    let s = ''; for (let i = 0; i < end; i++) s += String.fromCharCode(b[i]);
+    s = s.trim(); return s || null;
+  }
+  int(e) {
+    if (!e) return null;
+    if (e.type === 3 || e.type === 8) return this.u16(e.valuePos);
+    if (e.type === 4 || e.type === 9 || e.type === 13) return this.u32(e.valuePos);
+    if (e.type === 1 || e.type === 7) return this.u8(e.valuePos);
+    return null;
+  }
+}
+const find = (ifd, tag) => (ifd || []).find(e => e.tag === tag) || null;
+
+function startsWith(buf, pos, s) {
+  if (pos < 0 || pos + s.length > buf.length) return false;
+  for (let i = 0; i < s.length; i++) if (buf[pos + i] !== s.charCodeAt(i)) return false;
+  return true;
+}
+
+// Sony 0x9050: c = b^3 mod 249 for bytes 2..247
+const DEC = new Uint8Array(256), ENC = new Uint8Array(256);
+for (let i = 0; i < 256; i++) { DEC[i] = i; ENC[i] = i; }
+for (let b = 2; b <= 247; b++) { const c = (b * b * b) % 249; DEC[c] = b; ENC[b] = c; }
+const sonyDecipher = src => src.map(x => DEC[x]);
+const sonyEncipher = src => src.map(x => ENC[x]);
+
+// ----------------------------------------------------------------- reader
+
+const TAG_MAKE = 0x010f, TAG_MODEL = 0x0110, TAG_SOFTWARE = 0x0131, TAG_EXIF = 0x8769;
+const TAG_MAKERNOTE = 0x927c, TAG_DATE = 0x9003, TAG_BODY_SERIAL = 0xa431;
+
+const MISSING_MAKERNOTE = "This photo is missing the camera's private data (maker notes). That usually means it was converted, resized or sent through an app like WhatsApp. On iPhone, pick the photo with “Choose File” from the Files app, not from Photos.";
+const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons need the Android or Mac app with a USB cable.";
+
+function failure(problem) {
+  return { brand: 'Other', make: null, model: null, displayName: 'Unknown camera', count: null, rated: null, ratedOfficial: false,
+    serial: null, dateTaken: null, software: null, details: [], warnings: [], problem };
+}
+
+function result(ctx, count, { serial = ctx.bodySerial, details = [], warnings = [], problem = null } = {}) {
+  const r = rating(ctx.brand, ctx.model);
+  return {
+    brand: ctx.brand, make: ctx.make, model: ctx.model, displayName: displayName(ctx.brand, ctx.model),
+    count, rated: r ? r.value : null, ratedOfficial: r ? r.official : false, serial: serial || null,
+    dateTaken: ctx.dateTaken, software: ctx.software, details, warnings, problem,
+    includesElectronic: ctx.brand === 'Canon' || (ctx.brand === 'Nikon' && /\bZ/.test(ctx.model || '')),
+  };
+}
+
+function findTiffStart(d) {
+  if (d.length < 8) return null;
+  if ((d[0] === 0x49 && d[1] === 0x49) || (d[0] === 0x4d && d[1] === 0x4d)) return 0;
+  if (d[0] !== 0xff || d[1] !== 0xd8) return null;
+  let p = 2;
+  while (p + 4 <= d.length) {
+    if (d[p] !== 0xff) { p++; continue; }
+    const marker = d[p + 1];
+    if (marker === 0xff) { p++; continue; }
+    if (marker === 0xd9 || marker === 0xda) return null;
+    if ((marker >= 0xd0 && marker <= 0xd7) || marker === 0x01) { p += 2; continue; }
+    const len = (d[p + 2] << 8) | d[p + 3];
+    if (len < 2) return null;
+    if (marker === 0xe1 && startsWith(d, p + 4, 'Exif\0\0') && p + 18 <= d.length) return p + 10;
+    p += 2 + len;
+  }
+  return null;
+}
+
+const isCr3 = d => d.length > 12 && startsWith(d, 4, 'ftyp') && startsWith(d, 8, 'crx ');
+const isHeif = d => d.length > 12 && startsWith(d, 4, 'ftyp') && /^(heic|heix|hevc|heim|heis|mif1|msf1)$/.test(String.fromCharCode(...d.subarray(8, 12)));
+
+function read(input) {
+  const data = input instanceof Uint8Array ? input : new Uint8Array(input);
+  if (isCr3(data)) return readCr3(data);
+  const start = findTiffStart(data);
+  if (start == null) {
+    if (isHeif(data)) return failure('This is a HEIC/HEIF file, which this page can’t read. Use the JPEG or RAW file from the camera.');
+    if (data[0] === 0x89 && data[1] === 0x50) return failure('This is a PNG (a screenshot or an exported image). Use the original JPEG or RAW file from the camera.');
+    return failure('This file has no camera data (EXIF). Use the original JPEG or RAW file straight from the camera.');
+  }
+  let little;
+  if (data[start] === 0x49 && data[start + 1] === 0x49) little = true;
+  else if (data[start] === 0x4d && data[start + 1] === 0x4d) little = false;
+  else return failure('Unrecognised photo format.');
+  const t = new Tiff(data, start, little);
+  const o = t.u32(start + 4);
+  const ifd0 = o == null ? null : t.readIfd(start + o);
+  if (!ifd0) return failure('Corrupt photo data.');
+  const make = t.string(find(ifd0, TAG_MAKE)), model = t.string(find(ifd0, TAG_MODEL)), software = t.string(find(ifd0, TAG_SOFTWARE));
+  const exifOff = t.int(find(ifd0, TAG_EXIF));
+  const exif = exifOff != null ? t.readIfd(start + exifOff) : null;
+  const ctx = {
+    tiff: t, brand: brandOf(make), make, model, software,
+    dateTaken: t.string(find(exif, TAG_DATE)), bodySerial: t.string(find(exif, TAG_BODY_SERIAL)),
+  };
+  const mn = find(exif, TAG_MAKERNOTE);
+  const warnings = [];
+  if (software && /photoshop|lightroom|snapseed|gimp|capture one|picsart|whatsapp|instagram/i.test(software)) {
+    warnings.push(`This photo was edited with ${software}. Edited photos may have missing or altered data; use an untouched file from the camera.`);
+  }
+  if (ctx.brand === 'Nikon') return readNikon(ctx, mn, warnings);
+  if (ctx.brand === 'Sony') return readSony(ctx, mn, warnings);
+  if (ctx.brand === 'Canon') return readCanon(ctx, mn, warnings);
+  const apple = /apple/i.test(make || '');
+  return result(ctx, null, {
+    warnings,
+    problem: apple ? 'This is an iPhone photo. Pick a photo taken by the camera.'
+      : !make ? 'This photo has no camera make. It may come from a phone, an editor or a messaging app.'
+      : `${make} cameras are not supported. This page reads Nikon, Sony and recent Canon R photos.`,
+  });
+}
+
+function readCanon(ctx, mn, warnings) {
+  const offset = canonPhotoOffset(ctx.model);
+  if (offset == null) return result(ctx, null, { warnings, problem: CANON_UNSUPPORTED });
+  if (!mn) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const t = new Tiff(ctx.tiff.buf, ctx.tiff.base, ctx.tiff.little);
+  if (!t.looksLikeIfd(mn.valuePos)) t.little = !t.little;
+  const ifd = t.readIfd(mn.valuePos);
+  if (!ifd) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  return canonResult(ctx, t, ifd, offset, warnings);
+}
+
+function canonResult(ctx, t, ifd, offset, warnings) {
+  const info = t.bytes(find(ifd, 0x000d));
+  if (!info || info.length < offset + 4) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const count = new Tiff(info, 0, t.little).u32(offset);
+  if (!count || count > 5000000) {
+    return result(ctx, null, { warnings, problem: "Couldn't find a valid shutter count in this Canon photo. Try a JPEG or CR3 taken just now." });
+  }
+  const sn = t.int(find(ifd, 0x000c));
+  return result(ctx, count, {
+    serial: sn > 0 ? String(sn) : ctx.bodySerial, warnings,
+    details: [['Note', 'On this Canon the count includes electronic-shutter shots, so wear may look higher than the mechanical shutter’s real use.']],
+  });
+}
+
+function readCr3(d) {
+  const box = type => {
+    const limit = Math.min(d.length - 8, 4 * 1024 * 1024);
+    for (let i = 4; i < limit; i++) if (d[i] === type.charCodeAt(0) && startsWith(d, i, type)) return i + 4;
+    return null;
+  };
+  const tiffAt = s => {
+    if (s == null || s + 8 > d.length) return null;
+    const t = new Tiff(d, s, d[s] === 0x49);
+    const o = t.u32(s + 4); if (o == null) return null;
+    const ifd = t.readIfd(s + o); return ifd ? [t, ifd] : null;
+  };
+  const c1 = tiffAt(box('CMT1'));
+  if (!c1) return failure("Couldn't read this CR3 file.");
+  const [t1, ifd0] = c1;
+  const c2 = tiffAt(box('CMT2'));
+  const ctx = {
+    tiff: t1, brand: 'Canon', make: t1.string(find(ifd0, TAG_MAKE)), model: t1.string(find(ifd0, TAG_MODEL)),
+    software: t1.string(find(ifd0, TAG_SOFTWARE)),
+    dateTaken: c2 ? c2[0].string(find(c2[1], TAG_DATE)) : null, bodySerial: c2 ? c2[0].string(find(c2[1], TAG_BODY_SERIAL)) : null,
+  };
+  const warnings = [];
+  const offset = canonPhotoOffset(ctx.model);
+  if (offset == null) return result(ctx, null, { warnings, problem: CANON_UNSUPPORTED });
+  const c3 = tiffAt(box('CMT3'));
+  if (!c3) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  // most Canons leave the CameraInfo block (and so the count) out of their CR3 files
+  if (!find(c3[1], 0x000d)) return result(ctx, null, { warnings, problem: "This camera keeps its shutter count in its JPG photos, not in its RAW (CR3) files. Pick a JPG taken by the camera, or shoot RAW+JPG." });
+  return canonResult(ctx, c3[0], c3[1], offset, warnings);
+}
+
+function readNikon(ctx, mn, warnings) {
+  if (!mn) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const buf = ctx.tiff.buf, start = mn.valuePos;
+  if (start < 0 || start + 18 > buf.length) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  let t, ifd;
+  if (startsWith(buf, start, 'Nikon\0\x02')) {
+    const hdr = start + 10;
+    t = new Tiff(buf, hdr, buf[hdr] === 0x49);
+    const o = t.u32(hdr + 4);
+    ifd = o == null ? null : t.readIfd(hdr + o);
+  } else if (startsWith(buf, start, 'Nikon\0\x01')) {
+    return result(ctx, null, { warnings, problem: 'This older Nikon model does not record a shutter count.' });
+  } else {
+    t = new Tiff(buf, ctx.tiff.base, ctx.tiff.little);
+    if (!t.looksLikeIfd(start)) t.little = !t.little;
+    ifd = t.readIfd(start);
+  }
+  if (!ifd) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const serial = t.string(find(ifd, 0x001d)) || ctx.bodySerial;
+  const count = t.int(find(ifd, 0x00a7));
+  if (count == null || count === 4294965247) {
+    return result(ctx, null, { serial, warnings, problem: "This Nikon photo does not contain a shutter count (some older or compact models don't record it)." });
+  }
+  const details = /\sZ/.test((ctx.model || '').toUpperCase()) ? [['Note', 'On Nikon Z cameras this count includes electronic-shutter shots.']] : [];
+  return result(ctx, count, { serial, details, warnings });
+}
+
+const sonyA = /^(DSC-|Stellar|ILCE-(1|6100|6300|6400|6500|6600|6700|7C|7M3|7M4|7M5|7RM2|7RM3A?|7RM4A?|7RM5|7RM6|7SM2|7SM3|9|9M2)|ILCA-99M2|ILME-(FX2|FX3)|ZV-)/;
+const sonyB = /^(ILCE-(6100A?|6300|6400A?|6500|6600|7C|7M3|7RM2|7RM3A?|7RM4A?|7SM2|9|9M2)|ILCA-99M2|ZV-E10)\b/;
+const sonyC = /^(ILCE-(1\b|7M4|7RM5|7SM3)|ILME-FX3)/;
+const sonyD = /^(ILCE-(6700|7CM2|7CR)|ILME-FX2|ZV-(E1|E10M2))\b/;
+const sonyDMech = /^(ILCE-(1M2|7M5|7RM6))/;
+
+function readSony(ctx, mn, warnings) {
+  const model = ctx.model || '';
+  if (model.startsWith('DSC-') || model.startsWith('ZV-1')) {
+    return result(ctx, null, { warnings, problem: "Sony compact cameras (RX100, ZV-1 and similar) don't record a shutter count in photos." });
+  }
+  if (!mn) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const buf = ctx.tiff.buf, start = mn.valuePos;
+  if (start < 0 || start + 14 > buf.length) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const ifdPos = ['SONY DSC ', 'SONY CAM ', 'SONY MOBILE'].some(h => startsWith(buf, start, h)) ? start + 12 : start;
+  const t = new Tiff(buf, ctx.tiff.base, ctx.tiff.little);
+  if (!t.looksLikeIfd(ifdPos)) t.little = !t.little;
+  const ifd = t.readIfd(ifdPos);
+  if (!ifd) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const raw = t.bytes(find(ifd, 0x9050));
+  if (!raw) return result(ctx, null, { warnings, problem: 'This Sony photo has no shutter-count block. The model may not record it, or the file was resized by an app (use the original file).' });
+
+  let table;
+  if (!sonyA.test(model)) table = 'A';
+  else if (sonyB.test(model)) table = 'B';
+  else if (sonyC.test(model)) table = 'C';
+  else if (sonyD.test(model)) table = 'D';
+  else if (sonyDMech.test(model) && raw.length >= 5 && [0, 1, 2, 3, 4].every(i => raw[i] === 0)) table = 'D';
+  if (!table) return result(ctx, null, { warnings, problem: `The ${displayName('Sony', model)} does not store a readable shutter count in photos (or uses the electronic shutter only).` });
+
+  const d = sonyDecipher(raw);
+  const u32 = o => (o + 4 <= d.length ? (d[o] | (d[o + 1] << 8) | (d[o + 2] << 16)) + d[o + 3] * 0x1000000 : null);
+  const masked = o => { const v = u32(o); return v == null ? null : v % 0x1000000; };
+  const details = [];
+  let count = null;
+  if (table === 'A') {
+    const flash = ((d[0x31] || 0) & 1) === 1;
+    const sc = masked(0x32);
+    const old = /^(ILCE-(7(R|S|M2)?|[56]000|5100|QX1))\b/.test(model);
+    const sc2 = !flash && old ? masked(0x4c) : null;
+    let sc3 = null;
+    if (/^(ILCE-(5100|QX1)|ILCA-(68|77M2))/.test(model)) sc3 = u32(0x1a0);
+    else if (/^(SLT-A(58|99V?)|HV|NEX-(3N|5R|5T|6|VG900|VG30E)|ILCE-([35]000|3500))\b/.test(model)) sc3 = u32(0x1aa);
+    else if (/^(SLT-A(37|57|65|77)V?|Lunar|NEX-(F3|5N|7|VG20E))/.test(model)) sc3 = u32(0x1bd);
+    if (!(sc3 > 0)) sc3 = null;
+    count = sc2 > 0 ? sc2 : sc3 != null && sc != null && sc3 > sc ? sc3 : sc;
+    if (sc2 == null && flash && old) warnings.push('The flash fired in this photo. On this model the most accurate counter is skipped when the flash fires; take a new photo without flash for the best reading.');
+    if (count != null && count < 65536 && sc2 == null && sc3 == null && model.startsWith('ILCE-7')) warnings.push('On this model the count can roll over after 65,536. If the camera looks heavily used, add 65,536.');
+  } else if (table === 'B' || table === 'C') {
+    count = masked(0x3a);
+  } else {
+    count = masked(0x0a);
+    details.push(['Note', 'Counts mechanical-shutter shots only (electronic/silent shots are not included).']);
+  }
+  if (!count) return result(ctx, null, { warnings, problem: "Couldn't find a shutter count in this Sony photo. If you used the silent/electronic shutter, take a new photo with the mechanical shutter." });
+  return result(ctx, count, { details, warnings });
+}
+
+/** "2025:03:18 14:55:02" → "18/03/2025 14:55" */
+function prettyExifDate(s) {
+  const m = /^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}):(\d{2})/.exec(s || '');
+  return m ? `${m[3]}/${m[2]}/${m[1]} ${m[4]}:${m[5]}` : s;
+}
+
+const fmtCount = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+// ---- ptp-usb.js
+const usb = (() => {
+// Reading a camera over USB from the browser (WebUSB: Chrome and Edge on Android, Mac, Windows, Linux).
+// Port of the Android app's PTP code. Only read-only operations are sent:
+//  - Nikon, Sony, Canon R: the newest photo on the card (GetObjectHandles / GetObjectInfo / GetPartialObject),
+//    then the same photo reader as the Photo tab.
+//  - Older Canons: their own counter (property D1AC, directly or through the EOS event stream).
+// Never sends Canon's 9052/9053 shutter-unit commands (an R50 showed Err 70 with them).
+
+
+const supported = typeof navigator !== 'undefined' && !!navigator.usb;
+
+const VENDORS = [0x04a9 /* Canon */, 0x04b0 /* Nikon */, 0x054c /* Sony */];
+const OP = {
+  GetDeviceInfo: 0x1001, OpenSession: 0x1002, CloseSession: 0x1003, GetStorageIDs: 0x1004,
+  GetObjectHandles: 0x1007, GetObjectInfo: 0x1008, GetObject: 0x1009, GetDevicePropValue: 0x1015, GetPartialObject: 0x101b,
+  EosSetRemoteMode: 0x9114, EosSetEventMode: 0x9115, EosGetEvent: 0x9116, EosRequestProp: 0x9127,
+};
+const PROP_COUNTER = 0xd1ac, PROP_SERIAL = 0xd1af, EVT_PROP_CHANGED = 0xc189;
+const RC_OK = 0x2001, RC_SESSION_OPEN = 0x201e;
+const IMAGE_EXT = /\.(JPG|JPEG|NEF|NRW|ARW|SRF|SR2|CR2|CR3|HIF|HEIF)$/i;
+const HEADER_BYTES = 512 * 1024, MAX_FULL = 80 * 1024 * 1024;
+
+class UsbError extends Error {
+  constructor(code, message) { super(message); this.code = code; }
+}
+
+const le16 = (d, o) => d[o] | (d[o + 1] << 8);
+const le32 = (d, o) => (d[o] | (d[o + 1] << 8) | (d[o + 2] << 16)) + d[o + 3] * 0x1000000;
+function put32(a, o, v) { a[o] = v & 255; a[o + 1] = (v >>> 8) & 255; a[o + 2] = (v >>> 16) & 255; a[o + 3] = (v >>> 24) & 255; }
+
+/** PTP dataset reader (little-endian, PTP strings are UCS-2 with a length byte). */
+class Reader {
+  constructor(d) { this.d = d; this.p = 0; }
+  u8() { return this.p < this.d.length ? this.d[this.p++] : (this.p++, 0); }
+  u16() { const v = this.p + 2 <= this.d.length ? le16(this.d, this.p) : 0; this.p += 2; return v; }
+  u32() { const v = this.p + 4 <= this.d.length ? le32(this.d, this.p) : 0; this.p += 4; return v; }
+  arr16() { const n = this.u32(); if (n > 4096) return []; return Array.from({ length: n }, () => this.u16()); }
+  str() {
+    const n = this.u8(); let s = '';
+    for (let i = 0; i < n; i++) { const c = this.u16(); if (c) s += String.fromCharCode(c); }
+    return s.trim();
+  }
+}
+
+/** PTP over two bulk endpoints. [usb] is a USBDevice (or a fake with the same methods, for tests). */
+class Ptp {
+  constructor(usb, epIn, epOut, timeoutMs = 15000) {
+    this.usb = usb; this.epIn = epIn; this.epOut = epOut; this.tid = 0; this.pending = new Uint8Array(0); this.timeoutMs = timeoutMs;
+  }
+  async send(bytes) {
+    const r = await this.usb.transferOut(this.epOut, bytes);
+    if (r.status !== 'ok') throw new UsbError('io', "Couldn't send to the camera.");
+  }
+  async fill(n) {
+    let empty = 0;
+    while (this.pending.length < n) {
+      const r = await withTimeout(this.usb.transferIn(this.epIn, 65536), this.timeoutMs);
+      if (r.status === 'stall') { await this.usb.clearHalt('in', this.epIn); continue; }
+      const chunk = r.data ? new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength) : new Uint8Array(0);
+      if (!chunk.length) { if (++empty > 8) throw new UsbError('timeout', 'The camera stopped responding.'); continue; }
+      empty = 0;
+      const merged = new Uint8Array(this.pending.length + chunk.length);
+      merged.set(this.pending); merged.set(chunk, this.pending.length); this.pending = merged;
+    }
+  }
+  async container() {
+    await this.fill(12);
+    const len = le32(this.pending, 0);
+    if (len < 12 || len > 64 * 1024 * 1024) throw new UsbError('garbled', 'Garbled reply from the camera.');
+    const type = le16(this.pending, 4), code = le16(this.pending, 6);
+    await this.fill(len);
+    const payload = this.pending.slice(12, len);
+    this.pending = this.pending.slice(len);
+    return { type, code, payload };
+  }
+  async transact(op, params = []) {
+    const tid = ++this.tid;
+    const cmd = new Uint8Array(12 + 4 * params.length);
+    put32(cmd, 0, cmd.length); cmd[4] = 1; cmd[6] = op & 255; cmd[7] = op >> 8; put32(cmd, 8, tid);
+    params.forEach((p, i) => put32(cmd, 12 + 4 * i, p));
+    await this.send(cmd);
+    const parts = [];
+    for (;;) {
+      const c = await this.container();
+      if (c.type === 2) parts.push(c.payload);
+      else if (c.type === 3) {
+        const ps = []; for (let i = 0; i + 4 <= c.payload.length; i += 4) ps.push(le32(c.payload, i));
+        const size = parts.reduce((s, p) => s + p.length, 0), data = new Uint8Array(size);
+        let o = 0; for (const p of parts) { data.set(p, o); o += p.length; }
+        return { code: c.code, ok: c.code === RC_OK, params: ps, data };
+      } else if (c.type !== 4) throw new UsbError('garbled', 'Unexpected reply from the camera.');
+    }
+  }
+}
+
+function withTimeout(promise, ms) {
+  let t; return Promise.race([promise, new Promise((_, rej) => { t = setTimeout(() => rej(new UsbError('timeout', 'The camera stopped responding.')), ms); })]).finally(() => clearTimeout(t));
+}
+
+function parseDeviceInfo(d) {
+  const r = new Reader(d);
+  r.u16(); const ext = r.u32(); r.u16(); r.str(); r.u16();
+  const operations = new Set(r.arr16()); r.arr16(); const properties = new Set(r.arr16()); r.arr16(); r.arr16();
+  return { vendorExtensionId: ext, operations, properties, manufacturer: r.str(), model: r.str(), version: r.str(), serial: r.str() };
+}
+
+function parseObjectInfo(handle, d) {
+  const r = new Reader(d);
+  r.u32(); const format = r.u16(); r.u16(); const size = r.u32(); r.u16(); r.u32(); r.u32(); r.u32(); r.u32(); r.u32(); r.u32(); r.u32(); r.u16(); r.u32(); r.u32();
+  return { handle, format, size, name: r.str(), captured: r.str() };
+}
+const array32 = d => { if (d.length < 4) return []; const n = le32(d, 0); if (4 + n * 4 > d.length) return []; return Array.from({ length: n }, (_, i) => le32(d, 4 + 4 * i)); };
+
+/** Value bytes of a property-changed record in a Canon EOS GetEvent dataset. */
+function findProp(d, wanted) {
+  let p = 0;
+  while (p + 8 <= d.length) {
+    const size = le32(d, p), type = le32(d, p + 4);
+    if (size < 8 || type === 0 || p + size > d.length) break;
+    if (type === EVT_PROP_CHANGED && size >= 12 && le32(d, p + 8) === wanted) return d.slice(p + 12, p + size);
+    p += size;
+  }
+  return null;
+}
+const ascii = b => { let s = ''; for (const c of b) { if (!c) break; s += String.fromCharCode(c); } s = s.trim(); return /^[A-Za-z0-9]{4,32}$/.test(s) ? s : null; };
+const isDeviceId = s => s.length >= 20 && /^[0-9a-f]+$/i.test(s);
+const isCanonR = m => /\bEOS R\w*$/i.test((m || '').trim());
+
+/** Asks the browser for the camera (shows Chrome's device chooser) and opens it. */
+async function connect() {
+  if (!supported) throw new UsbError('unsupported', 'This browser cannot use USB.');
+  let device;
+  try {
+    device = await navigator.usb.requestDevice({ filters: [...VENDORS.map(vendorId => ({ vendorId })), { classCode: 6 }] });
+  } catch (e) {
+    throw new UsbError('cancelled', 'No camera chosen.');
+  }
+  return open(device);
+}
+
+/** Cameras already allowed on this site (no chooser needed). */
+async function known() {
+  if (!supported) return [];
+  return (await navigator.usb.getDevices()).filter(d => VENDORS.includes(d.vendorId));
+}
+
+async function open(device) {
+  try { await device.open(); } catch (e) { throw new UsbError('busy', e.message); }
+  if (!device.configuration) await device.selectConfiguration(1);
+  // the still-image (PTP) interface; some Sony models use a vendor class with the same endpoints
+  let pick = null;
+  for (const intf of device.configuration.interfaces) for (const alt of intf.alternates) {
+    const bulkIn = alt.endpoints.find(e => e.type === 'bulk' && e.direction === 'in');
+    const bulkOut = alt.endpoints.find(e => e.type === 'bulk' && e.direction === 'out');
+    if (!bulkIn || !bulkOut) continue;
+    const score = alt.interfaceClass === 6 ? 2 : alt.interfaceClass === 0xff ? 1 : 0;
+    if (score && (!pick || score > pick.score)) pick = { score, intf, alt, bulkIn, bulkOut };
+  }
+  if (!pick) { await device.close().catch(() => {}); throw new UsbError('nointerface', 'This device has no camera (PTP) connection.'); }
+  try {
+    await device.claimInterface(pick.intf.interfaceNumber);
+    if (pick.intf.alternates.length > 1) await device.selectAlternateInterface(pick.intf.interfaceNumber, pick.alt.alternateSetting);
+  } catch (e) {
+    await device.close().catch(() => {});
+    throw new UsbError('busy', e.message);   // another program (macOS, Windows driver) holds the camera
+  }
+  return { device, ptp: new Ptp(device, pick.bulkIn.endpointNumber, pick.bulkOut.endpointNumber), iface: pick.intf.interfaceNumber };
+}
+
+/**
+ * Reads the shutter count. [status] gets short progress texts.
+ * Returns { camera, serial, count, method, reading?, photoFile?, photoDate?, problem?, log }.
+ */
+async function readCamera(conn, status = () => {}) {
+  const { ptp } = conn, log = [];
+  const hex = v => v.toString(16).toUpperCase().padStart(4, '0');
+  try {
+    status('session');
+    let r = await ptp.transact(OP.OpenSession, [1]);
+    if (!r.ok && r.code !== RC_SESSION_OPEN) throw new UsbError('refused', `Camera refused the connection (${hex(r.code)}).`);
+    r = await ptp.transact(OP.GetDeviceInfo);
+    if (!r.ok) throw new UsbError('refused', 'The camera did not describe itself.');
+    const info = parseDeviceInfo(r.data);
+    const model = info.model || 'Camera';
+    const isCanon = /canon/i.test(info.manufacturer) || info.vendorExtensionId === 11;
+    const camera = isCanon && !/^canon/i.test(model) ? 'Canon ' + model : model;
+    const usbSerial = info.serial && !isDeviceId(info.serial) ? info.serial : null;
+    log.push(`Camera: ${info.manufacturer} / ${model} / firmware ${info.version}`);
+
+    if (!isCanon || canonPhotoOffset(camera) != null) {
+      status('photo');
+      return { ...(await newestPhoto(ptp, info, camera, usbSerial, log)), log };
+    }
+    if (isCanonR(camera)) {
+      return { camera, serial: usbSerial, count: null, method: null, log,
+        problem: 'canon-r-unknown' };
+    }
+    status('counter');
+    const res = await canonCounter(ptp, info.operations, log);
+    return { camera, serial: res.serial || usbSerial, count: res.count, method: res.method, log, problem: res.count == null ? 'canon-no-counter' : null };
+  } finally {
+    try { await ptp.transact(OP.CloseSession); } catch {}
+  }
+}
+
+async function newestPhoto(ptp, info, camera, usbSerial, log) {
+  const ops = info.operations, hex = v => v.toString(16).toUpperCase().padStart(4, '0');
+  let r = await ptp.transact(OP.GetStorageIDs);
+  log.push(`GetStorageIDs: ${hex(r.code)}`);
+  const storages = r.ok ? array32(r.data).filter(s => (s & 0xffff) !== 0) : [];
+  const handles = [];
+  for (const sid of storages) {
+    r = await ptp.transact(OP.GetObjectHandles, [sid, 0, 0]);
+    if (!r.ok || !array32(r.data).length) r = await ptp.transact(OP.GetObjectHandles, [sid, 0, 0xffffffff]);
+    const h = r.ok ? array32(r.data) : [];
+    log.push(`GetObjectHandles: ${hex(r.code)}, ${h.length} objects`);
+    handles.push(...h);
+  }
+  const infos = [];
+  for (const h of handles.sort((a, b) => a - b).slice(-40).reverse()) {
+    const ir = await ptp.transact(OP.GetObjectInfo, [h]);
+    if (!ir.ok) continue;
+    const oi = parseObjectInfo(h, ir.data);
+    if (oi.format !== 0x3001 && IMAGE_EXT.test(oi.name)) infos.push(oi);
+  }
+  if (!infos.length) return { camera, serial: usbSerial, count: null, method: 'photo', problem: 'no-photo' };
+  infos.sort((a, b) => (b.captured.localeCompare(a.captured)) || (b.handle - a.handle));
+  const best = infos.find(i => i.captured === infos[0].captured && /\.jpe?g$/i.test(i.name)) || infos[0];
+  log.push(`Newest photo: ${best.name} (${best.captured}, ${best.size} bytes)`);
+  let bytes = null, partial = false;
+  if (ops.has(OP.GetPartialObject)) {
+    r = await ptp.transact(OP.GetPartialObject, [best.handle, 0, HEADER_BYTES]);
+    log.push(`GetPartialObject: ${hex(r.code)}, ${r.data.length} bytes`);
+    if (r.ok && r.data.length) { bytes = r.data; partial = r.data.length < best.size; }
+  }
+  let reading = bytes ? read(bytes) : null;
+  if ((!reading || (reading.count == null && partial)) && ops.has(OP.GetObject) && best.size <= MAX_FULL) {
+    r = await ptp.transact(OP.GetObject, [best.handle]);
+    log.push(`GetObject: ${hex(r.code)}, ${r.data.length} bytes`);
+    if (r.ok && r.data.length) reading = read(r.data);
+  }
+  if (!reading) return { camera, serial: usbSerial, count: null, method: 'photo', problem: 'no-transfer', photoFile: best.name };
+  const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/.exec(best.captured);
+  return {
+    camera: reading.make ? reading.displayName : camera, serial: reading.serial || usbSerial, count: reading.count, method: 'photo', reading,
+    photoFile: best.name, photoDate: m ? `${m[3]}/${m[2]}/${m[1]} ${m[4]}:${m[5]}` : null,
+    problem: reading.count == null ? reading.problem : null,
+  };
+}
+
+/** Older Canon EOS bodies: property D1AC, then the EOS event stream (which also carries the body serial). */
+async function canonCounter(ptp, ops, log) {
+  const hex = v => v.toString(16).toUpperCase().padStart(4, '0');
+  let count = null, serial = null, method = null;
+  let r = await ptp.transact(OP.GetDevicePropValue, [PROP_COUNTER]);
+  log.push(`GetDevicePropValue D1AC: ${hex(r.code)}, ${r.data.length} bytes`);
+  if (r.ok && r.data.length >= 4 && le32(r.data, 0) >= 1 && le32(r.data, 0) <= 20000000) { count = le32(r.data, 0); method = 'property'; }
+  if ([OP.EosSetRemoteMode, OP.EosSetEventMode, OP.EosGetEvent].every(o => ops.has(o))) {
+    const remote = await ptp.transact(OP.EosSetRemoteMode, [1]);
+    const event = await ptp.transact(OP.EosSetEventMode, [1]);
+    log.push(`SetRemoteMode: ${hex(remote.code)}, SetEventMode: ${hex(event.code)}`);
+    try {
+      if (remote.ok && event.ok) {
+        if (ops.has(OP.EosRequestProp)) for (const p of [PROP_COUNTER, PROP_SERIAL]) {
+          const q = await ptp.transact(OP.EosRequestProp, [p]); log.push(`RequestDevicePropValue ${hex(p)}: ${hex(q.code)}`);
+        }
+        for (let i = 0; i < 4; i++) {
+          const e = await ptp.transact(OP.EosGetEvent);
+          if (!e.ok) { log.push(`GetEvent: ${hex(e.code)}`); break; }
+          const c = findProp(e.data, PROP_COUNTER);
+          if (count == null && c && c.length >= 4 && le32(c, 0) >= 1 && le32(c, 0) <= 20000000) { count = le32(c, 0); method = 'event'; }
+          const s = findProp(e.data, PROP_SERIAL);
+          if (!serial && s) serial = ascii(s);
+          log.push(`GetEvent #${i + 1}: ${e.data.length} bytes`);
+          if ((count != null && serial) || e.data.length <= 8) break;
+        }
+      }
+    } finally {
+      await ptp.transact(OP.EosSetEventMode, [0]).catch(() => {});
+      await ptp.transact(OP.EosSetRemoteMode, [0]).catch(() => {});
+    }
+  } else log.push('EOS event stream: not offered');
+  return { count, serial, method };
+}
+
+async function disconnect(conn) {
+  try { await conn.device.releaseInterface(conn.iface); } catch {}
+  try { await conn.device.close(); } catch {}
+}
+
+/** Which system the visitor is on, for the right "the camera is busy" help. */
+function platform() {
+  const ua = navigator.userAgent || '';
+  if (/Android/i.test(ua)) return 'android';
+  if (/Mac OS X/i.test(ua)) return 'mac';
+  if (/Windows/i.test(ua)) return 'windows';
+  if (/Linux|CrOS/i.test(ua)) return 'linux';
+  return 'other';
+}
+
+return { supported, connect, known, open, readCamera, disconnect, platform, UsbError };
+})();
+
+// ---- page
+
+
+const WA = '212621319882';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const tone = t => ({ ok: 'var(--ok)', mid: 'var(--mid)', high: 'var(--high)' }[t]);
+const toneHex = t => ({ ok: '#2f9a5a', mid: '#d98a1f', high: '#d4493a' }[t]);
+const fmtDate = t => { const d = new Date(t), p = n => String(n).padStart(2, '0'); return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+let toastTimer;
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400); };
+
+// The reader speaks English (it's shared with the apps): its messages in French for the site.
+const FR = [
+  [/^This file has no camera data/, "Ce fichier ne contient pas les données de l'appareil (EXIF). Choisissez le fichier JPG ou RAW original, tel qu'il sort de l'appareil."],
+  [/^This is a HEIC\/HEIF file/, "C'est un fichier HEIC, que cet outil ne lit pas. Choisissez le fichier JPG ou RAW de l'appareil."],
+  [/^This is a PNG/, "C'est un fichier PNG (une capture d'écran ou une image exportée). Choisissez la photo originale de l'appareil."],
+  [/^This is an iPhone photo/, "C'est une photo prise avec un iPhone. Choisissez une photo prise par l'appareil photo."],
+  [/^This photo has no camera make/, "Cette photo n'indique pas d'appareil. Elle vient sans doute d'un téléphone, d'un logiciel de retouche ou d'une messagerie."],
+  [/cameras are not supported/, "Cette marque n'est pas prise en charge. L'outil lit les Nikon, les Sony et les Canon R récents."],
+  [/is missing the camera's private data/, "Cette photo a perdu les données internes de l'appareil : elle a été convertie, réduite ou envoyée par une app comme WhatsApp. Sur iPhone, choisissez la photo dans l'app Fichiers, pas dans Photos."],
+  [/^This Canon doesn't store a readable shutter count/, "Ce Canon n'enregistre pas son compteur dans les photos. Les reflex Canon se vérifient avec un câble : passez au showroom ou écrivez-nous sur WhatsApp."],
+  [/^Couldn't find a valid shutter count in this Canon/, "Pas de compteur valide dans cette photo Canon. Essayez avec une photo JPG ou CR3 prise à l'instant."],
+  [/^This older Nikon model/, "Ce Nikon ancien n'enregistre pas de compteur."],
+  [/^This Nikon photo does not contain/, "Cette photo Nikon ne contient pas de compteur (certains modèles anciens ou compacts ne l'enregistrent pas)."],
+  [/^Sony compact cameras/, "Les compacts Sony (RX100, ZV-1…) n'enregistrent pas de compteur dans les photos."],
+  [/^This Sony photo has no shutter-count block/, "Cette photo Sony n'a pas de bloc compteur : le modèle ne l'enregistre pas, ou la photo a été réduite par une app. Utilisez le fichier original."],
+  [/does not store a readable shutter count in photos \(or uses/, "Ce Sony n'enregistre pas de compteur lisible dans les photos (ou n'a qu'un obturateur électronique)."],
+  [/^Couldn't find a shutter count in this Sony/, "Pas de compteur dans cette photo Sony. Si l'obturateur silencieux était activé, reprenez une photo avec l'obturateur mécanique."],
+  [/in its JPG photos, not in its RAW/, "Cet appareil enregistre son compteur dans les photos JPG, pas dans les fichiers RAW (CR3). Choisissez une photo JPG, ou photographiez en RAW+JPG."],
+  [/^Unrecognised photo format/, "Format de photo non reconnu."],
+  [/^Corrupt photo data/, "Les données de la photo sont abîmées."],
+  [/^Couldn't read this CR3/, "Impossible de lire ce fichier CR3."],
+  [/^This photo was edited with (.*?)\./, (m, app) => `Cette photo a été modifiée avec ${app}. Les données peuvent manquer ou être faussées : utilisez le fichier original de l'appareil.`],
+  [/^The flash fired/, "Le flash s'est déclenché sur cette photo : sur ce modèle, le compteur le plus précis est alors ignoré. Reprenez une photo sans flash."],
+  [/can roll over after 65,536/, "Sur ce modèle, le compteur peut repartir de zéro après 65 536. Si l'appareil semble très utilisé, ajoutez 65 536."],
+  [/^On this Canon the count includes electronic-shutter/, "Sur ce Canon, le compteur inclut les photos en obturateur électronique : l'usure réelle de l'obturateur peut être plus faible."],
+  [/^On Nikon Z cameras/, "Sur les Nikon Z, le compteur inclut les photos en obturateur électronique."],
+  [/^Counts mechanical-shutter shots only/, "Seules les photos en obturateur mécanique sont comptées (pas celles en mode silencieux)."],
+];
+const fr = s => { for (const [re, out] of FR) { const m = s.match(re); if (m) return typeof out === 'function' ? out(...m) : out; } return s; };
+
+// ---------- reading
+const drop = $('#drop'), input = $('#file'), out = $('#out');
+input.onchange = () => { const f = input.files[0]; input.value = ''; if (f) readFile(f); };
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('hot'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('hot'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('hot'); const f = e.dataTransfer.files[0]; if (f) readFile(f); });
+
+let current = null;
+
+async function readFile(file) {
+  drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
+  out.innerHTML = `<div class="busy"><div class="spin"></div>Lecture de ${esc(file.name)}…</div>`;
+  let r;
+  try { r = read(new Uint8Array(await file.slice(0, 12 * 1024 * 1024).arrayBuffer())); }
+  catch { r = { count: null, problem: "Impossible d'ouvrir ce fichier.", displayName: 'Appareil inconnu', details: [], warnings: [] }; }
+  current = { r, fileName: file.name, time: Date.now() };
+  render();
+  $('#tool').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function panel(r) {
+  const count = r.count, digits = count == null ? '' : String(count), n = Math.max(6, digits.length), padded = digits.padStart(n, '0');
+  let wheels = '';
+  for (let i = 0; i < n; i++) {
+    const rem = n - 1 - i, dim = count == null || i < n - digits.length;
+    wheels += `<div class="wheel${dim ? ' dim' : ''}${rem > 0 && rem % 3 === 0 ? ' group' : ''}${count != null ? ' roll' : ''}"><span style="animation-delay:${i * 50}ms">${count == null ? '–' : padded[i]}</span></div>`;
+  }
+  let scale = '';
+  if (count != null && r.rated) {
+    const w = wear(count, r.rated), f = Math.min(1, count / r.rated), pct = wearPercent(count, r.rated);
+    let ticks = '';
+    for (let t = 0; t <= 40; t++) ticks += `<i class="${t % 10 === 0 ? 'major' : ''}"${count > 0 && t / 40 <= f ? ` style="background:${tone(w.tone)}"` : ''}></i>`;
+    scale = `<div class="scale"><div class="ticks">${ticks}</div><div class="marker"><b style="left:${(f * 100).toFixed(2)}%"></b></div>
+      <div class="scale-labels num"><span>0</span><span>${fmtCount(r.rated / 2)}</span><span>${fmtCount(r.rated)} ${r.ratedOfficial ? '(nominale)' : '(estimée)'}</span></div></div>
+      <div class="verdict"><strong>${w.fr}</strong><span>${pct === 0 && count > 0 ? 'moins de 1 %' : pct + ' %'} de la durée de vie ${r.ratedOfficial ? 'nominale' : 'estimée'}</span></div>`;
+  }
+  const title = r.make == null && count == null ? 'Aucun compteur trouvé' : r.displayName;
+  const caption = count == null ? 'Pas de compteur dans ce fichier' : r.includesElectronic ? 'déclenchements, obturateur électronique compris' : 'déclenchements';
+  return `<div class="panel"><div class="head"><div class="cam${count == null ? ' dim' : ''}">${esc(title)}</div>${r.serial ? `<div class="sn num">N° de série ${esc(r.serial)}</div>` : ''}</div>
+    <div class="odo num" role="img" aria-label="${count == null ? 'Pas de compteur' : fmtCount(count) + ' déclenchements'}">${wheels}</div>
+    <div class="caption">${caption}</div>${scale}
+    <div class="by"><span>Contrôle réalisé avec l'outil</span><b>MIDOX SHOP</b></div></div>`;
+}
+
+function render() {
+  const { r, fileName } = current;
+  let h = panel(r);
+  if (r.problem) h += `<div class="notice bad"><b>Pas de résultat</b>${r.problemHtml || esc(fr(r.problem))}</div>`;
+  for (const w of r.warnings || []) h += `<div class="notice warn">${esc(fr(w))}</div>`;
+  for (const [, v] of (r.details || []).filter(d => d[0] === 'Note')) h += `<div class="notice info">${esc(fr(v))}</div>`;
+  const rows = [];
+  if (r.dateTaken) rows.push(['Photo prise le', prettyExifDate(r.dateTaken)]);
+  if (fileName) rows.push([current.usb ? 'Dernière photo' : 'Fichier', fileName]);
+  if (current.usb) rows.push(['Méthode', current.method === 'photo' ? 'USB (dernière photo)' : 'USB (compteur de l\u2019appareil)']);
+  if (r.rated) rows.push([r.ratedOfficial ? 'Durée de vie nominale' : 'Durée de vie estimée', fmtCount(r.rated) + ' déclenchements']);
+  h += `<dl class="details">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd class="num">${esc(v)}</dd></div>`).join('')}</dl>`;
+  if (r.count != null) {
+    const msg = `Bonjour Midox Shop, je voudrais vendre ou échanger mon ${r.displayName} (${fmtCount(r.count).replace(/ /g, ' ')} déclenchements).`;
+    h += `<div class="actions">
+      <button class="btn btn-gold" id="share">Partager le rapport</button>
+      <a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" rel="noopener">Vendre ou échanger cet appareil</a>
+      <a class="link" href="/products">Voir nos appareils →</a>
+    </div>`;
+    if (r.dateTaken) h += `<p class="privacy" style="margin-top:0">C'est le compteur au moment de la photo. Pour le chiffre du jour, utilisez une photo prise à l'instant.</p>`;
+  } else {
+    h += `<a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Midox Shop, je voudrais vérifier le nombre de déclenchements de mon appareil photo.')}" rel="noopener">Demander une vérification sur WhatsApp</a>`;
+  }
+  h += `<div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="again">Choisir une photo</button>${usbOn ? '<button class="again" id="usbAgain">Lire en USB</button>' : ''}</div>`;
+  out.innerHTML = h;
+  $('#again').onclick = () => input.click();
+  if ($('#usbAgain')) $('#usbAgain').onclick = readUsb;
+  if (r.count != null) $('#share').onclick = shareReport;
+}
+
+// ---------- USB (Chrome / Edge): the same read-only steps as the Android app
+const USB_PROBLEMS = {
+  'canon-r-unknown': "Ce Canon R n'est pas encore pris en charge : son compteur se lit dans ses photos JPG et nous ne connaissons pas encore son emplacement. Écrivez-nous sur WhatsApp, nous le vérifions au showroom.",
+  'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre. Passez au showroom ou écrivez-nous sur WhatsApp.",
+  'no-photo': "Aucune photo sur la carte de l'appareil. Prenez une photo, puis lisez à nouveau.",
+  'no-transfer': "L'appareil n'a pas envoyé sa dernière photo. Débranchez, rallumez l'appareil et réessayez.",
+};
+function busyHelp() {
+  const p = usb.platform();
+  if (p === 'mac') return "macOS garde l'appareil pour lui. Fermez Photos et Transfert d'images, ouvrez le Terminal et tapez <code>killall -9 ptpcamerad PTPCamera</code>, puis cliquez tout de suite sur « Lire en USB ».";
+  if (p === 'windows') return "Windows réserve l'appareil à son propre pilote, le navigateur ne peut pas l'ouvrir. Le plus simple : un téléphone Android avec Chrome, ou choisir une photo de l'appareil.";
+  if (p === 'linux') return "Un autre programme utilise l'appareil (le gestionnaire de photos). Fermez-le, débranchez et rebranchez, puis réessayez.";
+  return "Un autre programme utilise l'appareil. Fermez les applications photo, débranchez et rebranchez, puis réessayez.";
+}
+const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
+
+async function readUsb() {
+  let conn;
+  try {
+    conn = await usb.connect();
+  } catch (e) {
+    if (e.code === 'cancelled') return;
+    return showUsbError(e);
+  }
+  drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
+  const busy = t => { out.innerHTML = `<div class="busy"><div class="spin"></div>${esc(t)}</div>`; };
+  busy("Connexion à l'appareil…");
+  try {
+    const res = await usb.readCamera(conn, k => busy(usbStatus[k] || '…'));
+    let r;
+    if (res.reading) r = { ...res.reading, displayName: res.camera, serial: res.serial };
+    else {
+      const rt = rating('Canon', res.camera.replace(/^Canon\s+/i, ''));
+      r = { displayName: res.camera, make: 'Canon', count: res.count, serial: res.serial, rated: rt ? rt.value : null, ratedOfficial: rt ? rt.official : false,
+        includesElectronic: false, details: [], warnings: [] };
+    }
+    if (res.problem) { r.problem = USB_PROBLEMS[res.problem] || res.problem; }
+    if (res.photoDate) r.dateTaken = null;
+    current = { r, fileName: res.photoFile || null, time: Date.now(), usb: true, method: res.method };
+    render();
+    if (res.photoDate && r.count != null) out.insertAdjacentHTML('beforeend', `<p class="privacy">Compteur lu dans la dernière photo, prise le ${esc(res.photoDate)}. Pour le chiffre du jour, prenez une photo juste avant de brancher.</p>`);
+  } catch (e) {
+    showUsbError(e);
+  } finally {
+    await usb.disconnect(conn);
+  }
+}
+
+function showUsbError(e) {
+  drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
+  const msg = e.code === 'busy' ? busyHelp()
+    : e.code === 'nointerface' ? "Cet appareil n'a pas de connexion appareil photo (PTP). Sur Sony, réglez « Connexion USB » sur MTP dans le menu."
+    : e.code === 'timeout' || e.code === 'io' ? "L'appareil ne répond plus. Coupez son Wi-Fi et son Bluetooth, débranchez, rallumez-le et réessayez."
+    : "Impossible de lire l'appareil. Débranchez, rallumez-le et réessayez.";
+  out.innerHTML = `<div class="notice bad"><b>Lecture USB impossible</b>${msg}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="usbAgain">Réessayer en USB</button><button class="again" id="again">Choisir une photo</button></div>`;
+  $('#usbAgain').onclick = readUsb; $('#again').onclick = () => input.click();
+}
+
+// Only where it works without any setup: Android with Chrome. Mac and Windows keep the camera for
+// themselves (freeing it needs Terminal or a driver change), so visitors there use a photo instead.
+// The shop can still turn it on anywhere with ?usb=1 at the end of the address.
+const usbOn = usb.supported && (usb.platform() === 'android' || new URLSearchParams(location.search).has('usb'));
+if (usbOn) { $('#usbBox').hidden = false; $('#usbBtn').onclick = readUsb; }
+
+// ---------- report image: the shop's colours, in French, with the site at the bottom
+// The shop's logo for the report (same site, so the canvas can still be exported); text only if it doesn't load.
+const logoReady = new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = 'data:image/webp;base64,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'; });
+
+async function renderReport() {
+  const { r, time } = current;
+  const logo = await logoReady;
+  await Promise.all(['600 84px Kanit', '700 84px Kanit', '300 36px Kanit', '400 36px Kanit', '500 36px Kanit'].map(f => document.fonts.load(f).catch(() => {})));
+  const W = 1080, H = 1350, P = 72, inner = W - 2 * P;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const c = cv.getContext('2d');
+  const font = (w, s, fam) => `${w} ${s}px ${fam}, sans-serif`;
+  const text = (s, x, y, f, col, align = 'left') => { c.font = f; c.fillStyle = col; c.textAlign = align; c.fillText(s, x, y); };
+  const TEXT = '#fafafa', MUTED = '#a3a3a3', GOLD = '#d4a74b';
+  c.fillStyle = '#1f1f1f'; c.fillRect(0, 0, W, H);
+  let y = 128;
+  text('MIDOX SHOP · RAPPORT DE DÉCLENCHEMENTS', P, y, font(500, 28, 'Kanit'), GOLD);
+  if (logo) {   // the shop's logo on a white badge, top right
+    const lh = 64, lw = Math.min(220, logo.naturalWidth * lh / logo.naturalHeight), bx = W - P - lw - 28, byy = 58;
+    c.fillStyle = '#ffffff'; c.beginPath(); c.roundRect ? c.roundRect(bx, byy, lw + 28, lh + 20, 12) : c.rect(bx, byy, lw + 28, lh + 20); c.fill();
+    c.drawImage(logo, bx + 14, byy + 10, lw, lh);
+  }
+  y += 96;
+  let size = 84; c.font = font(600, size, 'Kanit');
+  while (c.measureText(r.displayName).width > inner && size > 48) { size -= 2; c.font = font(600, size, 'Kanit'); }
+  text(r.displayName, P, y, font(600, size, 'Kanit'), '#ffffff');
+  if (r.serial) { y += 58; text('N° de série ' + r.serial, P, y, font(300, 36, 'Kanit'), MUTED); }
+  y += 56;
+  const digits = String(r.count), n = Math.max(6, digits.length), groups = Math.floor((n - 1) / 3);
+  const gap = 12, gg = 28, ww = (inner - gap * (n - 1 - groups) - gg * groups) / n, wh = 220, padded = digits.padStart(n, '0');
+  let x = P;
+  for (let i = 0; i < n; i++) {
+    const g = c.createLinearGradient(0, y, 0, y + wh);
+    [['#0e0e0e', 0], ['#262626', .22], ['#333333', .5], ['#262626', .78], ['#0e0e0e', 1]].forEach(([col, s]) => g.addColorStop(s, col));
+    c.fillStyle = g; c.beginPath(); c.roundRect ? c.roundRect(x, y, ww, wh, 14) : c.rect(x, y, ww, wh); c.fill();
+    c.font = font(600, 170, 'Kanit'); c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = i < n - digits.length ? '#5c5c5c' : '#ffffff'; c.fillText(padded[i], x + ww / 2, y + wh / 2 + 8);
+    c.textBaseline = 'alphabetic';
+    const rem = n - 1 - i; x += ww + (rem > 0 && rem % 3 === 0 ? gg : gap);
+  }
+  y += wh + 58;
+  text('déclenchements', P, y, font(300, 38, 'Kanit'), MUTED);
+  if (r.rated) {
+    const w = wear(r.count, r.rated), f = Math.min(1, r.count / r.rated), col = toneHex(w.tone);
+    y += 64; const base = y + 44;
+    for (let t = 0; t <= 40; t++) { const tx = P + t * (inner - 4) / 40, h = t % 10 === 0 ? 44 : 24; c.fillStyle = r.count > 0 && t / 40 <= f ? col : '#4a4a4a'; c.fillRect(tx, base - h, 4, h); }
+    const mx = P + f * (inner - 4) + 2;
+    c.fillStyle = GOLD; c.beginPath(); c.moveTo(mx, base + 8); c.lineTo(mx - 16, base + 30); c.lineTo(mx + 16, base + 30); c.closePath(); c.fill();
+    y = base + 74;
+    const sm = font(300, 30, 'Kanit');
+    text('0', P, y, sm, MUTED); text(fmtCount(r.rated / 2), P + inner / 2, y, sm, MUTED, 'center');
+    text(`${fmtCount(r.rated)} ${r.ratedOfficial ? '(nominale)' : '(estimée)'}`, P + inner, y, sm, MUTED, 'right');
+    y += 96;
+    const pct = wearPercent(r.count, r.rated);
+    c.font = font(600, 62, 'Kanit'); const lw = c.measureText(w.fr).width;
+    text(w.fr, P, y, font(600, 62, 'Kanit'), '#ffffff');
+    const rest = (pct === 0 && r.count > 0 ? 'moins de 1 %' : pct + ' %') + (r.ratedOfficial ? ' de la durée de vie nominale' : ' de la durée de vie estimée');
+    let rs = 34; c.font = font(300, rs, 'Kanit');
+    while (P + lw + 24 + c.measureText(rest).width > W - P && rs > 22) { rs -= 1; c.font = font(300, rs, 'Kanit'); }
+    text(rest, P + lw + 24, y - 6, font(300, rs, 'Kanit'), MUTED);
+  }
+  const rows = [['Méthode', current.usb ? (current.method === 'photo' ? 'USB (dernière photo)' : 'USB (compteur de l\u2019appareil)') : 'Photo (données EXIF)'], ['Date du contrôle', fmtDate(time)]];
+  let by = H - P - 84 - rows.length * 72 - (r.includesElectronic ? 56 : 0);
+  for (const [k, v] of rows) {
+    c.fillStyle = '#3a3a3a'; c.fillRect(P, by, inner, 2);
+    text(k, P, by + 48, font(300, 32, 'Kanit'), MUTED);
+    text(v, P + inner, by + 48, font(500, 32, 'Kanit'), TEXT, 'right');
+    by += 72;
+  }
+  if (r.includesElectronic) { text('Le compteur inclut les déclenchements en obturateur électronique.', P, by + 36, font(300, 28, 'Kanit'), MUTED); by += 56; }
+  c.fillStyle = '#3a3a3a'; c.fillRect(P, H - P - 52, inner, 2);
+  text('Contrôlé avec l\u2019outil Midox Shop', P, H - P - 6, font(300, 28, 'Kanit'), MUTED);
+  text('midoxshop.ma', P + inner, H - P - 6, font(500, 30, 'Kanit'), GOLD, 'right');
+  return new Promise(res => cv.toBlob(res, 'image/png'));
+}
+
+async function shareReport() {
+  const blob = await renderReport();
+  const name = `rapport-${current.r.displayName.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${current.r.count}.png`;
+  const file = new File([blob], name, { type: 'image/png' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file] }); } catch (e) { if (e.name !== 'AbortError') toast("Impossible de partager le rapport"); }
+    return;
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  toast('Rapport enregistré');
+}
+
+window.__test = { readFile, renderReport, get current() { return current; } };
+</script>
+</body>
+</html>
