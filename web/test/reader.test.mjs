@@ -50,6 +50,7 @@ assert.equal(read(canon('Canon EOS R100', 0x0acf, 623)).count, 623);
 assert.equal(read(canon('Canon EOS RP', 0x0960, 2347)).count, 2347);
 assert.equal(read(canon('Canon EOS M50m2', 0x0acf, 8912)).count, 8912);
 assert.equal(read(canon('Canon EOS R7', 0x0c93, 434)).count, 434);
+assert.equal(read(canon('Canon EOS 250D', 0x094c, 2784)).count, 2784);
 assert.equal(read(canon('Canon EOS M50', 0x0188, 82)).count, 82);
 assert.equal(read(canon('Canon EOS R', 0x0190, 201)).count, null);
 assert.equal(read(canon('Canon EOS R6', 0x0af1, 45678)).count, 45678);

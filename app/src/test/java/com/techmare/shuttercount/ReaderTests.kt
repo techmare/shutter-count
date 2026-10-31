@@ -70,6 +70,8 @@ class ReaderTests {
         assertEquals(0x0960, CameraModels.canonPhotoOffset("Canon EOS RP"))
         assertEquals(0x0acf, CameraModels.canonPhotoOffset("Canon EOS M50m2"))
         assertEquals(0x0c93, CameraModels.canonPhotoOffset("Canon EOS R7"))
+        assertEquals(0x094c, CameraModels.canonPhotoOffset("Canon EOS 250D"))
+        assertEquals(0x094c, CameraModels.canonPhotoOffset("Canon EOS Rebel SL3"))
         assertEquals(0x0c93, CameraModels.canonPhotoOffset("Canon EOS R10"))
         assertEquals(0x0ac7, CameraModels.canonPhotoOffset("Canon EOS M6 Mark II"))
         assertEquals(0x0188, CameraModels.canonPhotoOffset("Canon EOS M50"))

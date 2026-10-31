@@ -146,6 +146,8 @@ public enum CameraModels {
         if Rx.has("\\bEOS (R100|M50m2|M50 Mark II)$", m) { return 0x0acf }
         // RP: found by comparing two photos 4 shots apart (2343 -> 2347)
         if Rx.has("\\bEOS RP$", m) { return 0x0960 }
+        // 250D (Rebel SL3 / Kiss X10 / 200D Mark II): two photos 4 shots apart went 2780 -> 2784
+        if Rx.has("\\bEOS (250D|Rebel SL3|Kiss X10|200D Mark II)$", m) { return 0x094c }
         // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8 spots
         if Rx.has("\\bEOS (R7|R10)$", m) { return 0x0c93 }
         if Rx.has("\\bEOS M6 Mark II$", m) { return 0x0ac7 }
