@@ -41,7 +41,7 @@ class FakeCamera {
     };
     switch (op) {
       case 0x1002: case 0x1003: return reply(0x2001), { status: 'ok' };
-      case 0x1001: return reply(0x2001, [...u16(100), ...u32(this.ext), ...u16(100), ...pstr(''), ...u16(0), ...arr16(this.ops), ...arr16([]), ...arr16([0xd303]), ...arr16([]), ...arr16([]), ...pstr(this.manufacturer), ...pstr(this.model), ...pstr('1.0.0'), ...pstr(this.serial)]), { status: 'ok' };
+      case 0x1001: return reply(0x2001, [...u16(100), ...u32(this.ext), ...u16(100), ...pstr(''), ...u16(0), ...arr16(this.ops), ...arr16([]), ...arr16([0xd303]), ...arr16([]), ...arr16([]), ...pstr(this.manufacturer), ...pstr(this.model), ...pstr(this.version || '1.0.0'), ...pstr(this.serial)]), { status: 'ok' };
       case 0x1004: return reply(0x2001, arr32([0x00010001])), { status: 'ok' };
       case 0x1007: return reply(0x2001, arr32(this.photo ? [5, 6] : [])), { status: 'ok' };
       case 0x1008: {
@@ -82,6 +82,13 @@ r = await readCamera(conn(cam));
 assert.equal(r.count, null); assert.equal(r.problem, 'canon-r-unknown');
 assert.deepEqual(cam.sent, [0x1002, 0x1001, 0x1003]);
 console.log('EOS R: refused safely');
+
+// 3b. A 250D (firmware 3-1.0.1): same, never the event commands
+cam = new FakeCamera({ model: 'Canon EOS 250D', ops: [...STD, 0x9114, 0x9115, 0x9116, 0x9127], events: [ev] });
+cam.version = '3-1.0.1';
+r = await readCamera(conn(cam));
+assert.equal(r.problem, 'canon-r-unknown'); assert.deepEqual(cam.sent, [0x1002, 0x1001, 0x1003]);
+console.log('250D: refused safely');
 
 // 4. Nikon with no photo on the card
 cam = new FakeCamera({ manufacturer: 'Nikon Corporation', ext: 10, model: 'D3500', ops: STD, photo: null });

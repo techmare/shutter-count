@@ -191,7 +191,7 @@ export async function readCamera(conn, status = () => {}) {
       status('photo');
       return { ...(await newestPhoto(ptp, info, camera, usbSerial, log)), log };
     }
-    if (isCanonR(camera)) {
+    if (isCanonR(camera) || /^3-/.test((info.version || '').trim())) {   // newer generation: count is in its JPGs; the RP and 250D froze on the event commands
       return { camera, serial: usbSerial, count: null, method: null, log,
         problem: 'canon-r-unknown' };
     }

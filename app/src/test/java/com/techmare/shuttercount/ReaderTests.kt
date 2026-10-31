@@ -65,6 +65,8 @@ class ReaderTests {
 
     @Test fun canonRAndDeviceIds() {
         assertTrue(CameraModels.isCanonR("Canon EOS RP"))
+        assertTrue(CameraModels.isPhotoCountCanon("Canon EOS 250D", "3-1.0.1"))
+        assertFalse(CameraModels.isPhotoCountCanon("Canon EOS 4000D", "1.0.0"))
         assertEquals(0x0960, CameraModels.canonPhotoOffset("Canon EOS RP"))
         assertEquals(0x0acf, CameraModels.canonPhotoOffset("Canon EOS M50m2"))
         assertEquals(0x0c93, CameraModels.canonPhotoOffset("Canon EOS R7"))

@@ -57,9 +57,9 @@ final class CameraManager: NSObject, ObservableObject {
                 let canonModel = model0.lowercased().hasPrefix("canon") ? model0 : "Canon \(model0)"
 
                 var reading: Reading
-                if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil && CameraModels.isCanonR(canonModel) {
+                if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil && CameraModels.isPhotoCountCanon(canonModel, info?.version) {
                     // Older Canons' status commands made an EOS RP stop answering: don't send them to R bodies.
-                    throw Failure("This Canon R keeps its shutter count inside its photos, and reading this model isn't supported yet. Support is added by comparing two of its photos taken a few shots apart.")
+                    throw Failure("This Canon keeps its shutter count inside its JPG photos, and reading this model isn't supported yet. Support is added by comparing two of its JPG photos taken a few shots apart.")
                 } else if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil {
                     guard canPTP, let ops = info?.operations else {
                         throw Failure("This Canon doesn't accept the status commands needed to read its counter on this Mac.")

@@ -131,6 +131,12 @@ public enum CameraModels {
         (model ?? "").trimmingCharacters(in: .whitespaces).range(of: #"\bEOS R\w*$"#, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
+    /// Canon's newer generation (firmware "3-1.0.1", all EOS R bodies) keeps the count in its JPG photos;
+    /// an EOS RP and a 250D stopped answering after the older bodies' event commands.
+    public static func isPhotoCountCanon(_ model: String?, _ firmware: String?) -> Bool {
+        isCanonR(model) || (firmware ?? "").trimmingCharacters(in: .whitespaces).hasPrefix("3-")
+    }
+
     public static func canonPhotoOffset(_ model: String?) -> Int? {
         guard let m = model else { return nil }
         if Rx.has("\\bEOS (R6m2|R6 Mark II|R8|R50)$", m) { return 0x0d29 }

@@ -987,7 +987,7 @@ async function readCamera(conn, status = () => {}) {
       status('photo');
       return { ...(await newestPhoto(ptp, info, camera, usbSerial, log)), log };
     }
-    if (isCanonR(camera)) {
+    if (isCanonR(camera) || /^3-/.test((info.version || '').trim())) {   // newer generation: count is in its JPGs; the RP and 250D froze on the event commands
       return { camera, serial: usbSerial, count: null, method: null, log,
         problem: 'canon-r-unknown' };
     }
@@ -1215,7 +1215,7 @@ function render() {
 
 // ---------- USB (Chrome / Edge): the same read-only steps as the Android app
 const USB_PROBLEMS = {
-  'canon-r-unknown': "Ce Canon R n'est pas encore pris en charge : son compteur se lit dans ses photos JPG et nous ne connaissons pas encore son emplacement. Écrivez-nous sur WhatsApp, nous le vérifions au showroom.",
+  'canon-r-unknown': "Ce Canon n'est pas encore pris en charge : il garde son compteur dans ses photos JPG et nous ne connaissons pas encore son emplacement pour ce modèle. Écrivez-nous sur WhatsApp, nous le vérifions au showroom.",
   'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre. Passez au showroom ou écrivez-nous sur WhatsApp.",
   'no-photo': "Aucune photo sur la carte de l'appareil. Prenez une photo, puis lisez à nouveau.",
   'no-transfer': "L'appareil n'a pas envoyé sa dernière photo. Débranchez, rallumez l'appareil et réessayez.",
