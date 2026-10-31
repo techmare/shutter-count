@@ -28,7 +28,8 @@ export function displayName(brand, model) {
     let m = raw.replace(/^NIKON/, '').trim().replace(/^Z\s+/, 'Z').replace('_2', ' II').replace('_3', ' III');
     return 'Nikon ' + m;
   }
-  if (brand === 'Canon') return raw.toUpperCase().startsWith('CANON') ? raw : 'Canon ' + raw;
+  // newer Canons write "EOS R5m2"; people know it as the R5 Mark II
+  if (brand === 'Canon') { const c = raw.replace(/(\w)m2$/, '$1 Mark II'); return c.toUpperCase().startsWith('CANON') ? c : 'Canon ' + c; }
   return raw;
 }
 
@@ -66,7 +67,7 @@ function sonyRated(m) {
 }
 
 function canonRated(m) {
-  const s = m.replace(/^EOS/, '').trim().replace(/\s+/g, ' ').replace('R6M2', 'R6 MARK II');
+  const s = m.replace(/^EOS/, '').trim().replace(/\s+/g, ' ').replace('R6M2', 'R6 MARK II').replace('R5M2', 'R5 MARK II');
   if (/^-?1D X MARK (II|III)$/.test(s)) return off(500000);
   if (/^-?1D X$/.test(s)) return off(400000);
   if (/^-?1D MARK IV$/.test(s)) return off(300000);
@@ -106,6 +107,8 @@ export function canonPhotoOffset(model) {
   if (/\bEOS (R100|M50m2|M50 Mark II)$/.test(m)) return 0x0acf;
   // found by comparing two RP photos 4 shots apart (2343 -> 2347)
   if (/\bEOS RP$/.test(m)) return 0x0960;
+  // R5 Mark II: two photos 4 shots apart went 49408 -> 49412 (file numbers 8278 -> 8282)
+  if (/\bEOS (R5m2|R5 Mark II)$/.test(m)) return 0x076d;
   // 250D (Rebel SL3 / Kiss X10 / 200D Mark II): two photos 4 shots apart went 2780 -> 2784
   if (/\bEOS (250D|Rebel SL3|Kiss X10|200D Mark II)$/.test(m)) return 0x094c;
   // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8 spots
@@ -202,7 +205,7 @@ const TAG_MAKE = 0x010f, TAG_MODEL = 0x0110, TAG_SOFTWARE = 0x0131, TAG_EXIF = 0
 const TAG_MAKERNOTE = 0x927c, TAG_DATE = 0x9003, TAG_BODY_SERIAL = 0xa431;
 
 const MISSING_MAKERNOTE = "This photo is missing the camera's private data (maker notes). That usually means it was converted, resized or sent through an app like WhatsApp. On iPhone, pick the photo with “Choose File” from the Files app, not from Photos.";
-const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons need the Android or Mac app with a USB cable.";
+const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons need the Android or Mac app with a USB cable.";
 
 function failure(problem) {
   return { brand: 'Other', make: null, model: null, displayName: 'Unknown camera', count: null, rated: null, ratedOfficial: false,

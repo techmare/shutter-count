@@ -91,7 +91,7 @@ object PhotoShutterReader {
     private fun canonOffset(model: String?): Int? = CameraModels.canonPhotoOffset(model)
 
     private const val CANON_UNSUPPORTED =
-        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
+        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
 
     private fun readCanon(ctx: Ctx, mn: IfdEntry?, warnings: MutableList<String>): PhotoReading {
         val offset = canonOffset(ctx.model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)

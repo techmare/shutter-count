@@ -54,6 +54,8 @@ assert.equal(read(canon('Canon EOS 250D', 0x094c, 2784)).count, 2784);
 assert.equal(read(canon('Canon EOS M50', 0x0188, 82)).count, 82);
 assert.equal(read(canon('Canon EOS R', 0x0190, 201)).count, null);
 assert.equal(read(canon('Canon EOS R6', 0x0af1, 45678)).count, 45678);
+assert.equal(read(canon('Canon EOS R5m2', 0x076d, 49408)).count, 49408);
+assert.equal(read(canon('Canon EOS R5m2', 0x076d, 49408)).displayName, 'Canon EOS R5 Mark II');
 assert.equal(read(canon('Canon EOS R8', 0x0d29, 777)).serial, '123456789');
 assert.equal(read(canon('Canon EOS 5D Mark IV', 0x0d29, 5)).count, null);
 assert.equal(read(new Uint8Array(0)).count, null);

@@ -73,6 +73,7 @@ final class ShutterCoreTests: XCTestCase {
         XCTAssertFalse(CameraModels.isPhotoCountCanon("Canon EOS 2000D", [0x1001, 0x1015, 0x9116]))
         XCTAssertTrue(CameraModels.isPhotoCountCanon("Canon EOS 250D", [0x1001, 0x1016, 0x9116]))
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R6", 0x0af1, 45678)).shutterCount, 45678)
+        XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R5m2", 0x076d, 49408)).shutterCount, 49408)
         let r = PhotoReader.read(canonTiff("Canon EOS R8", 0x0d29, 777))
         XCTAssertEqual(r.serial, "123456789")
         XCTAssertTrue(r.includesElectronic)

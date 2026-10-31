@@ -26,7 +26,8 @@ object CameraModels {
         return when (brand) {
             Brand.SONY -> "Sony " + sonyName(raw)
             Brand.NIKON -> "Nikon " + nikonName(raw)
-            Brand.CANON -> if (raw.uppercase().startsWith("CANON")) raw else "Canon $raw"
+            // newer Canons write "EOS R5m2"; people know it as the R5 Mark II
+            Brand.CANON -> raw.replace(Regex("(\\w)m2$"), "$1 Mark II").let { if (it.uppercase().startsWith("CANON")) it else "Canon $it" }
             Brand.OTHER -> raw
         }
     }
@@ -105,7 +106,7 @@ object CameraModels {
     }
 
     private fun canonRated(m: String): Rating? {
-        val s = m.removePrefix("EOS").trim().replace(Regex("\\s+"), " ").replace("R6M2", "R6 MARK II")
+        val s = m.removePrefix("EOS").trim().replace(Regex("\\s+"), " ").replace("R6M2", "R6 MARK II").replace("R5M2", "R5 MARK II")
         return when {
             s.matches(Regex("-?1D X MARK (II|III)")) -> off(500_000)
             s.matches(Regex("-?1D X")) -> off(400_000)
@@ -140,6 +141,8 @@ object CameraModels {
             Regex("\\bEOS (R100|M50m2|M50 Mark II)$").containsMatchIn(m) -> 0x0acf
             // found by comparing two RP photos 4 shots apart (2343 -> 2347)
             Regex("\\bEOS RP$").containsMatchIn(m) -> 0x0960
+            // R5 Mark II: two photos 4 shots apart went 49408 -> 49412 (file numbers 8278 -> 8282)
+            Regex("\\bEOS (R5m2|R5 Mark II)$").containsMatchIn(m) -> 0x076d
             // 250D (Rebel SL3 / Kiss X10 / 200D Mark II): two photos 4 shots apart went 2780 -> 2784
             Regex("\\bEOS (250D|Rebel SL3|Kiss X10|200D Mark II)$").containsMatchIn(m) -> 0x094c
             // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8

@@ -26,7 +26,10 @@ public enum CameraModels {
         switch brand {
         case .sony: return "Sony " + sonyName(raw)
         case .nikon: return "Nikon " + nikonName(raw)
-        case .canon: return raw.uppercased().hasPrefix("CANON") ? raw : "Canon \(raw)"
+        case .canon:
+            // newer Canons write "EOS R5m2"; people know it as the R5 Mark II
+            let c = raw.replacingOccurrences(of: #"(\w)m2$"#, with: "$1 Mark II", options: .regularExpression)
+            return c.uppercased().hasPrefix("CANON") ? c : "Canon \(c)"
         case .other: return raw
         }
     }
@@ -104,7 +107,7 @@ public enum CameraModels {
 
     private static func canonRated(_ m: String) -> Rating? {
         var s = m.dropPrefix("EOS").trimmingCharacters(in: .whitespaces)
-        s = Rx.replace("\\s+", in: s, with: " ").replacingOccurrences(of: "R6M2", with: "R6 MARK II")
+        s = Rx.replace("\\s+", in: s, with: " ").replacingOccurrences(of: "R6M2", with: "R6 MARK II").replacingOccurrences(of: "R5M2", with: "R5 MARK II")
         if Rx.full("-?1D X MARK (II|III)", s) { return off(500_000) }
         if Rx.full("-?1D X", s) { return off(400_000) }
         if Rx.full("-?1D MARK IV", s) { return off(300_000) }
@@ -147,6 +150,8 @@ public enum CameraModels {
         if Rx.has("\\bEOS (R100|M50m2|M50 Mark II)$", m) { return 0x0acf }
         // RP: found by comparing two photos 4 shots apart (2343 -> 2347)
         if Rx.has("\\bEOS RP$", m) { return 0x0960 }
+        // R5 Mark II: two photos 4 shots apart went 49408 -> 49412 (file numbers 8278 -> 8282)
+        if Rx.has("\\bEOS (R5m2|R5 Mark II)$", m) { return 0x076d }
         // 250D (Rebel SL3 / Kiss X10 / 200D Mark II): two photos 4 shots apart went 2780 -> 2784
         if Rx.has("\\bEOS (250D|Rebel SL3|Kiss X10|200D Mark II)$", m) { return 0x094c }
         // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8 spots

@@ -59,6 +59,8 @@ class ReaderTests {
         assertEquals(12345L, PhotoShutterReader.read(canonTiff("Canon EOS R50", 0x0d29, 12345)).shutterCount)
         assertEquals(777L, PhotoShutterReader.read(canonTiff("Canon EOS R8", 0x0d29, 777)).shutterCount)
         assertEquals(45678L, PhotoShutterReader.read(canonTiff("Canon EOS R6", 0x0af1, 45678)).shutterCount)
+        assertEquals(49408L, PhotoShutterReader.read(canonTiff("Canon EOS R5m2", 0x076d, 49408)).shutterCount)
+        assertEquals("Canon EOS R5 Mark II", CameraModels.displayName(Brand.CANON, "Canon EOS R5m2"))
         assertEquals(623L, PhotoShutterReader.read(canonTiff("Canon EOS R100", 0x0acf, 623)).shutterCount)
         assertNull(PhotoShutterReader.read(canonTiff("Canon EOS 5D Mark IV", 0x0d29, 5)).shutterCount)
     }

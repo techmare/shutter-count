@@ -35,7 +35,7 @@ public enum PhotoReader {
     static let missingMakerNote =
         "This photo is missing the camera's private data (maker notes). That usually means it was resized, edited or sent through an app like WhatsApp. Use the original file from the memory card."
     static let canonUnsupported =
-        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
+        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
 
     public static func read(_ data: Data) -> PhotoReading { read(Array(data)) }
 
