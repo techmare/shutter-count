@@ -109,6 +109,11 @@ button, input { font: inherit; color: inherit; }
 .drop b { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; display: block; }
 .drop p { color: var(--muted); font-size: .94rem; margin: 6px auto 16px; max-width: 38ch; }
 .drop[hidden] { display: none; }
+.usb { display: grid; justify-items: center; gap: 6px; margin-top: 12px; text-align: center; }
+.usb[hidden] { display: none; }
+.usb > span { color: var(--muted); font-size: .85rem; }
+.usb small { color: var(--muted); font-size: .8rem; max-width: 40ch; }
+.notice code { background: rgba(29,39,66,.08); padding: 2px 6px; border-radius: 4px; font-size: .92em; user-select: all; }
 input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .privacy { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: .85rem; margin-top: 12px; }
 .privacy svg { flex: none; margin-top: 2px; color: var(--gold-ink); }
@@ -253,6 +258,11 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
           <span class="btn btn-gold">Choisir une photo</span>
         </label>
         <input type="file" id="file" accept="image/jpeg,.jpg,.jpeg,.nef,.nrw,.arw,.sr2,.srf,.cr2,.cr3,.tif,.tiff,.dng">
+        <div class="usb" id="usbBox" hidden>
+          <span>ou</span>
+          <button class="btn btn-line" id="usbBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v14M12 3l-3 3M12 3l3 3M7 10v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19" r="2"/></svg>Brancher l'appareil en USB</button>
+          <small id="usbHint">Chrome ou Edge · câble USB, appareil allumé, Wi-Fi de l'appareil coupé</small>
+        </div>
         <div class="out" id="out" hidden></div>
         <p class="privacy" id="privacy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>La photo est lue sur votre appareil. Elle n'est ni envoyée ni enregistrée.</p>
       </div>
@@ -304,6 +314,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <details class="faq"><summary>Ma photo est-elle envoyée sur internet ?</summary><p>Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop.</p></details>
       <details class="faq"><summary>Pourquoi ma photo ne donne pas de résultat ?</summary><p>Il faut la photo originale, telle qu'elle sort de l'appareil. Une photo envoyée par WhatsApp, retouchée ou une capture d'écran a perdu les données de l'appareil. Sur iPhone, choisissez la photo dans l'app Fichiers plutôt que dans Photos.</p></details>
       <details class="faq"><summary>Le compteur compte-t-il aussi l'obturateur électronique ?</summary><p>Sur les Canon R et les Nikon Z, oui : le chiffre inclut les photos en obturateur électronique, l'usure réelle de l'obturateur peut donc être plus faible. Sur les Sony récents, seules les photos en obturateur mécanique sont comptées.</p></details>
+      <details class="faq"><summary>Peut-on brancher l'appareil en USB ?</summary><p>Oui, avec Chrome ou Edge sur Android, Mac ou PC : « Brancher l'appareil en USB » lit la dernière photo de la carte (Nikon, Sony, Canon R) ou le compteur des reflex Canon plus anciens (4000D, 2000D, 1300D…). Seules des commandes de lecture sont envoyées. Sur Mac, il faut d'abord libérer l'appareil (la page explique comment) ; sur iPhone, l'USB n'est pas possible.</p></details>
       <details class="faq"><summary>Mon appareil n'est pas compatible, que faire ?</summary><p>Passez dans l'un de nos showrooms à Casablanca ou écrivez-nous sur WhatsApp : nous vérifions le compteur des autres modèles avec un câble.</p></details>
     </div>
   </section>
@@ -336,7 +347,8 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
-import { read, wear, wearPercent, prettyExifDate, fmtCount } from './reader.js';
+import { read, wear, wearPercent, prettyExifDate, fmtCount, rating } from './reader.js';
+import * as usb from './ptp-usb.js';
 
 const WA = '212621319882';
 const $ = s => document.querySelector(s);
@@ -387,7 +399,7 @@ drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('
 let current = null;
 
 async function readFile(file) {
-  drop.hidden = true; out.hidden = false;
+  drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
   out.innerHTML = `<div class="busy"><div class="spin"></div>Lecture de ${esc(file.name)}…</div>`;
   let r;
   try { r = read(new Uint8Array(await file.slice(0, 12 * 1024 * 1024).arrayBuffer())); }
@@ -424,12 +436,13 @@ function panel(r) {
 function render() {
   const { r, fileName } = current;
   let h = panel(r);
-  if (r.problem) h += `<div class="notice bad"><b>Pas de résultat</b>${esc(fr(r.problem))}</div>`;
+  if (r.problem) h += `<div class="notice bad"><b>Pas de résultat</b>${r.problemHtml || esc(fr(r.problem))}</div>`;
   for (const w of r.warnings || []) h += `<div class="notice warn">${esc(fr(w))}</div>`;
   for (const [, v] of (r.details || []).filter(d => d[0] === 'Note')) h += `<div class="notice info">${esc(fr(v))}</div>`;
   const rows = [];
   if (r.dateTaken) rows.push(['Photo prise le', prettyExifDate(r.dateTaken)]);
-  rows.push(['Fichier', fileName]);
+  if (fileName) rows.push([current.usb ? 'Dernière photo' : 'Fichier', fileName]);
+  if (current.usb) rows.push(['Méthode', current.method === 'photo' ? 'USB (dernière photo)' : 'USB (compteur de l\u2019appareil)']);
   if (r.rated) rows.push([r.ratedOfficial ? 'Durée de vie nominale' : 'Durée de vie estimée', fmtCount(r.rated) + ' déclenchements']);
   h += `<dl class="details">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd class="num">${esc(v)}</dd></div>`).join('')}</dl>`;
   if (r.count != null) {
@@ -443,11 +456,73 @@ function render() {
   } else {
     h += `<a class="btn btn-wa" href="https://wa.me/${WA}?text=${encodeURIComponent('Bonjour Midox Shop, je voudrais vérifier le nombre de déclenchements de mon appareil photo.')}" rel="noopener">Demander une vérification sur WhatsApp</a>`;
   }
-  h += `<button class="again" id="again">Choisir une autre photo</button>`;
+  h += `<div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="again">Choisir une photo</button>${usb.supported ? '<button class="again" id="usbAgain">Lire en USB</button>' : ''}</div>`;
   out.innerHTML = h;
   $('#again').onclick = () => input.click();
+  if ($('#usbAgain')) $('#usbAgain').onclick = readUsb;
   if (r.count != null) $('#share').onclick = shareReport;
 }
+
+// ---------- USB (Chrome / Edge): the same read-only steps as the Android app
+const USB_PROBLEMS = {
+  'canon-r-unknown': "Ce Canon R n'est pas encore pris en charge : son compteur se lit dans ses photos JPG et nous ne connaissons pas encore son emplacement. Écrivez-nous sur WhatsApp, nous le vérifions au showroom.",
+  'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre. Passez au showroom ou écrivez-nous sur WhatsApp.",
+  'no-photo': "Aucune photo sur la carte de l'appareil. Prenez une photo, puis lisez à nouveau.",
+  'no-transfer': "L'appareil n'a pas envoyé sa dernière photo. Débranchez, rallumez l'appareil et réessayez.",
+};
+function busyHelp() {
+  const p = usb.platform();
+  if (p === 'mac') return "macOS garde l'appareil pour lui. Fermez Photos et Transfert d'images, ouvrez le Terminal et tapez <code>killall -9 ptpcamerad PTPCamera</code>, puis cliquez tout de suite sur « Lire en USB ».";
+  if (p === 'windows') return "Windows réserve l'appareil à son propre pilote, le navigateur ne peut pas l'ouvrir. Le plus simple : un téléphone Android avec Chrome, ou choisir une photo de l'appareil.";
+  if (p === 'linux') return "Un autre programme utilise l'appareil (le gestionnaire de photos). Fermez-le, débranchez et rebranchez, puis réessayez.";
+  return "Un autre programme utilise l'appareil. Fermez les applications photo, débranchez et rebranchez, puis réessayez.";
+}
+const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
+
+async function readUsb() {
+  let conn;
+  try {
+    conn = await usb.connect();
+  } catch (e) {
+    if (e.code === 'cancelled') return;
+    return showUsbError(e);
+  }
+  drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
+  const busy = t => { out.innerHTML = `<div class="busy"><div class="spin"></div>${esc(t)}</div>`; };
+  busy("Connexion à l'appareil…");
+  try {
+    const res = await usb.readCamera(conn, k => busy(usbStatus[k] || '…'));
+    let r;
+    if (res.reading) r = { ...res.reading, displayName: res.camera, serial: res.serial };
+    else {
+      const rt = rating('Canon', res.camera.replace(/^Canon\s+/i, ''));
+      r = { displayName: res.camera, make: 'Canon', count: res.count, serial: res.serial, rated: rt ? rt.value : null, ratedOfficial: rt ? rt.official : false,
+        includesElectronic: false, details: [], warnings: [] };
+    }
+    if (res.problem) { r.problem = USB_PROBLEMS[res.problem] || res.problem; }
+    if (res.photoDate) r.dateTaken = null;
+    current = { r, fileName: res.photoFile || null, time: Date.now(), usb: true, method: res.method };
+    render();
+    if (res.photoDate && r.count != null) out.insertAdjacentHTML('beforeend', `<p class="privacy">Compteur lu dans la dernière photo, prise le ${esc(res.photoDate)}. Pour le chiffre du jour, prenez une photo juste avant de brancher.</p>`);
+  } catch (e) {
+    showUsbError(e);
+  } finally {
+    await usb.disconnect(conn);
+  }
+}
+
+function showUsbError(e) {
+  drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
+  const msg = e.code === 'busy' ? busyHelp()
+    : e.code === 'nointerface' ? "Cet appareil n'a pas de connexion appareil photo (PTP). Sur Sony, réglez « Connexion USB » sur MTP dans le menu."
+    : e.code === 'timeout' || e.code === 'io' ? "L'appareil ne répond plus. Coupez son Wi-Fi et son Bluetooth, débranchez, rallumez-le et réessayez."
+    : "Impossible de lire l'appareil. Débranchez, rallumez-le et réessayez.";
+  out.innerHTML = `<div class="notice bad"><b>Lecture USB impossible</b>${msg}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 18px"><button class="again" id="usbAgain">Réessayer en USB</button><button class="again" id="again">Choisir une photo</button></div>`;
+  $('#usbAgain').onclick = readUsb; $('#again').onclick = () => input.click();
+}
+
+if (usb.supported) { $('#usbBox').hidden = false; $('#usbBtn').onclick = readUsb; }
 
 // ---------- report image: the shop's colours, in French, with the site at the bottom
 // The shop's logo for the report (same site, so the canvas can still be exported); text only if it doesn't load.
@@ -510,7 +585,7 @@ async function renderReport() {
     while (P + lw + 24 + c.measureText(rest).width > W - P && rs > 22) { rs -= 1; c.font = font(400, rs, 'Figtree'); }
     text(rest, P + lw + 24, y - 6, font(400, rs, 'Figtree'), MUTED);
   }
-  const rows = [['Méthode', 'Photo (données EXIF)'], ['Date du contrôle', fmtDate(time)]];
+  const rows = [['Méthode', current.usb ? (current.method === 'photo' ? 'USB (dernière photo)' : 'USB (compteur de l\u2019appareil)') : 'Photo (données EXIF)'], ['Date du contrôle', fmtDate(time)]];
   let by = H - P - 84 - rows.length * 72 - (r.includesElectronic ? 56 : 0);
   for (const [k, v] of rows) {
     c.fillStyle = '#37446b'; c.fillRect(P, by, inner, 2);

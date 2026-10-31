@@ -15,3 +15,9 @@ Le logo est chargé depuis `/assets/images/logo.png` (celui du site). Si ce chem
 la balise `<img>` du header. Les numéros WhatsApp sont ceux du site (+212 6 21 31 98 82).
 
 Rien n'est envoyé à un serveur : la photo est lue dans le navigateur du visiteur.
+
+## USB (Chrome et Edge)
+
+`ptp-usb.js` ajoute « Brancher l'appareil en USB » : le bouton n'apparaît que dans les navigateurs
+qui le permettent (Chrome / Edge sur Android, Mac, PC). Seules des commandes de lecture sont envoyées.
+La page doit être servie en HTTPS (c'est le cas sur midoxshop.ma).
