@@ -106,6 +106,13 @@ export function canonPhotoOffset(model) {
   if (/\bEOS (R100|M50m2|M50 Mark II)$/.test(m)) return 0x0acf;
   // found by comparing two RP photos 4 shots apart (2343 -> 2347)
   if (/\bEOS RP$/.test(m)) return 0x0960;
+  // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8 spots
+  if (/\bEOS (R7|R10)$/.test(m)) return 0x0c93;
+  if (/\bEOS M6 Mark II$/.test(m)) return 0x0ac7;
+  if (/\bEOS (M50|Kiss M)$/.test(m)) return 0x0188;
+  if (/\bEOS R3$/.test(m)) return 0x0fa9;
+  // ExifTool (CameraInfoG5XII), JPEG files
+  if (/\bPowerShot G5 X Mark II$/.test(m)) return 0x0293;
   return null;
 }
 
@@ -193,7 +200,7 @@ const TAG_MAKE = 0x010f, TAG_MODEL = 0x0110, TAG_SOFTWARE = 0x0131, TAG_EXIF = 0
 const TAG_MAKERNOTE = 0x927c, TAG_DATE = 0x9003, TAG_BODY_SERIAL = 0xa431;
 
 const MISSING_MAKERNOTE = "This photo is missing the camera's private data (maker notes). That usually means it was converted, resized or sent through an app like WhatsApp. On iPhone, pick the photo with “Choose File” from the Files app, not from Photos.";
-const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R50, R100, RP, R8, R6, R6 Mark II, R5 and M50 Mark II. Older Canons need the Android or Mac app with a USB cable.";
+const CANON_UNSUPPORTED = "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons need the Android or Mac app with a USB cable.";
 
 function failure(problem) {
   return { brand: 'Other', make: null, model: null, displayName: 'Unknown camera', count: null, rated: null, ratedOfficial: false,
@@ -324,6 +331,8 @@ function readCr3(d) {
   if (offset == null) return result(ctx, null, { warnings, problem: CANON_UNSUPPORTED });
   const c3 = tiffAt(box('CMT3'));
   if (!c3) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  // most Canons leave the CameraInfo block (and so the count) out of their CR3 files
+  if (!find(c3[1], 0x000d)) return result(ctx, null, { warnings, problem: "This camera keeps its shutter count in its JPG photos, not in its RAW (CR3) files. Pick a JPG taken by the camera, or shoot RAW+JPG." });
   return canonResult(ctx, c3[0], c3[1], offset, warnings);
 }
 

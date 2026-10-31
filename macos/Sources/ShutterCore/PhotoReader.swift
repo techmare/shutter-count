@@ -35,7 +35,7 @@ public enum PhotoReader {
     static let missingMakerNote =
         "This photo is missing the camera's private data (maker notes). That usually means it was resized, edited or sent through an app like WhatsApp. Use the original file from the memory card."
     static let canonUnsupported =
-        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R50, R100, RP, R8, R6, R6 Mark II, R5 and M50 Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
+        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
 
     public static func read(_ data: Data) -> PhotoReading { read(Array(data)) }
 
@@ -129,6 +129,8 @@ public enum PhotoReader {
         let ctx = Ctx(tiff: t1, brand: .canon, make: make, model: model, software: software, dateTaken: dateTaken, bodySerial: bodySerial)
         guard let offset = CameraModels.canonPhotoOffset(model) else { return ctx.result(nil, problem: canonUnsupported) }
         guard let c3 = box("CMT3").flatMap(tiffAt) else { return ctx.result(nil, problem: missingMakerNote) }
+        // most Canons leave the CameraInfo block (and so the count) out of their CR3 files
+        if c3.1.find(0x000D) == nil { return ctx.result(nil, problem: "This camera keeps its shutter count in its JPG photos, not in its RAW (CR3) files. Pick a JPG taken by the camera, or shoot RAW+JPG.") }
         return canonResult(ctx, c3.0, c3.1, offset, [])
     }
 

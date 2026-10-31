@@ -140,6 +140,14 @@ object CameraModels {
             Regex("\\bEOS (R100|M50m2|M50 Mark II)$").containsMatchIn(m) -> 0x0acf
             // found by comparing two RP photos 4 shots apart (2343 -> 2347)
             Regex("\\bEOS RP$").containsMatchIn(m) -> 0x0960
+            // From review-site sample JPGs (Imaging Resource), checked against the known R5/R6/R50/R8
+            // spots first: the value rises with every shot and drifts from the file number after videos.
+            Regex("\\bEOS (R7|R10)$").containsMatchIn(m) -> 0x0c93
+            Regex("\\bEOS M6 Mark II$").containsMatchIn(m) -> 0x0ac7
+            Regex("\\bEOS (M50|Kiss M)$").containsMatchIn(m) -> 0x0188
+            Regex("\\bEOS R3$").containsMatchIn(m) -> 0x0fa9
+            // ExifTool (CameraInfoG5XII), JPEG files
+            Regex("\\bPowerShot G5 X Mark II$").containsMatchIn(m) -> 0x0293
             else -> null
         }
     }

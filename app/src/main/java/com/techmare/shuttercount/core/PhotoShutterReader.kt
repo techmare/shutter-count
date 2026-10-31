@@ -91,7 +91,7 @@ object PhotoShutterReader {
     private fun canonOffset(model: String?): Int? = CameraModels.canonPhotoOffset(model)
 
     private const val CANON_UNSUPPORTED =
-        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R50, R100, RP, R8, R6, R6 Mark II, R5 and M50 Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
+        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
 
     private fun readCanon(ctx: Ctx, mn: IfdEntry?, warnings: MutableList<String>): PhotoReading {
         val offset = canonOffset(ctx.model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
@@ -152,6 +152,8 @@ object PhotoShutterReader {
         val warnings = mutableListOf<String>()
         val offset = canonOffset(model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
         val (t3, mn) = box("CMT3")?.let(::tiffAt) ?: return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
+        // most Canons leave the CameraInfo block (and so the count) out of their CR3 files
+        if (mn.find(0x000D) == null) return ctx.result(null, warnings = warnings, problem = RAW_WITHOUT_COUNT)
         return canonResult(ctx, t3, mn, offset, warnings)
     }
 
@@ -290,6 +292,9 @@ object PhotoShutterReader {
     }
 
     // --------------------------------------------------------------- helpers
+
+    private const val RAW_WITHOUT_COUNT =
+        "This camera keeps its shutter count in its JPG photos, not in its RAW (CR3) files. Pick a JPG taken by the camera, or shoot RAW+JPG."
 
     private const val MISSING_MAKERNOTE =
         "This photo is missing the camera's private data (maker notes). That usually means it was resized, edited or sent through an app like WhatsApp. Use the original file from the memory card."
