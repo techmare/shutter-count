@@ -70,6 +70,8 @@ final class ShutterCoreTests: XCTestCase {
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS M6 Mark II", 0x0ac7, 161)).shutterCount, 161)
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R3", 0x0fa9, 2819)).shutterCount, 2819)
         XCTAssertNil(CameraModels.canonPhotoOffset("Canon EOS R"))
+        XCTAssertFalse(CameraModels.isPhotoCountCanon("Canon EOS 2000D", [0x1001, 0x1015, 0x9116]))
+        XCTAssertTrue(CameraModels.isPhotoCountCanon("Canon EOS 250D", [0x1001, 0x1016, 0x9116]))
         XCTAssertEqual(PhotoReader.read(canonTiff("Canon EOS R6", 0x0af1, 45678)).shutterCount, 45678)
         let r = PhotoReader.read(canonTiff("Canon EOS R8", 0x0d29, 777))
         XCTAssertEqual(r.serial, "123456789")

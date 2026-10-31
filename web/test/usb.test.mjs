@@ -59,6 +59,7 @@ class FakeCamera {
 }
 const conn = cam => ({ ptp: new Ptp(cam, 1, 2), device: cam, iface: 0 });
 const STD = [0x1001, 0x1002, 0x1003, 0x1004, 0x1007, 0x1008, 0x1009, 0x101b, 0x1015];
+const NEW = STD.filter(o => o !== 0x1015);   // DIGIC 8 bodies don't list GetDevicePropValue
 
 // 1. Canon R50: newest photo, JPEG of a RAW+JPEG pair, read with the photo reader
 let cam = new FakeCamera({ model: 'Canon EOS R50', ops: STD, photo: canonTiff('Canon EOS R50', 0x0d29, 12345, 123456789) });
@@ -84,11 +85,18 @@ assert.deepEqual(cam.sent, [0x1002, 0x1001, 0x1003]);
 console.log('EOS R: refused safely');
 
 // 3b. A 90D (firmware 3-1.0.1, not decoded yet): never the event commands
-cam = new FakeCamera({ model: 'Canon EOS 90D', ops: [...STD, 0x9114, 0x9115, 0x9116, 0x9127], events: [ev] });
+cam = new FakeCamera({ model: 'Canon EOS 90D', ops: [...NEW, 0x9114, 0x9115, 0x9116, 0x9127], events: [ev] });
 cam.version = '3-1.0.1';
 r = await readCamera(conn(cam));
 assert.equal(r.problem, 'canon-r-unknown'); assert.deepEqual(cam.sent, [0x1002, 0x1001, 0x1003]);
 console.log('90D: refused safely');
+
+// 3c. A 2000D with firmware "3-1.1.0" still gets its counter
+cam = new FakeCamera({ model: 'Canon EOS 2000D', ops: [...STD, 0x9114, 0x9115, 0x9116, 0x9127], events: [ev] });
+cam.version = '3-1.1.0';
+r = await readCamera(conn(cam));
+assert.equal(r.count, 535);
+console.log('2000D (3-1.1.0): read', r.count);
 
 // 4. Nikon with no photo on the card
 cam = new FakeCamera({ manufacturer: 'Nikon Corporation', ext: 10, model: 'D3500', ops: STD, photo: null });

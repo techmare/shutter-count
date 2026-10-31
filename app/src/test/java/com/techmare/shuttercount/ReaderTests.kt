@@ -65,8 +65,10 @@ class ReaderTests {
 
     @Test fun canonRAndDeviceIds() {
         assertTrue(CameraModels.isCanonR("Canon EOS RP"))
-        assertTrue(CameraModels.isPhotoCountCanon("Canon EOS 250D", "3-1.0.1"))
-        assertFalse(CameraModels.isPhotoCountCanon("Canon EOS 4000D", "1.0.0"))
+        // a 250D doesn't list GetDevicePropValue; a 2000D (firmware "3-1.1.0" too) does and is read normally
+        assertTrue(CameraModels.isPhotoCountCanon("Canon EOS 250D", setOf(0x1001, 0x1002, 0x1014, 0x1016, 0x9114, 0x9116)))
+        assertFalse(CameraModels.isPhotoCountCanon("Canon EOS 2000D", setOf(0x1001, 0x1002, 0x1014, 0x1015, 0x1016, 0x9114, 0x9116)))
+        assertTrue(CameraModels.isPhotoCountCanon("Canon EOS RP", setOf(0x1015)))
         assertEquals(0x0960, CameraModels.canonPhotoOffset("Canon EOS RP"))
         assertEquals(0x0acf, CameraModels.canonPhotoOffset("Canon EOS M50m2"))
         assertEquals(0x0c93, CameraModels.canonPhotoOffset("Canon EOS R7"))

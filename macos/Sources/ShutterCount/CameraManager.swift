@@ -57,7 +57,7 @@ final class CameraManager: NSObject, ObservableObject {
                 let canonModel = model0.lowercased().hasPrefix("canon") ? model0 : "Canon \(model0)"
 
                 var reading: Reading
-                if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil && CameraModels.isPhotoCountCanon(canonModel, info?.version) {
+                if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil && CameraModels.isPhotoCountCanon(canonModel, info?.operations) {
                     // Older Canons' status commands made an EOS RP stop answering: don't send them to R bodies.
                     throw Failure("This Canon keeps its shutter count inside its JPG photos, and reading this model isn't supported yet. Support is added by comparing two of its JPG photos taken a few shots apart.")
                 } else if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil {

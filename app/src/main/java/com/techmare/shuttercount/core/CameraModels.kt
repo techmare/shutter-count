@@ -158,12 +158,13 @@ object CameraModels {
     fun isCanonR(model: String?): Boolean = Regex("\\bEOS R\\w*$", RegexOption.IGNORE_CASE).containsMatchIn(model.orEmpty().trim())
 
     /**
-     * Canon's newer generation (DIGIC 8 and later: firmware written "3-1.0.1", and all EOS R bodies)
-     * keeps the count in its JPG photos. An EOS RP and a 250D stopped answering after the older
-     * bodies' event commands, so these never get them.
+     * Canon's newer generation (DIGIC 8 and later, and all EOS R bodies) keeps the count in its JPG
+     * photos. An EOS RP and a 250D stopped answering after the older bodies' event commands. They don't
+     * list GetDevicePropValue (0x1015); the older bodies that answer the counter (4000D, 2000D) do.
+     * (The firmware name is no clue: a 2000D's is "3-1.1.0" too.)
      */
-    fun isPhotoCountCanon(model: String?, firmware: String?): Boolean =
-        isCanonR(model) || firmware.orEmpty().trim().startsWith("3-")
+    fun isPhotoCountCanon(model: String?, operations: Set<Int>): Boolean =
+        isCanonR(model) || 0x1015 !in operations
 
     /** Canon's DeviceInfo "serial" is a long hex ID of the USB connection, not the body serial. */
     fun isDeviceId(s: String): Boolean = s.length >= 20 && s.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }

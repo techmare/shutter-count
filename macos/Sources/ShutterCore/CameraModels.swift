@@ -131,10 +131,11 @@ public enum CameraModels {
         (model ?? "").trimmingCharacters(in: .whitespaces).range(of: #"\bEOS R\w*$"#, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
-    /// Canon's newer generation (firmware "3-1.0.1", all EOS R bodies) keeps the count in its JPG photos;
-    /// an EOS RP and a 250D stopped answering after the older bodies' event commands.
-    public static func isPhotoCountCanon(_ model: String?, _ firmware: String?) -> Bool {
-        isCanonR(model) || (firmware ?? "").trimmingCharacters(in: .whitespaces).hasPrefix("3-")
+    /// Canon's newer generation (DIGIC 8+, all EOS R bodies) keeps the count in its JPG photos; an EOS RP
+    /// and a 250D stopped answering after the older bodies' event commands. They don't list
+    /// GetDevicePropValue (0x1015); the older bodies that answer the counter (4000D, 2000D) do.
+    public static func isPhotoCountCanon(_ model: String?, _ operations: Set<Int>?) -> Bool {
+        isCanonR(model) || !(operations ?? []).contains(0x1015)
     }
 
     public static func canonPhotoOffset(_ model: String?) -> Int? {

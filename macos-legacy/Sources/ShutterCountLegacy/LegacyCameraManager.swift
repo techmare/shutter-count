@@ -61,7 +61,7 @@ final class LegacyCameraManager: NSObject {
             let model0 = (info?.model).flatMap { $0.isEmpty ? nil : $0 } ?? name
             let isCanon = (info?.manufacturer ?? "").localizedCaseInsensitiveContains("canon") || name.localizedCaseInsensitiveContains("canon")
             let canonModel = model0.lowercased().hasPrefix("canon") ? model0 : "Canon \(model0)"
-            if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil && CameraModels.isPhotoCountCanon(canonModel, info?.version) {
+            if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil && CameraModels.isPhotoCountCanon(canonModel, info?.operations) {
                     // Older Canons' status commands made an EOS RP stop answering: don't send them to R bodies.
                     self.fail(camera, "This Canon keeps its shutter count inside its JPG photos, and reading this model isn't supported yet. Support is added by comparing two of its JPG photos taken a few shots apart."); return
                 } else if isCanon && CameraModels.canonPhotoOffset(canonModel) == nil {

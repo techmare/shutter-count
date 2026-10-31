@@ -88,7 +88,7 @@ class CanonReader(private val session: PtpSession) {
 
             // Canon R bodies we can't decode yet: don't send them the older bodies' status commands
             // (an EOS RP stopped answering after them). Their count is in their photos instead.
-            if (CameraModels.isPhotoCountCanon(model, firmware)) {
+            if (CameraModels.isPhotoCountCanon(model, info.operations)) {
                 return result(emptyList(), null,
                     problem = "This Canon keeps its shutter count inside its JPG photos, not where older Canons do. " +
                         "Reading the ${model.removePrefix("Canon ").trim()} isn't supported yet: support is added by comparing two of its JPG photos taken a few shots apart.")
