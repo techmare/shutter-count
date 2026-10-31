@@ -83,12 +83,12 @@ assert.equal(r.count, null); assert.equal(r.problem, 'canon-r-unknown');
 assert.deepEqual(cam.sent, [0x1002, 0x1001, 0x1003]);
 console.log('EOS R: refused safely');
 
-// 3b. A 250D (firmware 3-1.0.1): same, never the event commands
-cam = new FakeCamera({ model: 'Canon EOS 250D', ops: [...STD, 0x9114, 0x9115, 0x9116, 0x9127], events: [ev] });
+// 3b. A 90D (firmware 3-1.0.1, not decoded yet): never the event commands
+cam = new FakeCamera({ model: 'Canon EOS 90D', ops: [...STD, 0x9114, 0x9115, 0x9116, 0x9127], events: [ev] });
 cam.version = '3-1.0.1';
 r = await readCamera(conn(cam));
 assert.equal(r.problem, 'canon-r-unknown'); assert.deepEqual(cam.sent, [0x1002, 0x1001, 0x1003]);
-console.log('250D: refused safely');
+console.log('90D: refused safely');
 
 // 4. Nikon with no photo on the card
 cam = new FakeCamera({ manufacturer: 'Nikon Corporation', ext: 10, model: 'D3500', ops: STD, photo: null });
