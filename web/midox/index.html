@@ -12,10 +12,10 @@
 <meta property="og:title" content="Nombre de déclenchements : vérifiez votre appareil photo">
 <meta property="og:description" content="Gratuit, sans inscription : choisissez une photo de l'appareil et voyez son nombre de déclenchements et son usure.">
 <meta property="og:url" content="https://www.midoxshop.ma/declenchements/">
-<meta name="theme-color" content="#1d2742">
+<meta name="theme-color" content="#1f2937">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -48,15 +48,16 @@
 </script>
 <style>
 :root {
-  --navy: #1d2742; --navy-2: #2b3758; --navy-3: #37446b;
-  --gold: #c59a3c; --gold-ink: #8a6517; --gold-soft: #f4ead3;
-  --bg: #f6f5f1; --surface: #ffffff; --line: #e4e1d8;
-  --text: #1d2742; --muted: #5c6378;
-  --on-dark: #f3efe4; --on-dark-muted: #b9bccb;
+  /* midoxshop.ma: Kanit, slate text, copper/gold accents, charcoal blocks */
+  --navy: #1f1f1f; --navy-2: #2b2b2b; --navy-3: #3a3a3a;     /* the site's charcoal (footer, dark blocks) */
+  --gold: #d4a74b; --gold-ink: #955228; --gold-soft: #faf3e3; --copper: #cb8c35;
+  --bg: #ffffff; --soft: #f3f4f6; --surface: #ffffff; --line: #e5e7eb;
+  --text: #334155; --heading: #475569; --muted: #64748b; --topbar: #1f2937; --ink: #171717;
+  --on-dark: #fafafa; --on-dark-muted: #a3a3a3;
   --wa: #1fa855; --ok: #2f9a5a; --mid: #d98a1f; --high: #d4493a;
   --f-display: "Kanit", "Arial Narrow", system-ui, sans-serif;
-  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --radius: 10px; --radius-lg: 14px; --wrap: 1080px;
+  --f-body: "Kanit", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius: 8px; --radius-lg: 8px; --wrap: 1180px;
   color-scheme: light;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -72,39 +73,46 @@ button, input { font: inherit; color: inherit; }
 .num { font-variant-numeric: tabular-nums; }
 
 /* header: same as the shop */
+.topbar { background: var(--topbar); color: #fff; font-size: .8rem; }
+.topbar ul { list-style: none; margin: 0 auto; padding: 5px 16px; display: flex; gap: 22px; justify-content: safe center; overflow-x: auto; white-space: nowrap; scrollbar-width: none; max-width: var(--wrap); }
+.topbar li { display: flex; align-items: center; gap: 6px; }
+@media (max-width: 640px) { .topbar ul { justify-content: flex-start; gap: 16px; } .topbar li:nth-child(3) { display: none; } }
 .header { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
 .header .wrap { display: flex; align-items: center; gap: 16px; min-height: 64px; }
 .logo { display: flex; align-items: center; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--navy); }
-.logo img { height: 40px; width: auto; }
+.logo img { height: 46px; width: auto; }
 .nav { display: none; gap: 22px; margin-left: auto; font-weight: 500; }
-.nav a { text-decoration: none; color: var(--muted); }
-.nav a:hover, .nav a[aria-current] { color: var(--navy); }
+.nav a { text-decoration: none; color: #374151; font-size: .86rem; font-weight: 500; }
+.nav a:hover, .nav a[aria-current] { color: var(--gold-ink); }
 .header .wa { margin-left: auto; }
 @media (min-width: 860px) { .nav { display: flex; } .header .wa { margin-left: 8px; } }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 999px; border: 1.5px solid transparent; font-weight: 600; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 6px; border: 1px solid transparent; font-weight: 500; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
 .btn:active { transform: scale(.97); }
-.btn-gold { background: var(--gold); color: var(--navy); }
-.btn-gold:hover { background: #d4aa4f; }
+.btn-gold { background: var(--gold); color: #1c1c1c; }
+.btn-gold:hover { background: #c99a3c; }
+.btn-dark { background: var(--ink); color: var(--on-dark); text-transform: uppercase; letter-spacing: .02em; }
+.btn-dark:hover { background: #000; }
 .btn-wa { background: var(--wa); color: #fff; }
 .btn-wa:hover { background: #1a9449; }
 .btn-line { background: var(--surface); border-color: var(--line); color: var(--navy); }
-.btn-line:hover { border-color: var(--navy); }
+.btn-line:hover { border-color: var(--text); }
 .btn-sm { min-height: 40px; padding: .45rem .9rem; font-size: .92rem; }
 
 /* hero with the tool in it */
-.hero { background: var(--navy); color: var(--on-dark); padding: 36px 0 40px; }
+.hero { background: var(--soft); color: var(--text); padding: 32px 0 40px; border-bottom: 1px solid var(--line); }
 .hero .wrap { display: grid; gap: 26px; }
-.eyebrow { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
-.hero h1 { color: #fff; font-size: clamp(2rem, 1.4rem + 3vw, 3.1rem); font-weight: 600; margin-top: 8px; }
-.hero .lead { color: var(--on-dark-muted); font-size: 1.06rem; margin-top: 12px; max-width: 46ch; }
-.promises { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .92rem; color: var(--on-dark); }
+.eyebrow { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-ink); font-weight: 500; }
+.hero h1 { color: var(--heading); font-size: clamp(2rem, 1.4rem + 3vw, 3.2rem); font-weight: 700; letter-spacing: .03em; margin-top: 8px; padding-bottom: 12px; position: relative; }
+.hero h1::after { content: ""; position: absolute; left: 0; bottom: 0; width: 80px; height: 2px; background: var(--gold-ink); }
+.hero .lead { color: var(--text); font-weight: 300; font-size: 1.06rem; margin-top: 12px; max-width: 46ch; }
+.promises { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .92rem; color: var(--text); }
 .promises li { display: flex; align-items: center; gap: 7px; }
-.promises svg { color: var(--gold); flex: none; }
+.promises svg { color: var(--copper); flex: none; }
 @media (min-width: 900px) { .hero { padding: 56px 0; } .hero .wrap { grid-template-columns: 1fr 1.05fr; align-items: start; gap: 44px; } }
 
-.tool { background: var(--surface); color: var(--text); border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 18px 40px rgba(10, 16, 34, .28); }
-.drop { display: block; border: 1.5px dashed #cfcab9; border-radius: var(--radius); padding: 26px 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+.tool { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 10px 30px rgba(15, 23, 42, .08); }
+.drop { display: block; border: 1.5px dashed #d1d5db; border-radius: var(--radius); padding: 26px 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
 .drop:hover, .drop.hot { border-color: var(--gold); background: var(--gold-soft); }
 .drop b { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; display: block; }
 .drop p { color: var(--muted); font-size: .94rem; margin: 6px auto 16px; max-width: 38ch; }
@@ -113,7 +121,7 @@ button, input { font: inherit; color: inherit; }
 .usb[hidden] { display: none; }
 .usb > span { color: var(--muted); font-size: .85rem; }
 .usb small { color: var(--muted); font-size: .8rem; max-width: 40ch; }
-.notice code { background: rgba(29,39,66,.08); padding: 2px 6px; border-radius: 4px; font-size: .92em; user-select: all; }
+.notice code { background: rgba(0,0,0,.06); padding: 2px 6px; border-radius: 4px; font-size: .92em; user-select: all; }
 input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .privacy { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-size: .85rem; margin-top: 12px; }
 .privacy svg { flex: none; margin-top: 2px; color: var(--gold-ink); }
@@ -127,18 +135,18 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 .panel .sn { color: var(--on-dark-muted); font-size: .88rem; }
 .odo { display: flex; margin: 16px 0 10px; }
 .wheel { flex: 1; max-height: 88px; aspect-ratio: .72; margin-right: 5px; border-radius: 8px; display: grid; place-items: center; overflow: hidden;
-  background: linear-gradient(#121a30, #26314f 22%, #313d62 50%, #26314f 78%, #121a30);
+  background: linear-gradient(#0e0e0e, #262626 22%, #333333 50%, #262626 78%, #0e0e0e);
   font-family: var(--f-display); font-weight: 600; font-size: clamp(30px, 9vw, 54px); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.07); }
 .wheel:last-child { margin-right: 0; }
 .wheel.group { margin-right: 13px; }
-.wheel.dim { color: #5d6788; }
+.wheel.dim { color: #5c5c5c; }
 .wheel span { display: block; }
 .wheel.roll span { animation: roll .45s cubic-bezier(.23,1,.32,1) both; }
 @keyframes roll { from { transform: translateY(-75%); opacity: 0; } to { transform: none; opacity: 1; } }
 .caption { color: var(--on-dark-muted); }
 .scale { margin-top: 16px; }
 .ticks { display: flex; justify-content: space-between; align-items: flex-end; height: 18px; }
-.ticks i { width: 2px; height: 9px; border-radius: 1px; background: #4b5678; }
+.ticks i { width: 2px; height: 9px; border-radius: 1px; background: #4a4a4a; }
 .ticks i.major { height: 18px; }
 .marker { position: relative; height: 12px; }
 .marker b { position: absolute; top: 3px; width: 0; height: 0; transform: translateX(-6px); border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 9px solid var(--gold); }
@@ -170,11 +178,12 @@ dl.details dd { margin: 0; text-align: right; font-weight: 500; overflow-wrap: a
 
 /* content sections */
 .section { padding: 48px 0; }
-.section h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem); font-weight: 600; }
+.section h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 1.95rem); font-weight: 700; color: var(--heading); letter-spacing: .035em; padding-bottom: 8px; position: relative; }
+.section h2::after { content: ""; position: absolute; left: 0; bottom: 0; width: 80px; height: 2px; background: var(--gold-ink); }
 .section .intro { color: var(--muted); margin-top: 8px; max-width: 60ch; }
 .steps { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; counter-reset: s; }
 .steps li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 16px 16px 58px; position: relative; counter-increment: s; }
-.steps li::before { content: counter(s); position: absolute; left: 16px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: var(--gold); font-family: var(--f-display); font-weight: 600; display: grid; place-items: center; }
+.steps li::before { content: counter(s); position: absolute; left: 16px; top: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--gold); color: #1c1c1c; font-family: var(--f-display); font-weight: 600; display: grid; place-items: center; }
 .steps b { display: block; font-weight: 600; }
 .steps span { color: var(--muted); font-size: .94rem; }
 @media (min-width: 860px) { .steps { grid-template-columns: repeat(3, 1fr); } }
@@ -199,7 +208,7 @@ details.faq summary::after { content: "+"; position: absolute; right: 18px; top:
 details.faq[open] summary::after { transform: rotate(45deg); }
 details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
-.cta { background: var(--navy); color: var(--on-dark); border-radius: var(--radius-lg); padding: 28px 22px; display: grid; gap: 14px; }
+.cta { background: var(--ink); color: var(--on-dark); border-radius: var(--radius-lg); padding: 28px 22px; display: grid; gap: 14px; }
 .cta h2 { color: #fff; }
 .cta p { color: var(--on-dark-muted); max-width: 56ch; }
 .cta .row { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -221,6 +230,11 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 </head>
 <body>
 
+<div class="topbar"><ul>
+  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Livraison partout au Maroc</li>
+  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Paiement sécurisé</li>
+  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>2 showrooms à Casablanca</li>
+</ul></div>
 <header class="header">
   <div class="wrap">
     <a class="logo" href="/" aria-label="Midox Shop, accueil">
@@ -535,16 +549,16 @@ const logoReady = new Promise(res => { const i = new Image(); i.onload = () => r
 async function renderReport() {
   const { r, time } = current;
   const logo = await logoReady;
-  await Promise.all(['600 84px Kanit', '700 84px Kanit', '400 36px Figtree', '600 36px Figtree'].map(f => document.fonts.load(f).catch(() => {})));
+  await Promise.all(['600 84px Kanit', '700 84px Kanit', '300 36px Kanit', '400 36px Kanit', '500 36px Kanit'].map(f => document.fonts.load(f).catch(() => {})));
   const W = 1080, H = 1350, P = 72, inner = W - 2 * P;
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const c = cv.getContext('2d');
   const font = (w, s, fam) => `${w} ${s}px ${fam}, sans-serif`;
   const text = (s, x, y, f, col, align = 'left') => { c.font = f; c.fillStyle = col; c.textAlign = align; c.fillText(s, x, y); };
-  const TEXT = '#f3efe4', MUTED = '#b9bccb', GOLD = '#c59a3c';
-  c.fillStyle = '#1d2742'; c.fillRect(0, 0, W, H);
+  const TEXT = '#fafafa', MUTED = '#a3a3a3', GOLD = '#d4a74b';
+  c.fillStyle = '#1f1f1f'; c.fillRect(0, 0, W, H);
   let y = 128;
-  text('MIDOX SHOP · RAPPORT DE DÉCLENCHEMENTS', P, y, font(600, 28, 'Figtree'), GOLD);
+  text('MIDOX SHOP · RAPPORT DE DÉCLENCHEMENTS', P, y, font(500, 28, 'Kanit'), GOLD);
   if (logo) {   // the shop's logo on a white badge, top right
     const lh = 64, lw = Math.min(220, logo.naturalWidth * lh / logo.naturalHeight), bx = W - P - lw - 28, byy = 58;
     c.fillStyle = '#ffffff'; c.beginPath(); c.roundRect ? c.roundRect(bx, byy, lw + 28, lh + 20, 12) : c.rect(bx, byy, lw + 28, lh + 20); c.fill();
@@ -554,30 +568,30 @@ async function renderReport() {
   let size = 84; c.font = font(600, size, 'Kanit');
   while (c.measureText(r.displayName).width > inner && size > 48) { size -= 2; c.font = font(600, size, 'Kanit'); }
   text(r.displayName, P, y, font(600, size, 'Kanit'), '#ffffff');
-  if (r.serial) { y += 58; text('N° de série ' + r.serial, P, y, font(400, 36, 'Figtree'), MUTED); }
+  if (r.serial) { y += 58; text('N° de série ' + r.serial, P, y, font(300, 36, 'Kanit'), MUTED); }
   y += 56;
   const digits = String(r.count), n = Math.max(6, digits.length), groups = Math.floor((n - 1) / 3);
   const gap = 12, gg = 28, ww = (inner - gap * (n - 1 - groups) - gg * groups) / n, wh = 220, padded = digits.padStart(n, '0');
   let x = P;
   for (let i = 0; i < n; i++) {
     const g = c.createLinearGradient(0, y, 0, y + wh);
-    [['#121a30', 0], ['#26314f', .22], ['#313d62', .5], ['#26314f', .78], ['#121a30', 1]].forEach(([col, s]) => g.addColorStop(s, col));
+    [['#0e0e0e', 0], ['#262626', .22], ['#333333', .5], ['#262626', .78], ['#0e0e0e', 1]].forEach(([col, s]) => g.addColorStop(s, col));
     c.fillStyle = g; c.beginPath(); c.roundRect ? c.roundRect(x, y, ww, wh, 14) : c.rect(x, y, ww, wh); c.fill();
     c.font = font(600, 170, 'Kanit'); c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillStyle = i < n - digits.length ? '#5d6788' : '#ffffff'; c.fillText(padded[i], x + ww / 2, y + wh / 2 + 8);
+    c.fillStyle = i < n - digits.length ? '#5c5c5c' : '#ffffff'; c.fillText(padded[i], x + ww / 2, y + wh / 2 + 8);
     c.textBaseline = 'alphabetic';
     const rem = n - 1 - i; x += ww + (rem > 0 && rem % 3 === 0 ? gg : gap);
   }
   y += wh + 58;
-  text('déclenchements', P, y, font(400, 38, 'Figtree'), MUTED);
+  text('déclenchements', P, y, font(300, 38, 'Kanit'), MUTED);
   if (r.rated) {
     const w = wear(r.count, r.rated), f = Math.min(1, r.count / r.rated), col = toneHex(w.tone);
     y += 64; const base = y + 44;
-    for (let t = 0; t <= 40; t++) { const tx = P + t * (inner - 4) / 40, h = t % 10 === 0 ? 44 : 24; c.fillStyle = r.count > 0 && t / 40 <= f ? col : '#4b5678'; c.fillRect(tx, base - h, 4, h); }
+    for (let t = 0; t <= 40; t++) { const tx = P + t * (inner - 4) / 40, h = t % 10 === 0 ? 44 : 24; c.fillStyle = r.count > 0 && t / 40 <= f ? col : '#4a4a4a'; c.fillRect(tx, base - h, 4, h); }
     const mx = P + f * (inner - 4) + 2;
     c.fillStyle = GOLD; c.beginPath(); c.moveTo(mx, base + 8); c.lineTo(mx - 16, base + 30); c.lineTo(mx + 16, base + 30); c.closePath(); c.fill();
     y = base + 74;
-    const sm = font(400, 30, 'Figtree');
+    const sm = font(300, 30, 'Kanit');
     text('0', P, y, sm, MUTED); text(fmtCount(r.rated / 2), P + inner / 2, y, sm, MUTED, 'center');
     text(`${fmtCount(r.rated)} ${r.ratedOfficial ? '(nominale)' : '(estimée)'}`, P + inner, y, sm, MUTED, 'right');
     y += 96;
@@ -585,22 +599,22 @@ async function renderReport() {
     c.font = font(600, 62, 'Kanit'); const lw = c.measureText(w.fr).width;
     text(w.fr, P, y, font(600, 62, 'Kanit'), '#ffffff');
     const rest = (pct === 0 && r.count > 0 ? 'moins de 1 %' : pct + ' %') + (r.ratedOfficial ? ' de la durée de vie nominale' : ' de la durée de vie estimée');
-    let rs = 34; c.font = font(400, rs, 'Figtree');
-    while (P + lw + 24 + c.measureText(rest).width > W - P && rs > 22) { rs -= 1; c.font = font(400, rs, 'Figtree'); }
-    text(rest, P + lw + 24, y - 6, font(400, rs, 'Figtree'), MUTED);
+    let rs = 34; c.font = font(300, rs, 'Kanit');
+    while (P + lw + 24 + c.measureText(rest).width > W - P && rs > 22) { rs -= 1; c.font = font(300, rs, 'Kanit'); }
+    text(rest, P + lw + 24, y - 6, font(300, rs, 'Kanit'), MUTED);
   }
   const rows = [['Méthode', current.usb ? (current.method === 'photo' ? 'USB (dernière photo)' : 'USB (compteur de l\u2019appareil)') : 'Photo (données EXIF)'], ['Date du contrôle', fmtDate(time)]];
   let by = H - P - 84 - rows.length * 72 - (r.includesElectronic ? 56 : 0);
   for (const [k, v] of rows) {
-    c.fillStyle = '#37446b'; c.fillRect(P, by, inner, 2);
-    text(k, P, by + 48, font(400, 32, 'Figtree'), MUTED);
-    text(v, P + inner, by + 48, font(600, 32, 'Figtree'), TEXT, 'right');
+    c.fillStyle = '#3a3a3a'; c.fillRect(P, by, inner, 2);
+    text(k, P, by + 48, font(300, 32, 'Kanit'), MUTED);
+    text(v, P + inner, by + 48, font(500, 32, 'Kanit'), TEXT, 'right');
     by += 72;
   }
-  if (r.includesElectronic) { text('Le compteur inclut les déclenchements en obturateur électronique.', P, by + 36, font(400, 28, 'Figtree'), MUTED); by += 56; }
-  c.fillStyle = '#37446b'; c.fillRect(P, H - P - 52, inner, 2);
-  text('Contrôlé avec l\u2019outil Midox Shop', P, H - P - 6, font(400, 28, 'Figtree'), MUTED);
-  text('midoxshop.ma', P + inner, H - P - 6, font(600, 30, 'Figtree'), GOLD, 'right');
+  if (r.includesElectronic) { text('Le compteur inclut les déclenchements en obturateur électronique.', P, by + 36, font(300, 28, 'Kanit'), MUTED); by += 56; }
+  c.fillStyle = '#3a3a3a'; c.fillRect(P, H - P - 52, inner, 2);
+  text('Contrôlé avec l\u2019outil Midox Shop', P, H - P - 6, font(300, 28, 'Kanit'), MUTED);
+  text('midoxshop.ma', P + inner, H - P - 6, font(500, 30, 'Kanit'), GOLD, 'right');
   return new Promise(res => cv.toBlob(res, 'image/png'));
 }
 

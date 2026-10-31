@@ -2,7 +2,7 @@
 
 Deux fichiers, rien à installer :
 
-- `index.html`: la page (thème Midox : bleu nuit #1d2742, or #c59a3c, Kanit + Figtree)
+- `index.html`: la page (thème midoxshop.ma : Kanit, texte ardoise #334155, or #d4a74b, cuivre #955228, anthracite #1f1f1f)
 - `reader.js`: le lecteur de photos (même code que l'app Shutter Count)
 
 ## Mise en ligne (site Next.js sur Vercel)
