@@ -99,31 +99,57 @@ final class LegacyCameraManager: NSObject {
             if #available(macOS 10.15, *), let d = f.exifCreationDate { return d }
             return f.creationDate ?? .distantPast
         }
-        let newestDate = files.map(date).max() ?? .distantPast
-        let sameShot = files.filter { abs(date($0).timeIntervalSince(newestDate)) < 1 }
-        let newest = sameShot.first { ($0.name ?? "").uppercased().hasSuffix(".JPG") } ?? sameShot.first ?? files[0]
-        let fileName = newest.name ?? "photo"
-        let size = Int64(newest.fileSize)
-        log.append("Newest: \(fileName), \(size) bytes")
+        // newest first, one file per shot (the JPEG of a RAW+JPEG pair)
+        var shots: [ICCameraFile] = []
+        for f in files.sorted(by: { date($0) > date($1) }) {
+            let base = ((f.name ?? "") as NSString).deletingPathExtension.uppercased()
+            if let t = shots.firstIndex(where: { abs(date($0).timeIntervalSince(date(f))) < 1 && (($0.name ?? "") as NSString).deletingPathExtension.uppercased() == base }) {
+                if (f.name ?? "").uppercased().hasSuffix(".JPG") && !(shots[t].name ?? "").uppercased().hasSuffix(".JPG") { shots[t] = f }
+            } else { shots.append(f) }
+        }
+        let tries = Array(shots.prefix(12))
+        var other: String?
 
-        let finishWith: ([UInt8]) -> Void = { data in
-            let parsed = PhotoReader.read(data)
-            self.log.append("Read: \(parsed.displayName), count \(parsed.shutterCount.map(String.init) ?? "none")")
+        func finishWith(_ f: ICCameraFile, _ parsed: PhotoReading) {
+            let fileName = f.name ?? "photo"
+            self.log.append("Read: \(fileName), \(parsed.displayName), count \(parsed.shutterCount.map(String.init) ?? "none")")
             var r = Reading.from(parsed, fileName: fileName, source: "USB", method: "USB (dernière photo)")
             if parsed.make == nil { r.camera = camera.name ?? r.camera }
-            let created = date(newest)
+            let created = date(f)
             if created != .distantPast { r.photoDate = Fmt.date(created) }
             self.finish(camera, done(r))
         }
-        readData(camera, newest, length: min(size, 512 * 1024)) { data, err in
-            guard let data = data else { self.fail(camera, err?.localizedDescription ?? "The camera didn't send the photo."); return }
-            let bytes = Array(data)
-            if PhotoReader.read(bytes).shutterCount == nil && Int64(bytes.count) < size && size < 80 * 1024 * 1024 {
-                self.readData(camera, newest, length: size) { full, _ in finishWith(full.map(Array.init) ?? bytes) }
-            } else {
-                finishWith(bytes)
+        // The card may hold photos from other cameras: walk back from the newest until one was
+        // taken by this body.
+        func attempt(_ k: Int) {
+            guard k < tries.count else {
+                fail(camera, other.map { "The newest photos on this card were taken by another camera (\($0)), not this one. Take one photo with this camera, then read again." }
+                    ?? "Couldn't read a photo from the camera's card. Take a new photo, then read again.")
+                return
+            }
+            let f = tries[k], size = Int64(f.fileSize)
+            readData(camera, f, length: min(size, 512 * 1024)) { data, err in
+                guard let data = data else { self.log.append("No data for \(f.name ?? "?"): \(err?.localizedDescription ?? "")"); attempt(k + 1); return }
+                let bytes = Array(data)
+                let partial = Int64(bytes.count) < size && size < 80 * 1024 * 1024
+                let parsed = PhotoReader.read(bytes)
+                let check: (PhotoReading) -> Void = { p in
+                    if p.make != nil && !CameraModels.photoFromCamera(camera.name, nil, p.model, p.serial) {
+                        self.log.append("Skipped \(f.name ?? "?"): taken by \(p.displayName), not this camera")
+                        if other == nil { other = p.displayName + (p.serial.map { " (S/N \($0))" } ?? "") }
+                        attempt(k + 1)
+                    } else {
+                        finishWith(f, p)
+                    }
+                }
+                if (parsed.make == nil || parsed.shutterCount == nil) && partial {
+                    self.readData(camera, f, length: size) { full, _ in check(full.map { PhotoReader.read(Array($0)) } ?? parsed) }
+                } else {
+                    check(parsed)
+                }
             }
         }
+        attempt(0)
     }
 
     private func finish(_ camera: ICCameraDevice, _ r: Reading) {

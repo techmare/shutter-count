@@ -5,7 +5,7 @@
 //  - Older Canons: their own counter (property D1AC, directly or through the EOS event stream).
 // Never sends Canon's 9052/9053 shutter-unit commands (an R50 showed Err 70 with them).
 
-import { read, canonPhotoOffset } from './reader.js';
+import { read, canonPhotoOffset, photoFromCamera } from './reader.js';
 
 export const supported = typeof navigator !== 'undefined' && !!navigator.usb;
 
@@ -54,24 +54,37 @@ export class Ptp {
   async fill(n) {
     let empty = 0;
     while (this.pending.length < n) {
-      const r = await withTimeout(this.usb.transferIn(this.epIn, 65536), this.timeoutMs);
-      if (r.status === 'stall') { await this.usb.clearHalt('in', this.epIn); continue; }
-      const chunk = r.data ? new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength) : new Uint8Array(0);
+      const chunk = await this.chunk();
       if (!chunk.length) { if (++empty > 8) throw new UsbError('timeout', 'The camera stopped responding.'); continue; }
       empty = 0;
       const merged = new Uint8Array(this.pending.length + chunk.length);
       merged.set(this.pending); merged.set(chunk, this.pending.length); this.pending = merged;
     }
   }
+  async chunk() {
+    const r = await withTimeout(this.usb.transferIn(this.epIn, 65536), this.timeoutMs);
+    if (r.status === 'stall') { await this.usb.clearHalt('in', this.epIn); return new Uint8Array(0); }
+    return r.data ? new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength) : new Uint8Array(0);
+  }
   async container() {
     await this.fill(12);
     const len = le32(this.pending, 0);
     if (len < 12 || len > 64 * 1024 * 1024) throw new UsbError('garbled', 'Garbled reply from the camera.');
     const type = le16(this.pending, 4), code = le16(this.pending, 6);
-    await this.fill(len);
-    const payload = this.pending.slice(12, len);
-    this.pending = this.pending.slice(len);
-    return { type, code, payload };
+    // one buffer of the right size: growing it chunk by chunk made a big RAW file very slow
+    const whole = new Uint8Array(len);
+    let have = Math.min(this.pending.length, len), empty = 0;
+    whole.set(this.pending.subarray(0, have));
+    this.pending = this.pending.slice(have);
+    while (have < len) {
+      const c = await this.chunk();
+      if (!c.length) { if (++empty > 8) throw new UsbError('timeout', 'The camera stopped responding.'); continue; }
+      empty = 0;
+      const use = Math.min(c.length, len - have);
+      whole.set(c.subarray(0, use), have); have += use;
+      if (use < c.length) this.pending = c.slice(use);
+    }
+    return { type, code, payload: whole.slice(12) };
   }
   async transact(op, params = []) {
     const tid = ++this.tid;
@@ -226,22 +239,42 @@ async function newestPhoto(ptp, info, camera, usbSerial, log) {
     if (oi.format !== 0x3001 && IMAGE_EXT.test(oi.name)) infos.push(oi);
   }
   if (!infos.length) return { camera, serial: usbSerial, count: null, method: 'photo', problem: 'no-photo' };
+  // newest first, one file per shot (the JPEG of a RAW+JPEG pair)
   infos.sort((a, b) => (b.captured.localeCompare(a.captured)) || (b.handle - a.handle));
-  const best = infos.find(i => i.captured === infos[0].captured && /\.jpe?g$/i.test(i.name)) || infos[0];
-  log.push(`Newest photo: ${best.name} (${best.captured}, ${best.size} bytes)`);
-  let bytes = null, partial = false;
-  if (ops.has(OP.GetPartialObject)) {
-    r = await ptp.transact(OP.GetPartialObject, [best.handle, 0, HEADER_BYTES]);
-    log.push(`GetPartialObject: ${hex(r.code)}, ${r.data.length} bytes`);
-    if (r.ok && r.data.length) { bytes = r.data; partial = r.data.length < best.size; }
+  const shots = [];
+  for (const i of infos) {
+    const base = i.name.replace(/\.[^.]*$/, '').toUpperCase();
+    const t = shots.findIndex(s => s.captured === i.captured && s.name.replace(/\.[^.]*$/, '').toUpperCase() === base);
+    if (t < 0) shots.push(i); else if (/\.jpe?g$/i.test(i.name) && !/\.jpe?g$/i.test(shots[t].name)) shots[t] = i;
   }
-  let reading = bytes ? read(bytes) : null;
-  if ((!reading || (reading.count == null && partial)) && ops.has(OP.GetObject) && best.size <= MAX_FULL) {
-    r = await ptp.transact(OP.GetObject, [best.handle]);
-    log.push(`GetObject: ${hex(r.code)}, ${r.data.length} bytes`);
-    if (r.ok && r.data.length) reading = read(r.data);
+  const getFull = async i => {
+    if (!ops.has(OP.GetObject) || i.size > MAX_FULL) return null;
+    const g = await ptp.transact(OP.GetObject, [i.handle]);
+    log.push(`GetObject ${i.name}: ${hex(g.code)}, ${g.data.length} bytes`);
+    return g.ok && g.data.length ? read(g.data) : null;
+  };
+  // The card may hold photos from other cameras: walk back from the newest until one was taken
+  // by this body (same model, and same serial when both are known).
+  let best = null, reading = null, other = null;
+  for (const i of shots.slice(0, 12)) {
+    let rd = null, partial = false;
+    if (ops.has(OP.GetPartialObject)) {
+      r = await ptp.transact(OP.GetPartialObject, [i.handle, 0, HEADER_BYTES]);
+      log.push(`GetPartialObject ${i.name}: ${hex(r.code)}, ${r.data.length} bytes`);
+      if (r.ok && r.data.length) { rd = read(r.data); partial = r.data.length < i.size; }
+    }
+    if (!rd || (!rd.make && partial)) rd = (await getFull(i)) || rd;
+    if (!rd) continue;
+    if (rd.make && !photoFromCamera(info.model || camera, usbSerial, rd.model, rd.serial)) {
+      log.push(`Skipped ${i.name}: taken by ${rd.displayName}${rd.serial ? ' S/N ' + rd.serial : ''}, not this camera`);
+      other = other || rd.displayName + (rd.serial ? ` (S/N ${rd.serial})` : '');
+      continue;
+    }
+    if (rd.count == null && partial) rd = (await getFull(i)) || rd;
+    best = i; reading = rd; break;
   }
-  if (!reading) return { camera, serial: usbSerial, count: null, method: 'photo', problem: 'no-transfer', photoFile: best.name };
+  if (!reading) return { camera, serial: usbSerial, count: null, method: 'photo', otherCamera: other, problem: other ? 'other-camera' : 'no-transfer' };
+  log.push(`Photo read: ${best.name}, ${reading.displayName}, count ${reading.count ?? 'none'}`);
   const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/.exec(best.captured);
   return {
     camera: reading.make ? reading.displayName : camera, serial: reading.serial || usbSerial, count: reading.count, method: 'photo', reading,

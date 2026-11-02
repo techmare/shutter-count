@@ -172,4 +172,13 @@ final class ShutterCoreTests: XCTestCase {
         XCTAssertFalse(fake.ops.contains(0x9052), "never sends shutter-unit commands")
         XCTAssertFalse(fake.ops.contains(0x9053))
     }
+
+    func testUsbPhotoMustComeFromTheCameraOnTheCable() {
+        XCTAssertFalse(CameraModels.photoFromCamera("NIKON DSC D3200", nil, "Canon EOS 100D", "353073003847"))
+        XCTAssertTrue(CameraModels.photoFromCamera("NIKON DSC D3200", nil, "NIKON D3200", "6012345"))
+        XCTAssertTrue(CameraModels.photoFromCamera("D3200", "0006012345", "NIKON D3200", "6012345"))
+        XCTAssertFalse(CameraModels.photoFromCamera("D3200", "6012345", "NIKON D3200", "6099999"))
+        XCTAssertTrue(CameraModels.photoFromCamera("Canon EOS R6 Mark II", nil, "Canon EOS R6m2", nil))
+        XCTAssertFalse(CameraModels.photoFromCamera("D750", nil, "NIKON D7500", nil))
+    }
 }

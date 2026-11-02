@@ -92,24 +92,42 @@ final class CameraManager: NSObject, ObservableObject {
         log.append("Image files on card: \(files.count)")
         guard !files.isEmpty else { throw Failure("No photo found on the camera's card. Take a photo, then read again.") }
         func date(_ f: ICCameraFile) -> Date { f.exifCreationDate ?? f.creationDate ?? f.fileCreationDate ?? .distantPast }
-        let newestDate = files.map(date).max() ?? .distantPast
-        let sameShot = files.filter { abs(date($0).timeIntervalSince(newestDate)) < 1 }
-        let newest = sameShot.first { ($0.name ?? "").uppercased().hasSuffix(".JPG") } ?? sameShot.first ?? files[0]
-        let name = newest.name ?? "photo"
-        log.append("Newest: \(name), \(newest.fileSize) bytes")
-
-        var data = try await readData(newest, length: min(Int64(newest.fileSize), 512 * 1024))
-        var parsed = PhotoReader.read(data)
-        if parsed.shutterCount == nil && Int64(data.count) < Int64(newest.fileSize) && newest.fileSize < 80 * 1024 * 1024 {
-            data = try await readData(newest, length: Int64(newest.fileSize))
-            parsed = PhotoReader.read(data)
+        // newest first, one file per shot (the JPEG of a RAW+JPEG pair)
+        var shots: [ICCameraFile] = []
+        for f in files.sorted(by: { date($0) > date($1) }) {
+            let base = ((f.name ?? "") as NSString).deletingPathExtension.uppercased()
+            if let t = shots.firstIndex(where: { abs(date($0).timeIntervalSince(date(f))) < 1 && (($0.name ?? "") as NSString).deletingPathExtension.uppercased() == base }) {
+                if (f.name ?? "").uppercased().hasSuffix(".JPG") && !(shots[t].name ?? "").uppercased().hasSuffix(".JPG") { shots[t] = f }
+            } else { shots.append(f) }
         }
-        log.append("Read: \(parsed.displayName), count \(parsed.shutterCount.map(String.init) ?? "none")")
-        var r = Reading.from(parsed, fileName: name, source: "USB", method: "USB (dernière photo)")
-        if parsed.make == nil { r.camera = camera.name ?? r.camera }
-        let created = date(newest)
-        if created != .distantPast { r.photoDate = Fmt.date(created) }
-        return r
+        // The card may hold photos from other cameras: walk back from the newest until one was
+        // taken by this body.
+        var other: String?
+        for f in shots.prefix(12) {
+            let name = f.name ?? "photo"
+            var data = try await readData(f, length: min(Int64(f.fileSize), 512 * 1024))
+            var parsed = PhotoReader.read(data)
+            let partial = Int64(data.count) < Int64(f.fileSize) && f.fileSize < 80 * 1024 * 1024
+            if parsed.make == nil && partial {
+                data = try await readData(f, length: Int64(f.fileSize)); parsed = PhotoReader.read(data)
+            }
+            if parsed.make != nil && !CameraModels.photoFromCamera(camera.name, nil, parsed.model, parsed.serial) {
+                log.append("Skipped \(name): taken by \(parsed.displayName), not this camera")
+                if other == nil { other = parsed.displayName + (parsed.serial.map { " (S/N \($0))" } ?? "") }
+                continue
+            }
+            if parsed.shutterCount == nil && partial && Int64(data.count) < Int64(f.fileSize) {
+                data = try await readData(f, length: Int64(f.fileSize)); parsed = PhotoReader.read(data)
+            }
+            log.append("Read: \(name), \(parsed.displayName), count \(parsed.shutterCount.map(String.init) ?? "none")")
+            var r = Reading.from(parsed, fileName: name, source: "USB", method: "USB (dernière photo)")
+            if parsed.make == nil { r.camera = camera.name ?? r.camera }
+            let created = date(f)
+            if created != .distantPast { r.photoDate = Fmt.date(created) }
+            return r
+        }
+        throw Failure(other.map { "The newest photos on this card were taken by another camera (\($0)), not this one. Take one photo with this camera, then read again." }
+            ?? "Couldn't read a photo from the camera's card. Take a new photo, then read again.")
     }
 
     // MARK: ImageCaptureCore plumbing

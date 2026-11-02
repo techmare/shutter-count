@@ -1,7 +1,7 @@
 package com.techmare.shuttercount.ptp
 
 /**
- * Fetches the newest photo from a connected camera's card using standard,
+ * Fetches recent photos from a connected camera's card using standard,
  * read-only PTP operations (the same ones every photo-transfer app uses):
  * GetStorageIDs, GetObjectHandles, GetObjectInfo, GetPartialObject / GetObject.
  */
@@ -11,36 +11,15 @@ class PhotoPull(private val session: PtpSession, private val ops: Set<Int>, priv
 
     internal data class Info(val handle: Long, val format: Int, val size: Long, val name: String, val captured: String)
 
-    /** Newest image on the camera, or null when there's none. Reads only the start of the file when possible. */
-    fun latest(): Pulled? {
-        val newest = newestImage() ?: return null
-        val canPartial = ops.contains(OP_GET_PARTIAL_OBJECT)
-        val bytes = if (canPartial) {
-            val r = session.transact(OP_GET_PARTIAL_OBJECT, listOf(newest.handle, 0L, HEADER_BYTES.toLong()))
-            log += "GetPartialObject ${newest.name}: ${hex(r.code)}, ${r.data.size} bytes"
-            if (r.ok && r.data.isNotEmpty()) r.data else null
-        } else null
-        if (bytes != null) return Pulled(newest.name, newest.captured.ifBlank { null }, bytes, bytes.size < newest.size)
-        return full(newest)
-    }
-
-    /** Whole file, for when the camera data isn't in the first part. */
-    fun fullOf(p: Pulled): Pulled? = newestCache?.takeIf { it.name == p.fileName }?.let(::full)
-
-    private var newestCache: Info? = null
-
-    private fun full(i: Info): Pulled? {
-        if (!ops.contains(OP_GET_OBJECT) || i.size > MAX_FULL) return null
-        val r = session.transact(OP_GET_OBJECT, listOf(i.handle))
-        log += "GetObject ${i.name}: ${hex(r.code)}, ${r.data.size} bytes"
-        return if (r.ok && r.data.isNotEmpty()) Pulled(i.name, i.captured.ifBlank { null }, r.data, false) else null
-    }
-
-    private fun newestImage(): Info? {
+    /**
+     * Recent photos, newest first, one per shot (the JPEG of a RAW+JPEG pair: smaller, metadata up front).
+     * The caller checks which camera took each one: a card can hold photos from other bodies.
+     */
+    internal fun recent(): List<Info> {
         val storages = run {
             val r = session.transact(OP_GET_STORAGE_IDS, emptyList())
             log += "GetStorageIDs: ${hex(r.code)}"
-            if (!r.ok) return null
+            if (!r.ok) return emptyList()
             readArray32(r.data).filter { (it and 0xFFFF) != 0L } // skip storages without media
         }
         val handles = ArrayList<Long>()
@@ -51,20 +30,28 @@ class PhotoPull(private val session: PtpSession, private val ops: Set<Int>, priv
             log += "GetObjectHandles storage ${"%08X".format(sid)}: ${hex(r.code)}, ${h.size} objects"
             handles += h
         }
-        if (handles.isEmpty()) return null
         // Cameras hand out increasing handles, so the newest files are at the end.
         val infos = handles.sorted().takeLast(CANDIDATES).reversed().mapNotNull(::info)
             .filter { it.format != FORMAT_ASSOCIATION && IMAGE_EXT.containsMatchIn(it.name) }
-        // Prefer the newest capture; for a RAW+JPEG pair prefer the JPEG (smaller, metadata up front).
-        val best = infos.sortedWith(
-            compareByDescending<Info> { it.captured }.thenByDescending { it.handle }
-        ).let { sorted ->
-            val top = sorted.firstOrNull() ?: return null
-            sorted.firstOrNull { it.captured == top.captured && it.name.endsWith(".JPG", true) } ?: top
+        return pickShots(infos)
+    }
+
+    /** The start of the file when the camera allows it, else the whole file. */
+    internal fun header(i: Info): Pulled? {
+        if (ops.contains(OP_GET_PARTIAL_OBJECT)) {
+            val r = session.transact(OP_GET_PARTIAL_OBJECT, listOf(i.handle, 0L, HEADER_BYTES.toLong()))
+            log += "GetPartialObject ${i.name}: ${hex(r.code)}, ${r.data.size} bytes"
+            if (r.ok && r.data.isNotEmpty()) return Pulled(i.name, i.captured.ifBlank { null }, r.data, r.data.size < i.size)
         }
-        log += "Newest photo: ${best.name} (${best.captured.ifBlank { "no date" }}, ${best.size} bytes)"
-        newestCache = best
-        return best
+        return full(i)
+    }
+
+    /** Whole file, for when the camera data isn't in the first part. */
+    internal fun full(i: Info): Pulled? {
+        if (!ops.contains(OP_GET_OBJECT) || i.size > MAX_FULL) return null
+        val r = session.transact(OP_GET_OBJECT, listOf(i.handle))
+        log += "GetObject ${i.name}: ${hex(r.code)}, ${r.data.size} bytes"
+        return if (r.ok && r.data.isNotEmpty()) Pulled(i.name, i.captured.ifBlank { null }, r.data, false) else null
     }
 
     /** ObjectInfo dataset, PIMA 15740 clause 5.5.2. */
@@ -84,6 +71,19 @@ class PhotoPull(private val session: PtpSession, private val ops: Set<Int>, priv
     private fun hex(code: Int) = "%04X".format(code)
 
     companion object {
+        /** Newest first; of files from the same shot (same capture time and name), keep the JPEG. */
+        internal fun pickShots(infos: List<Info>): List<Info> {
+            val sorted = infos.sortedWith(compareByDescending<Info> { it.captured }.thenByDescending { it.handle })
+            val out = ArrayList<Info>()
+            for (i in sorted) {
+                val shot = i.name.substringBeforeLast('.')
+                val twin = out.indexOfFirst { it.captured == i.captured && it.name.substringBeforeLast('.').equals(shot, true) }
+                if (twin < 0) out += i
+                else if (i.name.endsWith(".JPG", true) && !out[twin].name.endsWith(".JPG", true)) out[twin] = i
+            }
+            return out
+        }
+
         internal fun parseObjectInfo(handle: Long, data: ByteArray): Info {
             val p = PtpSession.Reader(data)
             p.u32()                     // StorageID
@@ -110,7 +110,7 @@ class PhotoPull(private val session: PtpSession, private val ops: Set<Int>, priv
         const val OP_GET_PARTIAL_OBJECT = 0x101B
         private const val FORMAT_ASSOCIATION = 0x3001
         private const val HEADER_BYTES = 512 * 1024
-        private const val MAX_FULL = 80L * 1024 * 1024
+        private const val MAX_FULL = 60L * 1024 * 1024
         private const val CANDIDATES = 40
         private val IMAGE_EXT = Regex("\\.(JPG|JPEG|NEF|NRW|ARW|SRF|SR2|CR2|CR3|HIF|HEIF)$", RegexOption.IGNORE_CASE)
     }

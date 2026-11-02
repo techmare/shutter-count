@@ -121,6 +121,21 @@ export function canonPhotoOffset(model) {
   return null;
 }
 
+/** "NIKON DSC D3200", "NIKON D3200" and "D3200" -> "D3200"; "Canon EOS R5 Mark II" and "Canon EOS R5m2" -> "EOSR5M2". */
+export function modelKey(model) {
+  return (model || '').toUpperCase().replace(/\b(NIKON|CORPORATION|DSC|CANON|INC|SONY)\b/g, ' ')
+    .replace(/[^A-Z0-9]/g, '').replace('MARKIII', 'M3').replace('MARKII', 'M2');
+}
+const serialKey = s => { const t = (s || '').trim(); if (!t || (t.length >= 20 && /^[0-9a-f]+$/i.test(t)) || !/^\d+$/.test(t)) return null; return t.replace(/^0+/, '') || null; };
+
+/** Was this photo taken by the camera on the cable? Cards often hold photos from other bodies. */
+export function photoFromCamera(cameraModel, cameraSerial, photoModel, photoSerial) {
+  const a = modelKey(cameraModel), b = modelKey(photoModel);
+  if (a && b && a !== b) return false;
+  const s1 = serialKey(cameraSerial), s2 = serialKey(photoSerial);
+  return s1 == null || s2 == null || s1 === s2;
+}
+
 export const WEAR = [
   { key: 'likeNew', en: 'Like new', fr: 'Comme neuf', below: 0.10, tone: 'ok' },
   { key: 'good', en: 'Good', fr: 'Bon état', below: 0.40, tone: 'ok' },

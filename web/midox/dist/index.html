@@ -359,7 +359,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version 2026.10.31-42</span></div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version 2026.11.02-43</span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -491,6 +491,21 @@ function canonPhotoOffset(model) {
   // ExifTool (CameraInfoG5XII), JPEG files
   if (/\bPowerShot G5 X Mark II$/.test(m)) return 0x0293;
   return null;
+}
+
+/** "NIKON DSC D3200", "NIKON D3200" and "D3200" -> "D3200"; "Canon EOS R5 Mark II" and "Canon EOS R5m2" -> "EOSR5M2". */
+function modelKey(model) {
+  return (model || '').toUpperCase().replace(/\b(NIKON|CORPORATION|DSC|CANON|INC|SONY)\b/g, ' ')
+    .replace(/[^A-Z0-9]/g, '').replace('MARKIII', 'M3').replace('MARKII', 'M2');
+}
+const serialKey = s => { const t = (s || '').trim(); if (!t || (t.length >= 20 && /^[0-9a-f]+$/i.test(t)) || !/^\d+$/.test(t)) return null; return t.replace(/^0+/, '') || null; };
+
+/** Was this photo taken by the camera on the cable? Cards often hold photos from other bodies. */
+function photoFromCamera(cameraModel, cameraSerial, photoModel, photoSerial) {
+  const a = modelKey(cameraModel), b = modelKey(photoModel);
+  if (a && b && a !== b) return false;
+  const s1 = serialKey(cameraSerial), s2 = serialKey(photoSerial);
+  return s1 == null || s2 == null || s1 === s2;
 }
 
 const WEAR = [
@@ -863,24 +878,37 @@ class Ptp {
   async fill(n) {
     let empty = 0;
     while (this.pending.length < n) {
-      const r = await withTimeout(this.usb.transferIn(this.epIn, 65536), this.timeoutMs);
-      if (r.status === 'stall') { await this.usb.clearHalt('in', this.epIn); continue; }
-      const chunk = r.data ? new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength) : new Uint8Array(0);
+      const chunk = await this.chunk();
       if (!chunk.length) { if (++empty > 8) throw new UsbError('timeout', 'The camera stopped responding.'); continue; }
       empty = 0;
       const merged = new Uint8Array(this.pending.length + chunk.length);
       merged.set(this.pending); merged.set(chunk, this.pending.length); this.pending = merged;
     }
   }
+  async chunk() {
+    const r = await withTimeout(this.usb.transferIn(this.epIn, 65536), this.timeoutMs);
+    if (r.status === 'stall') { await this.usb.clearHalt('in', this.epIn); return new Uint8Array(0); }
+    return r.data ? new Uint8Array(r.data.buffer, r.data.byteOffset, r.data.byteLength) : new Uint8Array(0);
+  }
   async container() {
     await this.fill(12);
     const len = le32(this.pending, 0);
     if (len < 12 || len > 64 * 1024 * 1024) throw new UsbError('garbled', 'Garbled reply from the camera.');
     const type = le16(this.pending, 4), code = le16(this.pending, 6);
-    await this.fill(len);
-    const payload = this.pending.slice(12, len);
-    this.pending = this.pending.slice(len);
-    return { type, code, payload };
+    // one buffer of the right size: growing it chunk by chunk made a big RAW file very slow
+    const whole = new Uint8Array(len);
+    let have = Math.min(this.pending.length, len), empty = 0;
+    whole.set(this.pending.subarray(0, have));
+    this.pending = this.pending.slice(have);
+    while (have < len) {
+      const c = await this.chunk();
+      if (!c.length) { if (++empty > 8) throw new UsbError('timeout', 'The camera stopped responding.'); continue; }
+      empty = 0;
+      const use = Math.min(c.length, len - have);
+      whole.set(c.subarray(0, use), have); have += use;
+      if (use < c.length) this.pending = c.slice(use);
+    }
+    return { type, code, payload: whole.slice(12) };
   }
   async transact(op, params = []) {
     const tid = ++this.tid;
@@ -1035,22 +1063,42 @@ async function newestPhoto(ptp, info, camera, usbSerial, log) {
     if (oi.format !== 0x3001 && IMAGE_EXT.test(oi.name)) infos.push(oi);
   }
   if (!infos.length) return { camera, serial: usbSerial, count: null, method: 'photo', problem: 'no-photo' };
+  // newest first, one file per shot (the JPEG of a RAW+JPEG pair)
   infos.sort((a, b) => (b.captured.localeCompare(a.captured)) || (b.handle - a.handle));
-  const best = infos.find(i => i.captured === infos[0].captured && /\.jpe?g$/i.test(i.name)) || infos[0];
-  log.push(`Newest photo: ${best.name} (${best.captured}, ${best.size} bytes)`);
-  let bytes = null, partial = false;
-  if (ops.has(OP.GetPartialObject)) {
-    r = await ptp.transact(OP.GetPartialObject, [best.handle, 0, HEADER_BYTES]);
-    log.push(`GetPartialObject: ${hex(r.code)}, ${r.data.length} bytes`);
-    if (r.ok && r.data.length) { bytes = r.data; partial = r.data.length < best.size; }
+  const shots = [];
+  for (const i of infos) {
+    const base = i.name.replace(/\.[^.]*$/, '').toUpperCase();
+    const t = shots.findIndex(s => s.captured === i.captured && s.name.replace(/\.[^.]*$/, '').toUpperCase() === base);
+    if (t < 0) shots.push(i); else if (/\.jpe?g$/i.test(i.name) && !/\.jpe?g$/i.test(shots[t].name)) shots[t] = i;
   }
-  let reading = bytes ? read(bytes) : null;
-  if ((!reading || (reading.count == null && partial)) && ops.has(OP.GetObject) && best.size <= MAX_FULL) {
-    r = await ptp.transact(OP.GetObject, [best.handle]);
-    log.push(`GetObject: ${hex(r.code)}, ${r.data.length} bytes`);
-    if (r.ok && r.data.length) reading = read(r.data);
+  const getFull = async i => {
+    if (!ops.has(OP.GetObject) || i.size > MAX_FULL) return null;
+    const g = await ptp.transact(OP.GetObject, [i.handle]);
+    log.push(`GetObject ${i.name}: ${hex(g.code)}, ${g.data.length} bytes`);
+    return g.ok && g.data.length ? read(g.data) : null;
+  };
+  // The card may hold photos from other cameras: walk back from the newest until one was taken
+  // by this body (same model, and same serial when both are known).
+  let best = null, reading = null, other = null;
+  for (const i of shots.slice(0, 12)) {
+    let rd = null, partial = false;
+    if (ops.has(OP.GetPartialObject)) {
+      r = await ptp.transact(OP.GetPartialObject, [i.handle, 0, HEADER_BYTES]);
+      log.push(`GetPartialObject ${i.name}: ${hex(r.code)}, ${r.data.length} bytes`);
+      if (r.ok && r.data.length) { rd = read(r.data); partial = r.data.length < i.size; }
+    }
+    if (!rd || (!rd.make && partial)) rd = (await getFull(i)) || rd;
+    if (!rd) continue;
+    if (rd.make && !photoFromCamera(info.model || camera, usbSerial, rd.model, rd.serial)) {
+      log.push(`Skipped ${i.name}: taken by ${rd.displayName}${rd.serial ? ' S/N ' + rd.serial : ''}, not this camera`);
+      other = other || rd.displayName + (rd.serial ? ` (S/N ${rd.serial})` : '');
+      continue;
+    }
+    if (rd.count == null && partial) rd = (await getFull(i)) || rd;
+    best = i; reading = rd; break;
   }
-  if (!reading) return { camera, serial: usbSerial, count: null, method: 'photo', problem: 'no-transfer', photoFile: best.name };
+  if (!reading) return { camera, serial: usbSerial, count: null, method: 'photo', otherCamera: other, problem: other ? 'other-camera' : 'no-transfer' };
+  log.push(`Photo read: ${best.name}, ${reading.displayName}, count ${reading.count ?? 'none'}`);
   const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/.exec(best.captured);
   return {
     camera: reading.make ? reading.displayName : camera, serial: reading.serial || usbSerial, count: reading.count, method: 'photo', reading,
@@ -1230,6 +1278,7 @@ const USB_PROBLEMS = {
   'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre, l'outil ne peut donc pas le lire.",
   'no-photo': "Aucune photo sur la carte de l'appareil. Prenez une photo, puis lisez à nouveau.",
   'no-transfer': "L'appareil n'a pas envoyé sa dernière photo. Débranchez, rallumez l'appareil et réessayez.",
+  'other-camera': "Les dernières photos de cette carte ont été prises par un autre appareil, pas par celui qui est branché. Prenez une photo avec cet appareil, puis lisez à nouveau.",
 };
 function busyHelp() {
   const p = usb.platform();
@@ -1240,7 +1289,7 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
-const VERSION = '2026.10.31-42';
+const VERSION = '2026.11.02-43';
 let lastLog = '';
 async function copyDiag() {
   try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }
@@ -1268,6 +1317,7 @@ async function readUsb() {
         includesElectronic: false, details: [], warnings: [] };
     }
     if (res.problem) { r.problem = USB_PROBLEMS[res.problem] || res.problem; }
+    if (res.problem === 'other-camera' && res.otherCamera) r.problem = r.problem.replace('un autre appareil', `un autre appareil (${res.otherCamera})`);
     if (res.photoDate) r.dateTaken = null;
     current = { r, fileName: res.photoFile || null, time: Date.now(), usb: true, method: res.method };
     render();

@@ -172,6 +172,31 @@ object CameraModels {
     /** Canon's DeviceInfo "serial" is a long hex ID of the USB connection, not the body serial. */
     fun isDeviceId(s: String): Boolean = s.length >= 20 && s.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }
 
+    /** "NIKON DSC D3200", "NIKON D3200" and "D3200" -> "D3200"; "Canon EOS R5 Mark II" and "Canon EOS R5m2" -> "EOSR5M2". */
+    fun modelKey(model: String?): String =
+        model.orEmpty().uppercase()
+            .replace(Regex("\\b(NIKON|CORPORATION|DSC|CANON|INC|SONY)\\b"), " ")
+            .replace(Regex("[^A-Z0-9]"), "")
+            .replace("MARKIII", "M3").replace("MARKII", "M2")
+
+    /**
+     * Was this photo taken by the camera on the cable? A card often holds photos from other
+     * bodies (a card moved between cameras), and their count must never be shown as this one's.
+     * The model has to match; the serial too when both sides know a real one.
+     */
+    fun photoFromCamera(cameraModel: String?, cameraSerial: String?, photoModel: String?, photoSerial: String?): Boolean {
+        val a = modelKey(cameraModel); val b = modelKey(photoModel)
+        if (a.isNotEmpty() && b.isNotEmpty() && a != b) return false
+        val s1 = serialKey(cameraSerial); val s2 = serialKey(photoSerial)
+        return s1 == null || s2 == null || s1 == s2
+    }
+
+    private fun serialKey(s: String?): String? {
+        val t = s?.trim().orEmpty()
+        if (t.isEmpty() || isDeviceId(t) || !t.all { it.isDigit() }) return null
+        return t.trimStart('0').ifEmpty { null }
+    }
+
     enum class Wear(val label: String) { LIKE_NEW("Like new"), GOOD("Good"), USED("Used"), HIGH("High wear"), BEYOND("Beyond rating") }
 
     fun wear(count: Long, rated: Int): Wear {

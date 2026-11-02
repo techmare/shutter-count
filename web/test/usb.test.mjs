@@ -102,4 +102,44 @@ console.log('2000D (3-1.1.0): read', r.count);
 cam = new FakeCamera({ manufacturer: 'Nikon Corporation', ext: 10, model: 'D3500', ops: STD, photo: null });
 r = await readCamera(conn(cam));
 assert.equal(r.problem, 'no-photo');
+// 5. A camera whose card holds photos from other bodies: read its own newest photo, never another's
+class CardCamera extends FakeCamera {
+  async transferOut(ep, data) {
+    const d = new Uint8Array(data), op = d[6] | (d[7] << 8), tid = d[8] | (d[9] << 8), h = d[12] | (d[13] << 8);
+    const f = this.files.find(x => x.h === h);
+    const send = (code, payload) => {
+      const p = payload instanceof Uint8Array ? payload : Uint8Array.from(payload || []), resp = container(3, code, tid);
+      const all = new Uint8Array((payload ? 12 + p.length : 0) + resp.length);
+      if (payload) { all.set(container(2, op, tid)); all.set(u32(12 + p.length), 0); all.set(p, 12); }
+      all.set(resp, all.length - resp.length);
+      for (let i = 0; i < all.length; i += 4096) this.out.push(all.slice(i, i + 4096));
+      return { status: 'ok' };
+    };
+    if (op === 0x1007) return send(0x2001, arr32(this.files.map(x => x.h)));
+    if (op === 0x1008) return send(0x2001, [...u32(0x00010001), ...u16(0x3801), ...u16(0), ...u32(f.data.length), ...u16(0), ...u32(0), ...u32(0), ...u32(0), ...u32(0), ...u32(0), ...u32(0), ...u32(0), ...u16(0), ...u32(0), ...u32(0), ...pstr(f.name), ...pstr(f.t)]);
+    if (op === 0x101b) { this.pulled.push(f.name); return send(0x2001, f.data); }
+    return super.transferOut(ep, data);
+  }
+}
+const own = canonTiff('Canon EOS R50', 0x0d29, 4321, 111111111), r5 = canonTiff('Canon EOS R5m2', 0x076d, 49408, 222222222);
+cam = new CardCamera({ model: 'Canon EOS R50', ops: NEW, photo: own });
+cam.files = [{ h: 1, name: 'IMG_0001.JPG', t: '20261101T100000', data: own }, { h: 2, name: '018A8278.JPG', t: '20261102T090000', data: r5 }, { h: 3, name: '018A8279.JPG', t: '20261102T090100', data: r5 }];
+cam.pulled = [];
+r = await readCamera(conn(cam));
+assert.equal(r.count, 4321); assert.equal(r.photoFile, 'IMG_0001.JPG');
+assert.deepEqual(cam.pulled, ['018A8279.JPG', '018A8278.JPG', 'IMG_0001.JPG']);
+console.log('other camera skipped:', r.count, r.photoFile);
+// only other cameras' photos: say so, show no count
+cam = new CardCamera({ model: 'Canon EOS R50', ops: NEW, photo: own });
+cam.files = [{ h: 2, name: '018A8278.JPG', t: '20261102T090000', data: r5 }]; cam.pulled = [];
+r = await readCamera(conn(cam));
+assert.equal(r.count, null); assert.equal(r.problem, 'other-camera'); assert.match(r.otherCamera, /R5 Mark II/);
+// a 20 MB transfer arrives in one buffer quickly
+const big = new Uint8Array(20 * 1024 * 1024); big.set(own);
+cam = new CardCamera({ model: 'Canon EOS R50', ops: NEW, photo: own });
+cam.files = [{ h: 1, name: 'IMG_0001.JPG', t: '20261101T100000', data: big }]; cam.pulled = [];
+const t0 = Date.now(); r = await readCamera(conn(cam));
+assert.equal(r.count, 4321); assert.ok(Date.now() - t0 < 5000, 'big file took ' + (Date.now() - t0) + ' ms');
+console.log('20 MB photo in', Date.now() - t0, 'ms');
+
 console.log('usb: ok');

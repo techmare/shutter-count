@@ -141,6 +141,29 @@ public enum CameraModels {
         isCanonR(model) || !(operations ?? []).contains(0x1015)
     }
 
+    /// "NIKON DSC D3200", "NIKON D3200" and "D3200" -> "D3200"; "Canon EOS R5 Mark II" and "Canon EOS R5m2" -> "EOSR5M2".
+    public static func modelKey(_ model: String?) -> String {
+        var s = Rx.replace("\\b(NIKON|CORPORATION|DSC|CANON|INC|SONY)\\b", in: (model ?? "").uppercased(), with: " ")
+        s = Rx.replace("[^A-Z0-9]", in: s, with: "")
+        return s.replacingOccurrences(of: "MARKIII", with: "M3").replacingOccurrences(of: "MARKII", with: "M2")
+    }
+
+    /// Was this photo taken by the camera on the cable? A card often holds photos from other bodies,
+    /// and their count must never be shown as this one's. The model has to match; the serial too
+    /// when both sides know a real one.
+    public static func photoFromCamera(_ cameraModel: String?, _ cameraSerial: String?, _ photoModel: String?, _ photoSerial: String?) -> Bool {
+        let a = modelKey(cameraModel), b = modelKey(photoModel)
+        if !a.isEmpty && !b.isEmpty && a != b { return false }
+        func key(_ s: String?) -> String? {
+            let t = (s ?? "").trimmingCharacters(in: .whitespaces)
+            guard !t.isEmpty, t.count < 20, t.allSatisfy({ $0.isASCII && $0.isNumber }) else { return nil }
+            let z = String(t.drop(while: { $0 == "0" }))
+            return z.isEmpty ? nil : z
+        }
+        guard let s1 = key(cameraSerial), let s2 = key(photoSerial) else { return true }
+        return s1 == s2
+    }
+
     public static func canonPhotoOffset(_ model: String?) -> Int? {
         guard let m = model else { return nil }
         if Rx.has("\\bEOS (R6m2|R6 Mark II|R8|R50)$", m) { return 0x0d29 }

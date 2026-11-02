@@ -81,7 +81,8 @@ class CanonReader(private val session: PtpSession) {
 
             // Nikon, Sony and Canon R bodies keep the count in their photos: read the newest one
             // over USB with standard transfer commands instead of any vendor command.
-            val isCanon = info.manufacturer.contains("Canon", ignoreCase = true) || info.vendorExtensionId == 11L
+            val isCanon = info.manufacturer.contains("Canon", ignoreCase = true) || info.vendorExtensionId == 11L ||
+                model.startsWith("Canon", ignoreCase = true)
             if (!isCanon || CameraModels.canonPhotoOffset(model) != null) {
                 return readNewestPhoto(info, model, serial, firmware)
             }
@@ -152,24 +153,51 @@ class CanonReader(private val session: PtpSession) {
 
     private fun readNewestPhoto(info: DeviceInfo, usbModel: String, usbSerial: String?, firmware: String?): CanonReading {
         val pull = PhotoPull(session, info.operations, log)
+        val brand = CameraModels.brandOf(info.manufacturer.ifBlank { usbModel })
+        val shownModel = CameraModels.displayName(brand, usbModel)
         fun fail(problem: String) = CanonReading(
-            usbModel, usbSerial, firmware, emptyList(), CanonMethod.PHOTO, true, null, emptyList(), problem, false,
+            shownModel, usbSerial, firmware, emptyList(), CanonMethod.PHOTO, true, null, emptyList(), problem, false,
             diagnostics = log.joinToString("\n"),
         )
-        var got = try { pull.latest() } catch (e: PtpException) { log += "Photo transfer: ${e.message}"; null }
-            ?: return fail("No photo found on the camera's card. Take a photo, then read again.")
-        var reading = PhotoShutterReader.read(got.bytes)
-        if (reading.shutterCount == null && got.partial) {
-            // the camera data wasn't in the first part of the file: fetch all of it
-            try { pull.fullOf(got) } catch (e: PtpException) { null }?.let { got = it; reading = PhotoShutterReader.read(it.bytes) }
+        val recent = try { pull.recent() } catch (e: PtpException) { log += "Photo list: ${e.message}"; emptyList() }
+        if (recent.isEmpty()) return fail("No photo found on the camera's card. Take a photo, then read again.")
+
+        // The card may hold photos from other cameras: walk back from the newest until one was
+        // taken by this body (same model, and same serial when both are known).
+        var got: PhotoPull.Pulled? = null
+        var reading: com.techmare.shuttercount.core.PhotoReading? = null
+        var other: String? = null
+        for (i in recent.take(MAX_PHOTOS_TRIED)) {
+            var p = try { pull.header(i) } catch (e: PtpException) { log += "Photo transfer ${i.name}: ${e.message}"; null } ?: continue
+            var r = PhotoShutterReader.read(p.bytes)
+            if (r.make == null && p.partial) {
+                // no camera data in the first part of the file: fetch all of it
+                try { pull.full(i) } catch (e: PtpException) { null }?.let { p = it; r = PhotoShutterReader.read(it.bytes) }
+            }
+            if (r.make != null && !CameraModels.photoFromCamera(usbModel, usbSerial, r.model, r.serial)) {
+                log += "Skipped ${i.name}: taken by ${r.displayName}${r.serial?.let { " S/N $it" } ?: ""}, not this camera"
+                other = other ?: r.displayName + (r.serial?.let { " (S/N $it)" } ?: "")
+                continue
+            }
+            if (r.shutterCount == null && p.partial) {
+                try { pull.full(i) } catch (e: PtpException) { null }?.let { p = it; r = PhotoShutterReader.read(it.bytes) }
+            }
+            got = p; reading = r
+            break
+        }
+        if (got == null || reading == null) {
+            return fail(
+                if (other != null) "The newest photos on this card were taken by another camera ($other), not this $shownModel. Take one photo with this camera, then read again."
+                else "Couldn't read a photo from the camera's card. Take a new photo, then read again."
+            )
         }
         val count = reading.shutterCount
-        log += "Photo read: ${reading.displayName}, count ${count ?: "none"}${reading.problem?.let { ", $it" } ?: ""}"
+        log += "Photo read: ${got.fileName}, ${reading.displayName}, count ${count ?: "none"}${reading.problem?.let { ", $it" } ?: ""}"
         val date = got.captureDate?.let { d ->
             Regex("^(\\d{4})(\\d{2})(\\d{2})T(\\d{2})(\\d{2})").find(d)?.destructured?.let { (y, mo, dd, h, mi) -> "$dd/$mo/$y $h:$mi" } ?: d
         } ?: reading.dateTaken
         return CanonReading(
-            model = if (reading.make != null) reading.displayName else usbModel,
+            model = if (reading.make != null) reading.displayName else shownModel,
             serial = reading.serial ?: usbSerial,
             firmware = firmware,
             counters = count?.let { listOf(CanonCounter("Shutter actuations", it)) } ?: emptyList(),
@@ -260,6 +288,8 @@ class CanonReader(private val session: PtpSession) {
         private const val EVT_PROP_VALUE_CHANGED = 0xC189L
 
         val CONFIRMED_FACTORY_MODELS = listOf("5D Mark IV")
+        /** Photos tried, newest first, before giving up on finding one from this camera. */
+        const val MAX_PHOTOS_TRIED = 12
 
         val MPU_COUNTERS = listOf(
             "Shutter actuations" to 0x1001L,

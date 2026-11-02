@@ -487,6 +487,7 @@ const USB_PROBLEMS = {
   'canon-no-counter': "Ce Canon ne communique pas son compteur par USB de façon sûre, l'outil ne peut donc pas le lire.",
   'no-photo': "Aucune photo sur la carte de l'appareil. Prenez une photo, puis lisez à nouveau.",
   'no-transfer': "L'appareil n'a pas envoyé sa dernière photo. Débranchez, rallumez l'appareil et réessayez.",
+  'other-camera': "Les dernières photos de cette carte ont été prises par un autre appareil, pas par celui qui est branché. Prenez une photo avec cet appareil, puis lisez à nouveau.",
 };
 function busyHelp() {
   const p = usb.platform();
@@ -525,6 +526,7 @@ async function readUsb() {
         includesElectronic: false, details: [], warnings: [] };
     }
     if (res.problem) { r.problem = USB_PROBLEMS[res.problem] || res.problem; }
+    if (res.problem === 'other-camera' && res.otherCamera) r.problem = r.problem.replace('un autre appareil', `un autre appareil (${res.otherCamera})`);
     if (res.photoDate) r.dateTaken = null;
     current = { r, fileName: res.photoFile || null, time: Date.now(), usb: true, method: res.method };
     render();

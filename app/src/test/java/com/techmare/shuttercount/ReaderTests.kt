@@ -157,4 +157,30 @@ class ReaderTests {
         assertEquals(26354L, CanonReader.decodeMpuCounter(h("0066000000000000f200")))
         assertEquals(26374L, CanonReader.decodeMpuCounter(h("00670000000000000006")))
     }
+
+    @Test
+    fun usbPhotoMustComeFromTheCameraOnTheCable() {
+        // a D3200 whose card holds a 100D's photos (seen in the shop)
+        assertFalse(CameraModels.photoFromCamera("D3200", "6012345", "Canon EOS 100D", "353073003847"))
+        assertTrue(CameraModels.photoFromCamera("D3200", "0006012345", "NIKON D3200", "6012345"))
+        assertTrue(CameraModels.photoFromCamera("NIKON DSC D3200", null, "NIKON D3200", "6012345"))
+        // two bodies of the same model
+        assertFalse(CameraModels.photoFromCamera("D3200", "6012345", "NIKON D3200", "6099999"))
+        // Canon and Sony USB "serials" are connection IDs: only the model counts
+        assertTrue(CameraModels.photoFromCamera("Canon EOS R5m2", "3F2A00C0FFEE00112233445566778899", "Canon EOS R5m2", "146302200018"))
+        assertTrue(CameraModels.photoFromCamera("ILCE-7M3", "00000000000000003282933003418975", "ILCE-7M3", "3418975"))
+        assertFalse(CameraModels.photoFromCamera("ILCE-7M3", null, "ILCE-7M4", null))
+        assertTrue(CameraModels.photoFromCamera("Canon EOS R6 Mark II", null, "Canon EOS R6m2", null))
+        assertFalse(CameraModels.photoFromCamera("D750", null, "NIKON D7500", null))
+    }
+
+    @Test
+    fun recentPhotosOnePerShotJpegFirst() {
+        fun i(h: Long, n: String, t: String) = com.techmare.shuttercount.ptp.PhotoPull.Info(h, 0x3801, 1, n, t)
+        val shots = com.techmare.shuttercount.ptp.PhotoPull.pickShots(listOf(
+            i(1, "DSC_0001.JPG", "20261102T100000"), i(2, "DSC_0002.NEF", "20261102T100500"),
+            i(3, "DSC_0002.JPG", "20261102T100500"), i(4, "IMG_2445.JPG", "20261031T201700"),
+        ))
+        assertEquals(listOf("DSC_0002.JPG", "DSC_0001.JPG", "IMG_2445.JPG"), shots.map { it.name })
+    }
 }
