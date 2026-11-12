@@ -362,7 +362,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 <header class="header">
   <div class="wrap">
     <a class="logo" href="https://www.midoxshop.ma/" aria-label="Midox Shop, accueil">
-      <img src="/assets/images/logo.png" alt="Midox Shop" width="120" height="48" onerror="this.replaceWith(document.createTextNode('Midox Shop'))">
+      <img src="logo.webp" alt="Midox Shop" width="120" height="48" onerror="this.replaceWith(document.createTextNode('Midox Shop'))">
     </a>
   </div>
 </header>
@@ -471,7 +471,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version __VERSION__</span></div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-53</span></span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -483,8 +483,8 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
-import { read, wear, wearPercent, prettyExifDate, fmtCount, rating } from '../web/reader.js';
-import * as usb from '../web/ptp-usb.js';
+import { read, wear, wearPercent, prettyExifDate, fmtCount, rating } from './reader.js';
+import * as usb from './ptp-usb.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -615,7 +615,7 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
-const VERSION = '__VERSION__';
+const VERSION = '2026.11.12-53';   // set by build.py
 let lastLog = '';
 async function copyDiag() {
   try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }
@@ -676,8 +676,8 @@ const usbOn = usb.supported && (usb.platform() === 'android' || new URLSearchPar
 if (usbOn) { $('#usbBox').hidden = false; $('#usbBtn').onclick = readUsb; }
 
 // ---------- report image: the shop's colours, in French, with the site at the bottom
-// The shop's logo for the report (same site, so the canvas can still be exported); text only if it doesn't load.
-const logoReady = new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = '/assets/images/logo.png'; });
+// The shop's logo for the report (same folder, so the canvas can still be exported); text only if it doesn't load.
+const logoReady = new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = 'logo.webp'; });
 
 // The logo for a dark background: grey/black pixels become white, the gold ones stay.
 function lightLogo(img) {
