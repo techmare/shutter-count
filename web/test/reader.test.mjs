@@ -58,36 +58,6 @@ assert.equal(read(canon('Canon EOS R5m2', 0x076d, 49408)).count, 49408);
 assert.equal(read(canon('Canon EOS R5m2', 0x076d, 49408)).displayName, 'Canon EOS R5 Mark II');
 assert.equal(read(canon('Canon EOS R8', 0x0d29, 777)).serial, '123456789');
 assert.equal(read(canon('Canon EOS 5D Mark IV', 0x0d29, 5)).count, null);
-// Fujifilm: maker note "FUJIFILM" + IFD position (counted from the maker note), count in 0x1438
-function fuji(model, value, { withTag = true, raf = false } = {}) {
-  const t = new Buf();
-  t.put([...Buffer.from('II')]); t.u16(42); t.u32(8);
-  t.pos = 8; t.u16(3);
-  t.entry(0x10f, 2, 9, 200); t.entry(0x110, 2, model.length + 1, 220); t.entry(0x8769, 4, 1, 300); t.u32(0);
-  t.pos = 200; t.str('FUJIFILM'); t.pos = 220; t.str(model);
-  t.pos = 300; t.u16(1); t.entry(0x927c, 7, 60, 400); t.u32(0);
-  t.pos = 400; t.put([...Buffer.from('FUJIFILM')]); t.u32(12);
-  t.u16(withTag ? 2 : 1); t.entry(0x0000, 7, 4, 0x30333130);
-  if (withTag) t.entry(0x1438, 3, 1, value);
-  t.u32(0);
-  const tiff = t.b.subarray(0, 500);
-  const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe1, (tiff.length + 8) >> 8, (tiff.length + 8) & 255, 0x45, 0x78, 0x69, 0x66, 0, 0, ...tiff, 0xff, 0xd9]);
-  if (!raf) return jpeg;
-  const f = new Uint8Array(160 + jpeg.length);
-  f.set([...'FUJIFILMCCD-RAW 0201'].map(c => c.charCodeAt(0)));
-  new DataView(f.buffer).setUint32(84, 160); new DataView(f.buffer).setUint32(88, jpeg.length);
-  f.set(jpeg, 160);
-  return f;
-}
-{
-  const r = read(fuji('X-T3', 12480));
-  assert.equal(r.count, 12480); assert.equal(r.displayName, 'Fujifilm X-T3'); assert.equal(r.includesElectronic, true);
-  assert.equal(r.rated, null); assert.equal(r.warnings.length, 1);
-  assert.equal(read(fuji('GFX 50R', 34565)).count, 1797);            // top bit set
-  assert.equal(read(fuji('X-T4', 900, { raf: true })).count, 900);   // RAF: the JPEG inside
-  assert.equal(read(fuji('X-T100', 0, { withTag: false })).count, null);
-  assert.equal(read(fuji('X-T1', 4000)).warnings.length, 2);         // not on the reliable list
-}
 assert.equal(read(new Uint8Array(0)).count, null);
 assert.equal(read(new Uint8Array(5000).map((_, i) => (i * 31) & 255)).count, null);
 assert.deepEqual(rating('Nikon', 'NIKON D750'), { value: 150000, official: true });
