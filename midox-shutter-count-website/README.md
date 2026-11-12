@@ -30,16 +30,6 @@ Upload these five files together, in the same folder, so the page is served at `
 - Then link to the page from the site menu or footer, add it to `sitemap.xml`, and request indexing in
   Google Search Console.
 
-## Header links (to fill in)
-
-The header is rebuilt to look like midoxshop.ma (dark strip, logo, search bar, cart, category row). The
-category links, the cart and the search all open the **home page** for now, because the real addresses
-were not available. Set them in `SITE_LINKS` and `SEARCH_URL` at the top of the page script in
-`index.html`. The search sends the typed words as `?q=`. The cart always shows 0.
-
-Better still, on the real site: delete this header block and render the page inside the site's own
-header and footer, so it always matches.
-
 ## for-testing-on-phone-only
 
 One self-contained HTML file with the scripts and logo inside it. Send it to a phone and open it from the

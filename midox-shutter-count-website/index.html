@@ -202,7 +202,7 @@ button, input { font: inherit; color: inherit; }
 .num { font-variant-numeric: tabular-nums; }
 
 /* header: same as the shop */
-/* ---- header, as on midoxshop.ma: dark strip, logo + search + cart, category row */
+/* ---- header: the site's dark strip and logo */
 .topbar { background: var(--topbar); color: #fff; font-size: .82rem; font-weight: 500; }
 .topbar ul { list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--wrap); display: flex; justify-content: space-around; gap: 16px; }
 .topbar li { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
@@ -210,34 +210,11 @@ button, input { font: inherit; color: inherit; }
 .head-main { display: flex; align-items: center; gap: 20px; min-height: 84px; }
 .logo { display: flex; align-items: center; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--navy); }
 .logo img { height: 60px; width: auto; }
-.search { flex: 1; max-width: 640px; margin-inline: auto; display: flex; align-items: center; background: var(--soft); border-radius: 999px; padding: 0 8px 0 20px; }
-.search input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 1rem; color: var(--text); padding: 12px 0; outline: none; }
-.search input::placeholder { color: #9ca3af; }
-.search button, .burger { border: 0; background: none; color: #4b5563; padding: 8px; cursor: pointer; display: flex; border-radius: 999px; }
-.search:focus-within { box-shadow: 0 0 0 2px var(--gold); }
-.head-icons { display: flex; align-items: center; gap: 6px; }
-.cart { position: relative; display: flex; padding: 8px; color: #374151; }
-.cart svg { width: 24px; height: 24px; }
-.cart span { position: absolute; top: 0; right: 0; min-width: 17px; height: 17px; border-radius: 999px; background: var(--copper); color: #fff; font-size: .68rem; font-weight: 600; display: grid; place-items: center; }
-.burger { display: none; } .burger svg { width: 24px; height: 24px; }
-.nav { border-top: 1px solid var(--line); }
-.nav .wrap { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 34px; padding-block: 16px; }
-.nav a { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #374151; font-size: .92rem; font-weight: 500; white-space: nowrap; }
-.nav a:hover { color: var(--gold-ink); }
-@media (max-width: 900px) {
-  .topbar li:not(:first-child) { display: none; }
-  .topbar ul { justify-content: center; padding-block: 5px; font-size: .78rem; }
-  .head-main { flex-wrap: wrap; gap: 0 12px; min-height: 0; padding-block: 8px 10px; }
+@media (max-width: 640px) {
+  .topbar ul { justify-content: center; gap: 18px; padding: 6px 10px; font-size: .74rem; }
+  .topbar li { gap: 6px; } .topbar svg { width: 15px; height: 15px; }
+  .head-main { min-height: 64px; }
   .logo img { height: 46px; }
-  .head-icons { margin-left: auto; }
-  .burger { display: flex; }
-  .search { order: 3; flex-basis: 100%; max-width: none; margin-top: 8px; }
-  .search input { padding: 9px 0; font-size: .95rem; }
-  .nav { display: none; }
-  .nav.open { display: block; }
-  .nav .wrap { flex-direction: column; gap: 0; padding-block: 0; }
-  .nav a { padding: 14px 2px; border-bottom: 1px solid var(--line); }
-  .nav a:last-child { border-bottom: 0; }
 }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 6px; border: 1px solid transparent; font-weight: 500; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
@@ -392,40 +369,16 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 </head>
 <body>
 
-<!-- The site's header, rebuilt to look like midoxshop.ma. Where each link goes is set in SITE_LINKS
-     at the top of the page script. On the real site, replace this block with the site's own header. -->
 <div class="topbar"><ul>
   <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Paiement Sécurisé</li>
   <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7.5" cy="17.500" r="1.800"/><circle cx="17.500" cy="17.500" r="1.800"/></svg>Livraison partout au Maroc</li>
-  <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Retours et échanges faciles</li>
 </ul></div>
 <header class="header">
   <div class="wrap head-main">
-    <a class="logo" data-link="home" href="https://www.midoxshop.ma/" aria-label="Midox Shop, accueil">
+    <a class="logo" href="https://www.midoxshop.ma/" aria-label="Midox Shop, accueil">
       <img src="logo.webp" alt="Midox Shop" width="120" height="48" onerror="this.replaceWith(document.createTextNode('Midox Shop'))">
     </a>
-    <form class="search" id="siteSearch" role="search" action="https://www.midoxshop.ma/" method="get">
-      <input type="search" name="q" placeholder="Que recherchez-vous ?" aria-label="Rechercher sur Midox Shop" autocomplete="off">
-      <button type="submit" aria-label="Rechercher"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg></button>
-    </form>
-    <div class="head-icons">
-      <a class="cart" data-link="cart" href="https://www.midoxshop.ma/" aria-label="Panier"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span>0</span></a>
-      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="siteNav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-    </div>
   </div>
-  <nav class="nav" id="siteNav" aria-label="Menu du site">
-    <div class="wrap">
-      <a data-link="categoryCamera" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.500"/></svg>Appareils Photo</a>
-      <a data-link="categoryLens" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m14.500 3.400-4 7M20.600 9.500h-8M18.200 18.500l-4-7M9.500 20.600l4-7M3.400 14.500h8M5.800 5.500l4 7"/></svg>Objectifs</a>
-      <a data-link="categorySound" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Son</a>
-      <a data-link="categoryLight" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.900 4.900l1.400 1.400M17.700 17.700l1.400 1.400M4.900 19.100l1.400-1.400M17.700 6.300l1.400-1.400"/></svg>Éclairage</a>
-      <a data-link="categoryGimbal" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h8v6H7zM15 11l3-1.500v5L15 13"/></svg>Stabilisateur</a>
-      <a data-link="categoryAccessories" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l3 3v15H6z"/><path d="M9 3v5h5V3"/></svg>Accessoires</a>
-      <a data-link="showroom" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9 5.500 4h13L20 9M4 9v11h16V9M4 9a2.700 2.700 0 0 0 5.300 0 2.700 2.700 0 0 0 5.400 0A2.700 2.700 0 0 0 20 9"/></svg>Showroom</a>
-      <a data-link="formations" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5.500"/><path d="m9 14-1.500 7 4.500-2.500 4.500 2.500L15 14"/></svg>Formations</a>
-      <a data-link="contact" href="https://www.midoxshop.ma/"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Contact</a>
-    </div>
-  </nav>
 </header>
 
 <main>
@@ -532,7 +485,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-54</span></span></div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-55</span></span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -592,25 +545,6 @@ drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add(
 drop.addEventListener('dragleave', () => drop.classList.remove('hot'));
 drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('hot'); const f = e.dataTransfer.files[0]; if (f) readFile(f); });
 
-// ---- Links to the shop. Everything points to the home page until the real addresses are filled in here.
-const SITE = 'https://www.midoxshop.ma';
-const SITE_LINKS = {
-  home: SITE + '/',
-  cart: SITE + '/',                 // the cart page
-  categoryCamera: SITE + '/',       // Appareils Photo
-  categoryLens: SITE + '/',         // Objectifs
-  categorySound: SITE + '/',        // Son
-  categoryLight: SITE + '/',        // Éclairage
-  categoryGimbal: SITE + '/',       // Stabilisateur
-  categoryAccessories: SITE + '/',  // Accessoires
-  showroom: SITE + '/showroom',
-  formations: SITE + '/formations',
-  contact: SITE + '/contact',
-};
-const SEARCH_URL = SITE + '/';      // the site's search page; the typed words are sent as ?q=
-for (const a of document.querySelectorAll('[data-link]')) a.href = SITE_LINKS[a.dataset.link] || SITE_LINKS.home;
-$('#siteSearch').action = SEARCH_URL;
-$('#burger').onclick = () => { const open = $('#siteNav').classList.toggle('open'); $('#burger').setAttribute('aria-expanded', open); };
 
 let current = null;
 // Phones share the report image (share sheet, WhatsApp); computers get it as a download.
@@ -696,7 +630,7 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
-const VERSION = '2026.11.12-54';   // set by build.py
+const VERSION = '2026.11.12-55';   // set by build.py
 let lastLog = '';
 async function copyDiag() {
   try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }
