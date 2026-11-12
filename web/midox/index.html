@@ -54,7 +54,7 @@
   --bg: #ffffff; --soft: #f3f4f6; --surface: #ffffff; --line: #e5e7eb;
   --text: #334155; --heading: #475569; --muted: #64748b; --topbar: #1f2937; --ink: #171717;
   --on-dark: #fafafa; --on-dark-muted: #a3a3a3;
-  --wa: #1fa855; --ok: #2f9a5a; --mid: #d98a1f; --high: #d4493a;
+  --ok: #2f9a5a; --mid: #d98a1f; --high: #d4493a;
   --f-display: "Kanit", "Arial Narrow", system-ui, sans-serif;
   --f-body: "Kanit", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --radius: 8px; --radius-lg: 8px; --wrap: 1180px;
@@ -84,8 +84,7 @@ button, input { font: inherit; color: inherit; }
 .nav { display: none; gap: 22px; margin-left: auto; font-weight: 500; }
 .nav a { text-decoration: none; color: #374151; font-size: .86rem; font-weight: 500; }
 .nav a:hover, .nav a[aria-current] { color: var(--gold-ink); }
-.header .wa { margin-left: auto; }
-@media (min-width: 860px) { .nav { display: flex; } .header .wa { margin-left: 8px; } }
+@media (min-width: 860px) { .nav { display: flex; } }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 6px; border: 1px solid transparent; font-weight: 500; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
 .btn:active { transform: scale(.97); }
@@ -93,8 +92,6 @@ button, input { font: inherit; color: inherit; }
 .btn-gold:hover { background: #c99a3c; }
 .btn-dark { background: var(--ink); color: var(--on-dark); text-transform: uppercase; letter-spacing: .02em; }
 .btn-dark:hover { background: #000; }
-.btn-wa { background: var(--wa); color: #fff; }
-.btn-wa:hover { background: #1a9449; }
 .btn-line { background: var(--surface); border-color: var(--line); color: var(--navy); }
 .btn-line:hover { border-color: var(--text); }
 .btn-sm { min-height: 40px; padding: .45rem .9rem; font-size: .92rem; }
@@ -111,7 +108,7 @@ button, input { font: inherit; color: inherit; }
 .promises svg { color: var(--copper); flex: none; }
 @media (min-width: 900px) { .hero { padding: 56px 0; } .hero .wrap { grid-template-columns: 1fr 1.05fr; align-items: start; gap: 44px; } }
 
-.tool { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 10px 30px rgba(15, 23, 42, .08); }
+.tool { scroll-margin-top: 80px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 10px 30px rgba(15, 23, 42, .08); }
 .drop { display: block; border: 1.5px dashed #d1d5db; border-radius: var(--radius); padding: 26px 16px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
 .drop:hover, .drop.hot { border-color: var(--gold); background: var(--gold-soft); }
 .drop b { font-family: var(--f-display); font-weight: 600; font-size: 1.3rem; display: block; }
@@ -256,7 +253,6 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <a href="/declenchements/" aria-current="page">Déclenchements</a>
       <a href="/contact">Contact</a>
     </nav>
-    <a class="btn btn-wa btn-sm wa" href="https://wa.me/212621319882" rel="noopener">WhatsApp</a>
   </div>
 </header>
 
@@ -297,7 +293,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <h2>Comment faire</h2>
       <ol class="steps">
         <li><b>Prenez une photo</b><span>Avec l'appareil à vérifier, obturateur mécanique (pas en mode silencieux).</span></li>
-        <li><b>Récupérez le fichier original</b><span>Avec un lecteur de carte SD, AirDrop ou l'app de l'appareil en taille originale. Sur iPhone, enregistrez-la dans Fichiers.</span></li>
+        <li><b>Récupérez le fichier original</b><span>Avec un lecteur de carte SD ou l'app de l'appareil en taille originale. Sur iPhone, enregistrez-la dans Fichiers.</span></li>
         <li><b>Choisissez-la ici</b><span>Le nombre de déclenchements et l'usure s'affichent tout de suite.</span></li>
       </ol>
     </div>
@@ -372,7 +368,6 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 import { read, wear, wearPercent, prettyExifDate, fmtCount, rating } from './reader.js';
 import * as usb from './ptp-usb.js';
 
-const WA = '212621319882';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const tone = t => ({ ok: 'var(--ok)', mid: 'var(--mid)', high: 'var(--high)' }[t]);
