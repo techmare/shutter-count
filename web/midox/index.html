@@ -560,6 +560,24 @@ if (usbOn) { $('#usbBox').hidden = false; $('#usbBtn').onclick = readUsb; }
 // The shop's logo for the report (same site, so the canvas can still be exported); text only if it doesn't load.
 const logoReady = new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = '/assets/images/logo.png'; });
 
+// The logo for a dark background: grey/black pixels become white, the gold ones stay.
+function lightLogo(img) {
+  try {
+    const cv = document.createElement('canvas'); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+    const x = cv.getContext('2d'); x.drawImage(img, 0, 0);
+    const d = x.getImageData(0, 0, cv.width, cv.height), p = d.data;
+    let opaque = 0;
+    for (let i = 0; i < p.length; i += 4) {
+      if (p[i + 3] > 200) opaque++;
+      const mx = Math.max(p[i], p[i + 1], p[i + 2]), mn = Math.min(p[i], p[i + 1], p[i + 2]);
+      if (mx - mn < 40 && mx < 140) { p[i] = p[i + 1] = p[i + 2] = 255; }
+    }
+    if (opaque > p.length / 4 * .9) return null;   // no transparency: a logo with its own background
+    x.putImageData(d, 0, 0);
+    return cv;
+  } catch { return null; }
+}
+
 async function renderReport() {
   const { r, time } = current;
   const logo = await logoReady;
@@ -573,10 +591,14 @@ async function renderReport() {
   c.fillStyle = '#1f1f1f'; c.fillRect(0, 0, W, H);
   let y = 128;
   text('MIDOX SHOP · RAPPORT DE DÉCLENCHEMENTS', P, y, font(500, 28, 'Kanit'), GOLD);
-  if (logo) {   // the shop's logo on a white badge, top right
-    const lh = 64, lw = Math.min(220, logo.naturalWidth * lh / logo.naturalHeight), bx = W - P - lw - 28, byy = 58;
-    c.fillStyle = '#ffffff'; c.beginPath(); c.roundRect ? c.roundRect(bx, byy, lw + 28, lh + 20, 12) : c.rect(bx, byy, lw + 28, lh + 20); c.fill();
-    c.drawImage(logo, bx + 14, byy + 10, lw, lh);
+  if (logo) {   // the shop's logo top right, its black lettering turned white for the dark card
+    const lh = 76, lw = Math.min(240, logo.naturalWidth * lh / logo.naturalHeight), lx = W - P - lw, ly = 62;
+    const light = lightLogo(logo);
+    if (light) c.drawImage(light, lx, ly, lw, lh);
+    else {   // the pixels can't be read (logo from another site): keep it readable on a white badge
+      c.fillStyle = '#ffffff'; c.beginPath(); c.roundRect ? c.roundRect(lx - 28, ly - 10, lw + 28, lh + 20, 12) : c.rect(lx - 28, ly - 10, lw + 28, lh + 20); c.fill();
+      c.drawImage(logo, lx - 14, ly, lw, lh);
+    }
   }
   y += 96;
   let size = 84; c.font = font(600, size, 'Kanit');
