@@ -18,4 +18,4 @@ Au magasin, sur Mac : ajouter `?usb=1` à l'adresse. Seules des commandes de lec
 
 Rien n'est envoyé à un serveur : la photo est lue dans le navigateur du visiteur.
 
-(Pour les développeurs : la page est générée par `build.py` à partir de `index.html`, `../reader.js` et `../ptp-usb.js`.)
+(Pour les développeurs : la page est générée par `build.py` à partir de `index.html`, `../web/reader.js` et `../web/ptp-usb.js`.)

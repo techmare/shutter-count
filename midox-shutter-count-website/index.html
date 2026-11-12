@@ -483,8 +483,8 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 <div class="toast" id="toast" role="status"></div>
 
 <script type="module">
-import { read, wear, wearPercent, prettyExifDate, fmtCount, rating } from './reader.js';
-import * as usb from './ptp-usb.js';
+import { read, wear, wearPercent, prettyExifDate, fmtCount, rating } from '../web/reader.js';
+import * as usb from '../web/ptp-usb.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

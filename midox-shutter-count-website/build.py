@@ -3,8 +3,8 @@ so it works opened straight from a phone's Files app (file://) as well as on mid
 import base64, pathlib, re
 here = pathlib.Path(__file__).parent
 page = (here / 'index.html').read_text()
-reader = (here.parent / 'reader.js').read_text()
-usb = (here.parent / 'ptp-usb.js').read_text()
+reader = (here.parent / 'web' / 'reader.js').read_text()
+usb = (here.parent / 'web' / 'ptp-usb.js').read_text()
 
 def strip_exports(js):
     return re.sub(r'^export (?=(async )?function|const|class|let)', '', js, flags=re.M)
