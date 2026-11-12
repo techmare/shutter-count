@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nombre de déclenchements (shutter count) gratuit | Midox Shop</title>
-<meta name="description" content="Vérifiez gratuitement le nombre de déclenchements (shutter count) d'un appareil photo Canon, Nikon ou Sony à partir d'une simple photo. Sans inscription.">
+<meta name="description" content="Vérifiez gratuitement le nombre de déclenchements (shutter count) d'un appareil photo Canon, Nikon, Sony ou Fujifilm à partir d'une simple photo.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://www.midoxshop.ma/declenchements/">
 <link rel="alternate" hreflang="fr" href="https://www.midoxshop.ma/declenchements/">
@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://www.midoxshop.ma/declenchements/apercu.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Compteur de déclenchements Midox Shop pour Canon, Nikon et Sony">
+<meta property="og:image:alt" content="Compteur de déclenchements Midox Shop pour Canon, Nikon, Sony et Fujifilm">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1f2937">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +36,7 @@
     "Shutter count Midox Shop",
     "Compteur de déclenchements"
    ],
-   "description": "Outil gratuit pour lire le nombre de déclenchements (shutter count) d'un appareil photo Canon, Nikon ou Sony à partir d'une photo.",
+   "description": "Outil gratuit pour lire le nombre de déclenchements (shutter count) d'un appareil photo Canon, Nikon, Sony ou Fujifilm à partir d'une photo.",
    "url": "https://www.midoxshop.ma/declenchements/",
    "image": "https://www.midoxshop.ma/declenchements/apercu.png",
    "applicationCategory": "UtilitiesApplication",
@@ -112,6 +112,14 @@
      "acceptedAnswer": {
       "@type": "Answer",
       "text": "Prenez une photo JPG ou ARW avec l'obturateur mécanique (pas en mode silencieux) et choisissez-la ici. Les hybrides Sony α enregistrent le compteur dans chaque photo ; les compacts (RX100, ZV-1…) ne l'enregistrent pas."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Comment voir le nombre de déclenchements d'un Fujifilm ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Prenez une photo JPG ou RAF avec votre Fujifilm (X-T2 et suivants, X-Pro2, X-E3, X-H1, X-S10, X100F et suivants, GFX) et choisissez-la ici. Le compteur indique le nombre de photos prises, obturateur électronique compris, et repart de zéro après 32 767 photos : un appareil très utilisé peut donc afficher un petit chiffre."
      }
     },
     {
@@ -332,7 +340,8 @@ dl.details dd { margin: 0; text-align: right; font-weight: 500; overflow-wrap: a
 .model h3 { font-size: 1.2rem; font-weight: 600; }
 .model p { color: var(--muted); font-size: .93rem; margin-top: 4px; }
 .model.no { background: transparent; border-style: dashed; }
-@media (min-width: 860px) { .models { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 860px) { .models { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px) { .models { grid-template-columns: repeat(5, 1fr); } }
 
 .scaletable { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .scaletable div { display: grid; grid-template-columns: 14px 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); }
@@ -389,7 +398,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
         <h1>Nombre de déclenchements de votre appareil photo</h1>
         <p class="lead">Le nombre de déclenchements (<i lang="en">shutter count</i>), c'est le « kilométrage » d'un appareil photo : lisez-le en quelques secondes à partir d'une seule photo. Utile avant d'acheter ou de vendre un appareil d'occasion.</p>
         <ul class="promises">
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Canon, Nikon et Sony</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Canon, Nikon, Sony et Fujifilm</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Gratuit, sans inscription</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg>Rien n'est envoyé</li>
         </ul>
@@ -398,10 +407,10 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <div class="tool" id="tool">
         <label class="drop" id="drop" for="file">
           <b>Choisissez une photo prise par l'appareil</b>
-          <p>Le fichier original JPG, NEF, ARW ou CR3, tel qu'il sort de l'appareil. Pas une capture d'écran ni une photo envoyée par WhatsApp.</p>
+          <p>Le fichier original JPG, NEF, ARW, CR3 ou RAF, tel qu'il sort de l'appareil. Pas une capture d'écran ni une photo envoyée par WhatsApp.</p>
           <span class="btn btn-gold">Choisir une photo</span>
         </label>
-        <input type="file" id="file" accept="image/jpeg,.jpg,.jpeg,.nef,.nrw,.arw,.sr2,.srf,.cr2,.cr3,.tif,.tiff,.dng">
+        <input type="file" id="file" accept="image/jpeg,.jpg,.jpeg,.nef,.nrw,.arw,.sr2,.srf,.cr2,.cr3,.raf,.tif,.tiff,.dng">
         <div class="usb" id="usbBox" hidden>
           <span>ou</span>
           <button class="btn btn-line" id="usbBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v14M12 3l-3 3M12 3l3 3M7 10v2a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"/><circle cx="12" cy="19" r="2"/></svg>Brancher l'appareil en USB</button>
@@ -426,12 +435,13 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
   <section class="section" style="padding-top:0">
     <div class="wrap">
-      <h2>Appareils compatibles : Canon, Nikon et Sony</h2>
+      <h2>Appareils compatibles : Canon, Nikon, Sony et Fujifilm</h2>
       <p class="intro">Le nombre de déclenchements est enregistré dans les photos de ces appareils.</p>
       <div class="models">
         <div class="model"><h3>Nikon</h3><p>Reflex D3000 à D850 et hybrides Z (Z5, Z6, Z7, Z50, Zf…).</p></div>
         <div class="model"><h3>Sony</h3><p>Hybrides α (α6000 à α6700, α7 et α7R, α7S, α9, α1) et reflex SLT / α99.</p></div>
         <div class="model"><h3>Canon</h3><p>EOS R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100 et RP, le reflex 250D, les M50, M50 Mark II et M6 Mark II, et le PowerShot G5 X Mark II.</p></div>
+        <div class="model"><h3>Fujifilm</h3><p>X-T2 à X-T5, X-T20 à X-T50, X-Pro2 et X-Pro3, X-E3 à X-E5, X-H1, X-H2, X-H2S, X-S10, X-S20, X-M5, X100F, X100V, X100VI et GFX. Le compteur repart de zéro après 32 767 photos.</p></div>
         <div class="model no"><h3>Autres Canon</h3><p>Les reflex plus anciens (4000D, 2000D, 1300D…) gardent le compteur dans l'appareil : il se lit par câble USB depuis un téléphone Android avec Chrome.</p></div>
       </div>
     </div>
@@ -458,6 +468,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
       <details class="faq"><summary>Comment connaître le nombre de déclenchements d'un Canon ?</summary><p>Sur les Canon récents (EOS R5, R6, R7, R8, R10, R50, R100, RP, 250D, M50…), choisissez ici une photo JPG prise par l'appareil : le compteur s'affiche aussitôt. Les reflex Canon plus anciens (4000D, 2000D, 1300D…) ne l'enregistrent pas dans leurs photos : il se lit par câble USB depuis un téléphone Android avec Chrome.</p></details>
       <details class="faq"><summary>Comment voir le nombre de déclenchements d'un Nikon ?</summary><p>Prenez une photo JPG ou NEF avec votre Nikon (reflex D3000 à D850, hybrides Z) et choisissez-la ici : le nombre de déclenchements est enregistré dans chaque photo.</p></details>
       <details class="faq"><summary>Comment voir le nombre de déclenchements d'un Sony ?</summary><p>Prenez une photo JPG ou ARW avec l'obturateur mécanique (pas en mode silencieux) et choisissez-la ici. Les hybrides Sony α enregistrent le compteur dans chaque photo ; les compacts (RX100, ZV-1…) ne l'enregistrent pas.</p></details>
+      <details class="faq"><summary>Comment voir le nombre de déclenchements d'un Fujifilm ?</summary><p>Prenez une photo JPG ou RAF avec votre Fujifilm (X-T2 et suivants, X-Pro2, X-E3, X-H1, X-S10, X100F et suivants, GFX) et choisissez-la ici. Le compteur indique le nombre de photos prises, obturateur électronique compris, et repart de zéro après 32 767 photos : un appareil très utilisé peut donc afficher un petit chiffre.</p></details>
       <details class="faq"><summary>À partir de combien de déclenchements un appareil est-il usé ?</summary><p>Cela dépend du modèle : un appareil d'entrée de gamme est prévu pour environ 100 000 déclenchements, un boîtier expert pour 150 000 à 200 000, un boîtier professionnel pour 300 000 à 500 000. En dessous de 10 % de cette durée, l'appareil est comme neuf.</p></details>
       <details class="faq"><summary>Pourquoi vérifier le nombre de déclenchements avant d'acheter un appareil d'occasion ?</summary><p>Comme le kilométrage d'une voiture, il montre si l'appareil a peu ou beaucoup servi. Demandez au vendeur une photo originale prise le jour même et vérifiez-la ici avant d'acheter.</p></details>
       <details class="faq"><summary>Ma photo est-elle envoyée sur internet ?</summary><p>Non. La photo est lue directement sur votre téléphone ou ordinateur. Rien n'est envoyé ni enregistré par Midox Shop.</p></details>
@@ -485,7 +496,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-55</span></span></div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-56</span></span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -515,7 +526,13 @@ const FR = [
   [/^This is a PNG/, "C'est un fichier PNG (une capture d'écran ou une image exportée). Choisissez la photo originale de l'appareil."],
   [/^This is an iPhone photo/, "C'est une photo prise avec un iPhone. Choisissez une photo prise par l'appareil photo."],
   [/^This photo has no camera make/, "Cette photo n'indique pas d'appareil. Elle vient sans doute d'un téléphone, d'un logiciel de retouche ou d'une messagerie."],
-  [/cameras are not supported/, "Cette marque n'est pas prise en charge. L'outil lit les Nikon, les Sony et les Canon R récents."],
+  [/cameras are not supported/, "Cette marque n'est pas prise en charge. L'outil lit les Nikon, les Sony, les Fujifilm et les Canon R récents."],
+  [/^This Fujifilm model doesn't record/, "Ce Fujifilm n'enregistre pas de compteur dans ses photos. Les boîtiers récents le font (X-T2 et suivants, X-Pro2, X-E3, X-H1, X-S10, X100F et suivants, GFX)."],
+  [/^Couldn't find a valid image count in this Fujifilm/, "Pas de compteur valide dans cette photo Fujifilm. Essayez avec une photo JPG prise à l'instant."],
+  [/^This Fujifilm model is not on the list/, "Ce modèle Fujifilm ne fait pas partie des boîtiers dont le compteur est connu comme fiable : prenez ce chiffre avec prudence."],
+  [/^Fujifilm counters restart from zero/, "Le compteur des Fujifilm repart de zéro après 32 767 photos : un appareil très utilisé peut afficher un petit chiffre. Une mise à jour du firmware ou un changement d'obturateur peut aussi le remettre à zéro."],
+  [/^On Fujifilm the count is the number of photos/, "Sur les Fujifilm, le compteur indique le nombre de photos prises, obturateur électronique compris (en bracketing, chaque fichier compte)."],
+  [/^Couldn't read this RAF/, "Impossible de lire ce fichier RAF. Choisissez une photo JPG prise par l'appareil."],
   [/is missing the camera's private data/, "Cette photo a perdu les données internes de l'appareil : elle a été convertie, réduite ou envoyée par une app comme WhatsApp. Sur iPhone, choisissez la photo dans l'app Fichiers, pas dans Photos."],
   [/^This Canon doesn't store a readable shutter count/, "Ce Canon n'enregistre pas son compteur dans les photos. Les reflex Canon plus anciens se lisent par câble USB, depuis un téléphone Android avec Chrome."],
   [/^Couldn't find a valid shutter count in this Canon/, "Pas de compteur valide dans cette photo Canon. Essayez avec une photo JPG ou CR3 prise à l'instant."],
@@ -630,7 +647,7 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
-const VERSION = '2026.11.12-55';   // set by build.py
+const VERSION = '2026.11.12-56';   // set by build.py
 let lastLog = '';
 async function copyDiag() {
   try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }

@@ -9,7 +9,7 @@ is read in the visitor's browser.
 | File | What it is |
 | --- | --- |
 | `index.html` | The page (markup, styles and the page script) |
-| `reader.js` | Reads the shutter count from a photo (Canon, Nikon, Sony) |
+| `reader.js` | Reads the shutter count from a photo (Canon, Nikon, Sony, Fujifilm) |
 | `ptp-usb.js` | Reads a camera over a USB cable (Chrome on Android) |
 | `logo.webp` | The shop logo used in the header and on the shared result image |
 | `apercu.png` | The preview image shown when the link is shared (WhatsApp, Facebook) |

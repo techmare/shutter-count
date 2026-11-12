@@ -1,4 +1,4 @@
-// Shutter count from a photo file (JPEG, NEF, ARW, CR2/CR3, TIFF). Port of the Android app's
+// Shutter count from a photo file (JPEG, NEF, ARW, CR2/CR3, RAF, TIFF). Port of the Android app's
 // PhotoShutterReader + CameraModels. Runs in the browser and in Node (tests). Nothing leaves the phone.
 
 // ------------------------------------------------------------------ models
@@ -8,6 +8,7 @@ export function brandOf(make) {
   if (m.includes('NIKON')) return 'Nikon';
   if (m.includes('SONY')) return 'Sony';
   if (m.includes('CANON')) return 'Canon';
+  if (m.includes('FUJI')) return 'Fujifilm';
   return 'Other';
 }
 
@@ -30,6 +31,7 @@ export function displayName(brand, model) {
   }
   // newer Canons write "EOS R5m2"; people know it as the R5 Mark II
   if (brand === 'Canon') { const c = raw.replace(/(\w)m2$/, '$1 Mark II'); return c.toUpperCase().startsWith('CANON') ? c : 'Canon ' + c; }
+  if (brand === 'Fujifilm') return /^fuji/i.test(raw) ? raw : 'Fujifilm ' + raw;
   return raw;
 }
 
@@ -233,7 +235,7 @@ function result(ctx, count, { serial = ctx.bodySerial, details = [], warnings = 
     brand: ctx.brand, make: ctx.make, model: ctx.model, displayName: displayName(ctx.brand, ctx.model),
     count, rated: r ? r.value : null, ratedOfficial: r ? r.official : false, serial: serial || null,
     dateTaken: ctx.dateTaken, software: ctx.software, details, warnings, problem,
-    includesElectronic: ctx.brand === 'Canon' || (ctx.brand === 'Nikon' && /\bZ/.test(ctx.model || '')),
+    includesElectronic: ctx.brand === 'Canon' || ctx.brand === 'Fujifilm' || (ctx.brand === 'Nikon' && /\bZ/.test(ctx.model || '')),
   };
 }
 
@@ -262,6 +264,13 @@ const isHeif = d => d.length > 12 && startsWith(d, 4, 'ftyp') && /^(heic|heix|he
 export function read(input) {
   const data = input instanceof Uint8Array ? input : new Uint8Array(input);
   if (isCr3(data)) return readCr3(data);
+  // Fujifilm RAW: the camera data is in the JPEG preview inside the file (position and length at bytes 84 and 88)
+  if (startsWith(data, 0, 'FUJIFILMCCD-RAW') && data.length > 92) {
+    const be = p => data[p] * 0x1000000 + ((data[p + 1] << 16) | (data[p + 2] << 8) | data[p + 3]);
+    const at = be(84), len = be(88);
+    if (at > 0 && len > 0 && at + len <= data.length) return read(data.subarray(at, at + len));
+    return failure("Couldn't read this RAF file. Pick a JPG taken by the camera.");
+  }
   const start = findTiffStart(data);
   if (start == null) {
     if (isHeif(data)) return failure('This is a HEIC/HEIF file, which this page can’t read. Use the JPEG or RAW file from the camera.');
@@ -291,13 +300,36 @@ export function read(input) {
   if (ctx.brand === 'Nikon') return readNikon(ctx, mn, warnings);
   if (ctx.brand === 'Sony') return readSony(ctx, mn, warnings);
   if (ctx.brand === 'Canon') return readCanon(ctx, mn, warnings);
+  if (ctx.brand === 'Fujifilm') return readFuji(ctx, mn, warnings);
   const apple = /apple/i.test(make || '');
   return result(ctx, null, {
     warnings,
     problem: apple ? 'This is an iPhone photo. Pick a photo taken by the camera.'
       : !make ? 'This photo has no camera make. It may come from a phone, an editor or a messaging app.'
-      : `${make} cameras are not supported. This page reads Nikon, Sony and recent Canon R photos.`,
+      : `${make} cameras are not supported. This page reads Nikon, Sony, Fujifilm and recent Canon R photos.`,
   });
+}
+
+// Fujifilm bodies known to write the image count (maker note 0x1438) reliably.
+const fujiKnown = /^(GFX ?(50R|50S|50S ?II|100|100 ?II|100RF|100S|100S ?II)|X-(E3|E4|E5|H1|H2|H2S|M5|Pro2|Pro3|S10|S20|T2|T3|T4|T5|T20|T30|T30 ?II|T50)|X100(F|V|VI))$/i;
+
+function readFuji(ctx, mn, warnings) {
+  if (!mn) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const buf = ctx.tiff.buf, start = mn.valuePos;
+  if (!startsWith(buf, start, 'FUJIFILM')) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  // always little-endian, positions counted from the start of the maker note
+  const t = new Tiff(buf, start, true);
+  const o = t.u32(start + 8);
+  const ifd = o == null ? null : t.readIfd(start + o);
+  if (!ifd) return result(ctx, null, { warnings, problem: MISSING_MAKERNOTE });
+  const e = find(ifd, 0x1438);
+  const raw = e && e.type === 3 ? t.int(e) : null;
+  if (raw == null) return result(ctx, null, { warnings, problem: "This Fujifilm model doesn't record an image count in its photos. Recent X and GFX bodies do (X-T2 and later, X-Pro2, X-E3, X-H1, X-S10, X100F and later)." });
+  const count = raw & 0x7fff;   // the top bit is not part of the count
+  if (!count) return result(ctx, null, { warnings, problem: "Couldn't find a valid image count in this Fujifilm photo. Try a JPG taken just now." });
+  if (!fujiKnown.test((ctx.model || '').trim())) warnings.push('This Fujifilm model is not on the list of bodies known to count reliably, so treat this number with caution.');
+  warnings.push('Fujifilm counters restart from zero after 32,767 photos, so a heavily used camera can show a low number. A firmware update or a shutter replacement can also reset it.');
+  return result(ctx, count, { warnings, details: [['Note', 'On Fujifilm the count is the number of photos taken, electronic-shutter shots included (bracketing counts each file).']] });
 }
 
 function readCanon(ctx, mn, warnings) {
