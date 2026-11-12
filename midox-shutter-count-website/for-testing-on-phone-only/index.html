@@ -203,16 +203,24 @@ button, input { font: inherit; color: inherit; }
 
 /* header: same as the shop */
 /* ---- header: the site's dark strip and logo */
-.topbar { background: var(--topbar); color: #fff; font-size: .82rem; font-weight: 500; }
-.topbar ul { list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--wrap); display: flex; justify-content: space-around; gap: 16px; }
-.topbar li { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.topbar { background: var(--topbar); color: #fff; font-size: .8rem; overflow: hidden; }
+.topbar-track { display: flex; width: max-content; min-width: 200%; animation: topbar-slide 28s linear infinite; }
+.topbar ul { list-style: none; margin: 0; padding: 6px 0; flex: 1 0 50%; display: flex; justify-content: space-around; gap: 48px; padding-inline: 24px; }
+.topbar li { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+@keyframes topbar-slide { to { transform: translateX(-50%); } }
+@media (hover: hover) { .topbar:hover .topbar-track { animation-play-state: paused; } }
+@media (prefers-reduced-motion: reduce) {
+  .topbar-track { animation: none; min-width: 100%; width: 100%; }
+  .topbar ul { flex-basis: 100%; flex-wrap: wrap; gap: 4px 22px; justify-content: center; }
+  .topbar ul[aria-hidden] { display: none; }
+}
 .header { background: var(--surface); border-bottom: 1px solid var(--line); }
 .head-main { display: flex; align-items: center; gap: 20px; min-height: 84px; }
 .logo { display: flex; align-items: center; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--navy); }
 .logo img { height: 60px; width: auto; }
 @media (max-width: 640px) {
-  .topbar ul { justify-content: center; gap: 18px; padding: 6px 10px; font-size: .74rem; }
-  .topbar li { gap: 6px; } .topbar svg { width: 15px; height: 15px; }
+  .topbar ul { gap: 32px; }
+  .topbar-track { animation-duration: 18s; }
   .head-main { min-height: 64px; }
   .logo img { height: 46px; }
 }
@@ -369,10 +377,19 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 </head>
 <body>
 
-<div class="topbar"><ul>
-  <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Paiement Sécurisé</li>
-  <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7.5" cy="17.500" r="1.800"/><circle cx="17.500" cy="17.500" r="1.800"/></svg>Livraison partout au Maroc</li>
-</ul></div>
+<!-- the banner slides from right to left: the list is there twice so the loop has no gap -->
+<div class="topbar"><div class="topbar-track">
+  <ul>
+    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Livraison partout au Maroc</li>
+    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Paiement sécurisé</li>
+    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>2 showrooms à Casablanca</li>
+  </ul>
+  <ul aria-hidden="true">
+    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Livraison partout au Maroc</li>
+    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Paiement sécurisé</li>
+    <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>2 showrooms à Casablanca</li>
+  </ul>
+</div></div>
 <header class="header">
   <div class="wrap head-main">
     <a class="logo" href="https://www.midoxshop.ma/" aria-label="Midox Shop, accueil">
@@ -485,7 +502,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-57</span></span></div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-58</span></span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -1421,7 +1438,7 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
-const VERSION = '2026.11.12-57';   // set by build.py
+const VERSION = '2026.11.12-58';   // set by build.py
 let lastLog = '';
 async function copyDiag() {
   try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }
