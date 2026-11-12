@@ -73,18 +73,10 @@ button, input { font: inherit; color: inherit; }
 .num { font-variant-numeric: tabular-nums; }
 
 /* header: same as the shop */
-.topbar { background: var(--topbar); color: #fff; font-size: .8rem; }
-.topbar ul { list-style: none; margin: 0 auto; padding: 5px 16px; display: flex; gap: 22px; justify-content: safe center; overflow-x: auto; white-space: nowrap; scrollbar-width: none; max-width: var(--wrap); }
-.topbar li { display: flex; align-items: center; gap: 6px; }
-@media (max-width: 640px) { .topbar ul { justify-content: flex-start; gap: 16px; } .topbar li:nth-child(3) { display: none; } }
 .header { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
 .header .wrap { display: flex; align-items: center; gap: 16px; min-height: 64px; }
 .logo { display: flex; align-items: center; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; color: var(--navy); }
 .logo img { height: 46px; width: auto; }
-.nav { display: none; gap: 22px; margin-left: auto; font-weight: 500; }
-.nav a { text-decoration: none; color: #374151; font-size: .86rem; font-weight: 500; }
-.nav a:hover, .nav a[aria-current] { color: var(--gold-ink); }
-@media (min-width: 860px) { .nav { display: flex; } }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: .7rem 1.25rem; border-radius: 6px; border: 1px solid transparent; font-weight: 500; text-decoration: none; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out, transform .12s ease-out; }
 .btn:active { transform: scale(.97); }
@@ -238,23 +230,11 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 </head>
 <body>
 
-<div class="topbar"><ul>
-  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Livraison partout au Maroc</li>
-  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Paiement sécurisé</li>
-  <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>2 showrooms à Casablanca</li>
-</ul></div>
 <header class="header">
   <div class="wrap">
-    <a class="logo" href="/" aria-label="Midox Shop, accueil">
+    <a class="logo" href="https://www.midoxshop.ma/" aria-label="Midox Shop, accueil">
       <img src="/assets/images/logo.png" alt="Midox Shop" width="120" height="48" onerror="this.replaceWith(document.createTextNode('Midox Shop'))">
     </a>
-    <nav class="nav" aria-label="Menu">
-      <a href="/products">Catalogue</a>
-      <a href="/showroom">Showroom</a>
-      <a href="/formations">Formations</a>
-      <a href="/declenchements/" aria-current="page">Déclenchements</a>
-      <a href="/contact">Contact</a>
-    </nav>
   </div>
 </header>
 
@@ -348,7 +328,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
           <p>Appareils photo, objectifs, éclairage, son et accessoires, neufs et d'occasion, avec deux showrooms à Casablanca et la livraison partout au Maroc.</p>
         </div>
         <div class="row">
-          <a class="btn btn-gold" href="/products">Voir le catalogue</a>
+          <a class="btn btn-gold" href="https://www.midoxshop.ma/products">Voir le catalogue</a>
         </div>
       </div>
     </div>
@@ -417,7 +397,8 @@ drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('
 
 let current = null;
 // Phones share the report image (share sheet, WhatsApp); computers get it as a download.
-const onPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform));
+const onPhone = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform))
+  || (navigator.maxTouchPoints > 0 && matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches);
 
 async function readFile(file) {
   drop.hidden = true; out.hidden = false; $('#usbBox').hidden = true;
@@ -470,7 +451,7 @@ function render() {
     h += `<div class="actions">
       ${onPhone ? `<button class="btn btn-gold" id="share">Partager le rapport</button>
       <button class="btn btn-wa" id="waShare"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.700 6.700 0 0 1-2-1.200 7.400 7.400 0 0 1-1.400-1.700c-.1-.2 0-.4.1-.5l.4-.4.2-.4a.5.5 0 0 0 0-.4l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5a.9.9 0 0 0-.7.300 2.800 2.800 0 0 0-.9 2.100 4.900 4.900 0 0 0 1 2.600 11.200 11.200 0 0 0 4.300 3.800c.6.300 1.100.400 1.400.500a3.400 3.400 0 0 0 1.600.1 2.600 2.600 0 0 0 1.700-1.200 2.100 2.100 0 0 0 .1-1.200c0-.1-.2-.2-.4-.3z"/></svg>Envoyer sur WhatsApp</button>` : '<button class="btn btn-gold" id="download">Télécharger l\'image</button>'}
-      <a class="link" href="/products">Découvrir le catalogue Midox Shop →</a>
+      <a class="link" href="https://www.midoxshop.ma/products">Découvrir le catalogue Midox Shop →</a>
     </div>`;
     if (r.dateTaken) h += `<p class="privacy" style="margin-top:0">C'est le compteur au moment de la photo. Pour le chiffre du jour, utilisez une photo prise à l'instant.</p>`;
   }
