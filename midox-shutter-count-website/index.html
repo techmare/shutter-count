@@ -205,13 +205,17 @@ button, input { font: inherit; color: inherit; }
 /* ---- header: the site's dark strip and logo */
 .topbar { background: var(--topbar); color: #fff; font-size: .8rem; overflow: hidden; }
 .topbar ul { list-style: none; margin: 0; padding: 0; position: relative; height: 30px; }
-.topbar li { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; animation: topbar-one 9s infinite backwards; }
+.topbar li { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; animation: topbar-one 9s linear infinite backwards; }
 .topbar li:nth-child(2) { animation-delay: 3s; }
 .topbar li:nth-child(3) { animation-delay: 6s; }
-@keyframes topbar-one {
-  0% { transform: translateX(60%); opacity: 0; }
-  5%, 28% { transform: none; opacity: 1; }
-  33.33%, 100% { transform: translateX(-60%); opacity: 0; }
+@keyframes topbar-one {   /* snaps in from the right with a small bounce, holds, then snaps out to the left */
+  0% { transform: translateX(100%); opacity: 0; }
+  2% { transform: translateX(-5%); opacity: 1; }
+  3.2% { transform: translateX(2.5%); }
+  4.2%, 30.5% { transform: none; opacity: 1; }
+  31.5% { transform: translateX(5%); opacity: 1; }
+  33.33%, 100% { transform: translateX(-100%); opacity: 0; }
+}
 }
 @media (prefers-reduced-motion: reduce) {
   .topbar ul { height: auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; padding: 6px 16px; }
@@ -496,7 +500,7 @@ details.faq p { padding: 0 16px 16px; color: var(--muted); }
 
 <footer class="footer">
   <div class="wrap">
-    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-59</span></span></div>
+    <div><b>Midox Shop</b>Appareils photo, objectifs, éclairage et accessoires, neufs et d'occasion. Livraison en 24 h partout au Maroc.<br><br>Outil « Nombre de déclenchements » conçu par Midox Shop. <span style="opacity:.6">Version <span id="version">2026.11.12-60</span></span></div>
     <div><b>Maârif, Casablanca</b>17 Rue du marché, Bd Brahim Roudani</div>
     <div><b>Derb Ghallef, Casablanca</b>Joutéya Souk Selk, n° 377</div>
     <div><b>Téléphone et WhatsApp</b><a href="tel:+212621319882">+212 6 21 31 98 82</a><br><a href="tel:+212674469830">+212 6 74 46 98 30</a></div>
@@ -641,7 +645,7 @@ function busyHelp() {
 }
 const usbStatus = { session: "Connexion à l'appareil…", photo: 'Lecture de la dernière photo…', counter: 'Lecture du compteur…' };
 
-const VERSION = '2026.11.12-59';   // set by build.py
+const VERSION = '2026.11.12-60';   // set by build.py
 let lastLog = '';
 async function copyDiag() {
   try { await navigator.clipboard.writeText(lastLog); toast('Diagnostic copié'); }
