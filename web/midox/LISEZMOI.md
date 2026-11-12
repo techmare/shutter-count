@@ -5,9 +5,11 @@ il fonctionne donc aussi ouvert directement depuis le téléphone (app Fichiers)
 
 ## Mise en ligne (site Next.js sur Vercel)
 
-1. Copier `index.html` dans `public/declenchements/` du projet.
+1. Copier `dist/index.html` et `apercu.png` dans `public/declenchements/` du projet.
+   (`apercu.png` est l'image affichée quand le lien est partagé sur WhatsApp ou Facebook.)
 2. Déployer. La page est à **https://www.midoxshop.ma/declenchements/**
-3. Ajouter le lien « Déclenchements » dans le menu du site et dans `sitemap.xml`.
+3. Ajouter le lien « Déclenchements » dans le menu ou le pied de page du site et dans `sitemap.xml`,
+   puis demander l'indexation de la page dans Google Search Console.
 
 ## USB
 
