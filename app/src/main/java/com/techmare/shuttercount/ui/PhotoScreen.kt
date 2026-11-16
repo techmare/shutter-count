@@ -19,19 +19,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.PhotoState
 import com.techmare.shuttercount.core.Brand
+import com.techmare.shuttercount.core.CameraModels
 import com.techmare.shuttercount.data.ReportData
-import com.techmare.shuttercount.data.Midox
-import com.techmare.shuttercount.data.shareReport
 
 @Composable
 fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
     val state by vm.photo.collectAsState()
-    val context = LocalContext.current
     val c = LocalAppColors.current
     val showWear by vm.showWear.collectAsState()
     val reportWear by vm.reportWear.collectAsState()
@@ -48,7 +45,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
             PhotoState.Idle -> {
                 InstrumentPanel(
                     title = "No camera yet", titleDim = true, count = null,
-                    caption = "Pick a photo from a Nikon, Sony or Canon R to read its count",
+                    caption = "Pick a photo from a Nikon, Sony or recent Canon to read its count",
                 )
                 Button(onClick = pick, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Choose photo") }
                 Steps(
@@ -60,7 +57,7 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     ),
                 )
                 Note("Photos sent through WhatsApp or edited in an app lose the data this needs.", warning = false)
-                Note("Canon: the R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II work from a photo here. Older Canons (DIGIC 5 and before) use the USB tab.", warning = false)
+                Note("Canon: the ${CameraModels.CANON_PHOTO_MODELS} work from a photo here. Older Canons (DIGIC 5 and before) use the USB tab.", warning = false)
             }
 
             PhotoState.Loading -> {
@@ -100,24 +97,12 @@ fun PhotoScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 r.details.filter { it.first == "Note" }.forEach { Note(it.second, warning = false) }
 
                 if (count != null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = {
-                                shareReport(context, ReportData(
-                                    r.displayName, r.serial, count, r.ratedLife.takeIf { reportWear }, "Photo (données EXIF)",
-                                    ratedOfficial = r.ratedOfficial,
-                                    includesElectronic = r.brand == Brand.CANON,
-                                ))
-                            },
-                            modifier = Modifier.weight(1f).height(48.dp),
-                        ) { Text("Share report") }
-                        GhostButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
-                    }
-                    if (Midox.installed(context)) {
-                        GhostButton(
-                            onClick = { Midox.addSerial(context, r.displayName, r.serial, count.toLong()) },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                        ) { Text("Add to Midox serial numbers") }
+                    ResultActions(noteLabel = "Add note", onNote = onAddNote) {
+                        ReportData(
+                            r.displayName, r.serial, count, r.ratedLife.takeIf { reportWear }, "Photo (données EXIF)",
+                            ratedOfficial = r.ratedOfficial,
+                            includesElectronic = r.brand == Brand.CANON,
+                        )
                     }
                     if (r.dateTaken != null) {
                         Note("This is the count when the photo was taken. For today's count, use a photo taken just now.", warning = false)

@@ -117,15 +117,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     /** Debug screen check: show a reading made from bytes, as if the photo had been picked. */
     internal fun showPhotoBytes(bytes: ByteArray, name: String) {
         val result = PhotoShutterReader.read(bytes)
-        var previous: Seen? = null
-        if (result.shutterCount != null) {
-            previous = seenBefore(result.serial)
-            addHistory(HistoryEntry(
-                id = System.nanoTime(), time = System.currentTimeMillis(), camera = result.displayName,
-                serial = result.serial, count = result.shutterCount, ratedLife = result.ratedLife, ratedOfficial = result.ratedOfficial, source = "Photo",
-            ))
-        }
-        _photo.value = PhotoState.Done(result, name, previous)
+        _photo.value = PhotoState.Done(result, name, recordPhoto(result))
     }
 
     /** Debug screen check: put the USB tab in a given state. */
@@ -165,15 +157,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 )
                 return@launch
             }
-            var previous: Seen? = null
-            if (result.shutterCount != null) {
-                previous = seenBefore(result.serial)
-                addHistory(HistoryEntry(
-                    id = System.nanoTime(), time = System.currentTimeMillis(), camera = result.displayName,
-                    serial = result.serial, count = result.shutterCount, ratedLife = result.ratedLife, ratedOfficial = result.ratedOfficial, source = "Photo",
-                ))
-            }
-            _photo.value = PhotoState.Done(result, name, previous)
+            _photo.value = PhotoState.Done(result, name, recordPhoto(result))
         }
     }
 
@@ -223,15 +207,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             }
             outcome.fold(
                 onSuccess = { reading ->
-                    var previous: Seen? = null
-                    val count = reading.shutterCount
-                    if (count != null) {
-                        previous = seenBefore(reading.serial)
-                        addHistory(HistoryEntry(
-                            id = System.nanoTime(), time = System.currentTimeMillis(), camera = reading.model,
-                            serial = reading.serial, count = count, ratedLife = reading.ratedLife, ratedOfficial = reading.ratedOfficial, source = "USB",
+                    val previous = reading.shutterCount?.let { count ->
+                        record(
+                            reading.model, reading.serial, count, reading.ratedLife, reading.ratedOfficial, source = "USB",
                             experimental = reading.method == CanonMethod.FACTORY && !reading.confirmed,
-                        ))
+                        )
                     }
                     _usb.value = UsbState.Done(reading, previous)
                 },
@@ -257,6 +237,23 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val earlier = _history.value.filter { it.serial == serial }
         return earlier.firstOrNull()?.let { Seen(it, earlier.size, earlier.firstOrNull { e -> e.note.isNotBlank() }?.note) }
     }
+
+    /** Saves a successful reading to History. Returns the earlier checks of the same body, if any. */
+    private fun record(
+        camera: String, serial: String?, count: Long, ratedLife: Int?, ratedOfficial: Boolean,
+        source: String, experimental: Boolean = false,
+    ): Seen? {
+        val previous = seenBefore(serial)
+        addHistory(HistoryEntry(
+            id = System.nanoTime(), time = System.currentTimeMillis(), camera = camera,
+            serial = serial, count = count, ratedLife = ratedLife, ratedOfficial = ratedOfficial, source = source,
+            experimental = experimental,
+        ))
+        return previous
+    }
+
+    private fun recordPhoto(r: PhotoReading): Seen? =
+        r.shutterCount?.let { record(r.displayName, r.serial, it, r.ratedLife, r.ratedOfficial, source = "Photo") }
 
     private fun addHistory(entry: HistoryEntry) {
         val list = listOf(entry) + _history.value

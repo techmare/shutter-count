@@ -52,13 +52,13 @@ object CameraModels {
         return m
     }
 
-    /** Approximate rated shutter actuations, or null if unknown / no mechanical shutter. */
     /** A shutter rating. [official] = published by the maker; otherwise an estimate for the camera's class. */
     data class Rating(val value: Int, val official: Boolean)
 
     private fun off(v: Int) = Rating(v, true)
     private fun est(v: Int) = Rating(v, false)
 
+    /** Approximate rated shutter actuations, or null if unknown / no mechanical shutter. */
     fun ratedLife(brand: Brand, model: String?): Int? = rating(brand, model)?.value
 
     fun rating(brand: Brand, model: String?): Rating? {
@@ -129,7 +129,11 @@ object CameraModels {
         }
     }
 
-    /** Where Canon R bodies keep their counter in a photo's CameraInfo block (ExifTool), or null. */
+    /** The Canons [canonPhotoOffset] knows, as shown to the user. Keep the two in step. */
+    const val CANON_PHOTO_MODELS =
+        "EOS R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II"
+
+    /** Where recent Canon bodies keep their counter in a photo's CameraInfo block (ExifTool), or null. */
     fun canonPhotoOffset(model: String?): Int? {
         val m = model ?: return null
         return when {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,16 +43,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.offset
 import com.techmare.shuttercount.core.CameraModels
-import com.techmare.shuttercount.data.HistoryEntry
+import com.techmare.shuttercount.data.Midox
+import com.techmare.shuttercount.data.ReportData
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.data.formatDate
-import com.techmare.shuttercount.data.wearPercent
+import com.techmare.shuttercount.data.shareReport
+import com.techmare.shuttercount.data.wearPercentText
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.pow
@@ -144,7 +149,7 @@ fun InstrumentPanel(
                 Text(wear.label, style = MaterialTheme.typography.titleLarge, color = c.panelText)
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    (if (wearPercent(count, ratedLife) == 0 && count > 0) "Under 1%" else "${wearPercent(count, ratedLife)}%") + (if (ratedOfficial) " of rated life used" else " of estimated life used"),
+                    wearPercentText(count, ratedLife) + (if (ratedOfficial) " of rated life used" else " of estimated life used"),
                     Modifier.padding(bottom = 2.dp),
                     style = MaterialTheme.typography.bodyMedium, color = c.panelMuted,
                 )
@@ -201,7 +206,11 @@ fun Odometer(value: Long?, roll: Boolean = true) {
     val significant = if (value == null || target == 0L) 0 else target.toString().length
     val v = if (value != null && anim.value >= target - 0.5f && !anim.isRunning) target.toDouble() else anim.value.toDouble()
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    val spoken = if (value == null) "No count" else formatCount(value)
+    Row(
+        Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = spoken },
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
         for (i in wheels - 1 downTo 0) {
             val unit = 10.0.pow(i)
             val pos = if (i == 0) v else {
@@ -403,12 +412,24 @@ fun SeenBefore(seen: com.techmare.shuttercount.Seen, count: Long) {
     }
 }
 
-/** "Last checked …" line comparing with the previous reading of the same camera. */
-fun previousLine(count: Long, previous: HistoryEntry?): Pair<String, String>? {
-    previous ?: return null
-    val diff = count - previous.count
-    val sign = if (diff >= 0) "+" else "−"
-    return "Last check" to "${formatCount(previous.count)} on ${formatDate(previous.time)} ($sign${formatCount(kotlin.math.abs(diff))})"
+/**
+ * The actions under a reading: share its report, add or edit its note and, when the shop's Midox
+ * app is on the phone, send the camera there. [report] is built when a button is tapped.
+ */
+@Composable
+fun ResultActions(noteLabel: String, onNote: () -> Unit, report: () -> ReportData) {
+    val context = LocalContext.current
+    val midox = remember { Midox.installed(context) }
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = { shareReport(context, report()) }, modifier = Modifier.weight(1f).height(48.dp)) { Text("Share report") }
+        GhostButton(onClick = onNote, modifier = Modifier.weight(1f).height(48.dp)) { Text(noteLabel) }
+    }
+    if (midox) {
+        GhostButton(
+            onClick = { report().let { Midox.addSerial(context, it.camera, it.serial, it.count) } },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+        ) { Text("Add to Midox serial numbers") }
+    }
 }
 
 fun shareText(context: Context, text: String) {

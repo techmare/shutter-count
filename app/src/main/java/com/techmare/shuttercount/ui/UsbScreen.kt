@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 import com.techmare.shuttercount.UsbState
 import com.techmare.shuttercount.data.ReportData
-import com.techmare.shuttercount.data.Midox
-import com.techmare.shuttercount.data.shareReport
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.ptp.CanonMethod
 
@@ -117,15 +115,26 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                     showWear = showWear,
                 )
 
+                val shareDiagnostics = { shareText(context, "Shutter Count diagnostic report\n${r.model}\n\n${r.diagnostics}") }
+                // The camera answered but offers no count this app can read: reading again gives the
+                // same answer, so the useful action is sending the report. (A photo-based read can
+                // succeed next time: take a photo, read again.)
+                val deadEnd = count == null && !r.canTryAdvanced && r.method != CanonMethod.PHOTO && r.diagnostics.isNotBlank()
+
                 if (count != null) s.seen?.let { SeenBefore(it, count) }
                 if (count == null) {
                     Note(r.problem ?: "The camera didn't return a count.", warning = !r.canTryAdvanced)
-                    if (r.canTryAdvanced) {
-                        Button(onClick = { confirmAdvanced = true }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                    when {
+                        r.canTryAdvanced -> Button(onClick = { confirmAdvanced = true }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                             Text("Try advanced read")
                         }
-                    } else {
-                        Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                        deadEnd -> {
+                            Button(onClick = shareDiagnostics, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                                Text("Share diagnostic report")
+                            }
+                            QuietButton(onClick = { vm.readCanon(allowAdvanced = false) }) { Text("Read again") }
+                        }
+                        else -> Button(onClick = { vm.readCanon(allowAdvanced = false) }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                             Text("Read again")
                         }
                     }
@@ -145,24 +154,12 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                 }
 
                 if (count != null) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                        Button(
-                            onClick = {
-                                shareReport(context, ReportData(
-                                    r.model, r.serial, count, r.ratedLife.takeIf { reportWear },
-                                    if (r.method == CanonMethod.PHOTO) "USB (dernière photo)" else "USB (lecture directe)",
-                                    experimental = experimental, includesElectronic = r.includesElectronic, ratedOfficial = r.ratedOfficial,
-                                ))
-                            },
-                            modifier = Modifier.weight(1f).height(48.dp),
-                        ) { Text("Share report") }
-                        GhostButton(onClick = onAddNote, modifier = Modifier.weight(1f).height(48.dp)) { Text("Add note") }
-                    }
-                    if (Midox.installed(context)) {
-                        GhostButton(
-                            onClick = { Midox.addSerial(context, r.model, r.serial, count.toLong()) },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                        ) { Text("Add to Midox serial numbers") }
+                    ResultActions(noteLabel = "Add note", onNote = onAddNote) {
+                        ReportData(
+                            r.model, r.serial, count, r.ratedLife.takeIf { reportWear },
+                            if (r.method == CanonMethod.PHOTO) "USB (dernière photo)" else "USB (lecture directe)",
+                            experimental = experimental, includesElectronic = r.includesElectronic, ratedOfficial = r.ratedOfficial,
+                        )
                     }
                     QuietButton(onClick = { vm.readCanon(allowAdvanced = r.method == CanonMethod.FACTORY) }) { Text("Read again") }
                 }
@@ -174,10 +171,8 @@ fun UsbScreen(vm: MainViewModel, onAddNote: () -> Unit) {
                         Text(raw.joinToString("\n"), fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall, color = c.muted)
                     }
                 }
-                if (r.diagnostics.isNotBlank()) {
-                    QuietButton(onClick = {
-                        shareText(context, "Shutter Count diagnostic report\n${r.model}\n\n${r.diagnostics}")
-                    }) { Text("Share diagnostic report") }
+                if (r.diagnostics.isNotBlank() && !deadEnd) {
+                    QuietButton(onClick = shareDiagnostics) { Text("Share diagnostic report") }
                 }
             }
         }

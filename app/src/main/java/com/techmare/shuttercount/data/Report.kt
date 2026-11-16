@@ -1,6 +1,5 @@
 package com.techmare.shuttercount.data
 
-import com.techmare.shuttercount.core.CameraModels
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -13,33 +12,15 @@ fun formatDate(time: Long): String = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale
 
 fun wearPercent(count: Long, rated: Int): Int = ((count * 100.0) / rated).toInt()
 
-private fun wearFr(w: CameraModels.Wear) = when (w) {
-    CameraModels.Wear.LIKE_NEW -> "Comme neuf"
-    CameraModels.Wear.GOOD -> "Bon état"
-    CameraModels.Wear.USED -> "Usure moyenne"
-    CameraModels.Wear.HIGH -> "Usure élevée"
-    CameraModels.Wear.BEYOND -> "Au-delà de la durée estimée"
-}
-
-/** Customer-facing report, in French. */
-fun buildReport(
-    camera: String,
-    serial: String?,
-    count: Long,
-    ratedLife: Int?,
-    method: String,
-    time: Long = System.currentTimeMillis(),
-    experimental: Boolean = false,
-): String = buildString {
-    appendLine("📷 Rapport de déclenchements")
-    appendLine("Appareil : $camera")
-    if (!serial.isNullOrBlank()) appendLine("N° de série : $serial")
-    appendLine("Déclenchements : ${formatCount(count)}")
-    if (ratedLife != null) {
-        appendLine("Durée de vie estimée de l'obturateur : ${formatCount(ratedLife.toLong())} (${wearPercent(count, ratedLife)} % utilisé)")
-        appendLine("État : ${wearFr(CameraModels.wear(count, ratedLife))}")
+/**
+ * The wear percentage as shown in the app: a used camera never reads as "0%", and one past its
+ * rating never reads as a bare "100%" next to "Beyond rating".
+ */
+fun wearPercentText(count: Long, rated: Int): String {
+    val p = wearPercent(count, rated)
+    return when {
+        p == 0 && count > 0 -> "Under 1%"
+        p == 100 && count > rated -> "Over 100%"
+        else -> "$p%"
     }
-    appendLine("Méthode : $method")
-    if (experimental) appendLine("(lecture expérimentale)")
-    append("Date du contrôle : ${formatDate(time)}")
 }

@@ -14,7 +14,7 @@ const val NIKON_VENDOR_ID = 0x04B0
 const val SONY_VENDOR_ID = 0x054C
 private val CAMERA_VENDORS = setOf(CANON_VENDOR_ID, NIKON_VENDOR_ID, SONY_VENDOR_ID)
 
-/** Finds a connected camera: a Canon device, or anything exposing a still-image (PTP) interface. */
+/** Finds a connected camera: a Canon, Nikon or Sony device, or anything exposing a still-image (PTP) interface. */
 fun findCamera(manager: UsbManager): UsbDevice? {
     val devices = manager.deviceList.values
     return devices.firstOrNull { it.vendorId in CAMERA_VENDORS }
