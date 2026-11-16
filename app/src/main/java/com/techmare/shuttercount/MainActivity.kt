@@ -3,6 +3,7 @@ package com.techmare.shuttercount
 import android.content.Intent
 import android.hardware.usb.UsbManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +33,9 @@ class MainActivity : ComponentActivity() {
         // The opening animation plays on a fresh start from the launcher only: not after a rotation,
         // and not when a shared photo or a plugged-in camera opened the app.
         launching = savedInstanceState == null && intent?.action == Intent.ACTION_MAIN && intent?.hasExtra("check") != true
+        // Take the system splash away in one step instead of letting it fade: LaunchReveal's first
+        // frame is the same picture, so the aperture stays put and then starts to move.
+        if (launching && Build.VERSION.SDK_INT >= 31) splashScreen.setOnExitAnimationListener { it.remove() }
         setContent {
             ShutterTheme {
                 Box {
