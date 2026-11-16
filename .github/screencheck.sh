@@ -46,7 +46,7 @@ adb shell input text "zzz"; sleep 2
 adb exec-out screencap -p > shots/search-none.png
 # opening animation: a short recording of a fresh start from the launcher
 adb shell am force-stop $PKG
-adb shell screenrecord --time-limit 5 /sdcard/launch.mp4 &
+adb shell screenrecord --time-limit 12 /sdcard/launch.mp4 &
 sleep 1.5
 adb shell am start -W -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n $PKG/.MainActivity >/dev/null
 wait
