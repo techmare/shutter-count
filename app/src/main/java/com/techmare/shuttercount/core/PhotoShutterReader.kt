@@ -35,6 +35,8 @@ object PhotoShutterReader {
     private const val TAG_DATE_ORIGINAL = 0x9003
     private const val TAG_BODY_SERIAL = 0xA431
 
+    private val EDITING_SOFTWARE = Regex("photoshop|lightroom|snapseed|gimp|capture one|picsart|whatsapp|instagram", RegexOption.IGNORE_CASE)
+
     fun read(data: ByteArray): PhotoReading {
         if (isCr3(data)) return readCr3(data)
         val tiffStart = findTiffStart(data)
@@ -65,7 +67,7 @@ object PhotoShutterReader {
         val ctx = Ctx(tiff, brand, make, model, software, dateTaken, bodySerial)
 
         val warnings = mutableListOf<String>()
-        if (software != null && Regex("photoshop|lightroom|snapseed|gimp|capture one|picsart|whatsapp|instagram", RegexOption.IGNORE_CASE).containsMatchIn(software)) {
+        if (software != null && EDITING_SOFTWARE.containsMatchIn(software)) {
             warnings += "This photo was edited with $software. Edited photos may have missing or altered data; use an untouched file from the camera."
         }
 
@@ -88,13 +90,11 @@ object PhotoShutterReader {
      * Offsets from ExifTool (Canon.pm, CameraInfoR6 / CameraInfoR6m2). The value
      * counts mechanical and electronic shutter shots together.
      */
-    private fun canonOffset(model: String?): Int? = CameraModels.canonPhotoOffset(model)
-
     private const val CANON_UNSUPPORTED =
-        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the EOS R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II. Older Canons (DIGIC 5 and before) can be read over USB."
+        "This Canon doesn't store a readable shutter count in photos. Photo reading works for the ${CameraModels.CANON_PHOTO_MODELS}. Older Canons (DIGIC 5 and before) can be read over USB."
 
     private fun readCanon(ctx: Ctx, mn: IfdEntry?, warnings: MutableList<String>): PhotoReading {
-        val offset = canonOffset(ctx.model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
+        val offset = CameraModels.canonPhotoOffset(ctx.model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
         if (mn == null) return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
         val t = Tiff(ctx.tiff.buf, ctx.tiff.base, ctx.tiff.littleEndian)
         val pos = mn.valuePos.toInt()
@@ -150,7 +150,7 @@ object PhotoShutterReader {
         val bodySerial = exif?.let { (t, ifd) -> ifd.find(TAG_BODY_SERIAL)?.let(t::string) }
         val ctx = Ctx(t1, Brand.CANON, make, model, software, dateTaken, bodySerial)
         val warnings = mutableListOf<String>()
-        val offset = canonOffset(model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
+        val offset = CameraModels.canonPhotoOffset(model) ?: return ctx.result(null, warnings = warnings, problem = CANON_UNSUPPORTED)
         val (t3, mn) = box("CMT3")?.let(::tiffAt) ?: return ctx.result(null, warnings = warnings, problem = MISSING_MAKERNOTE)
         // most Canons leave the CameraInfo block (and so the count) out of their CR3 files
         if (mn.find(0x000D) == null) return ctx.result(null, warnings = warnings, problem = RAW_WITHOUT_COUNT)
@@ -208,6 +208,8 @@ object PhotoShutterReader {
     private val sonyC = Regex("^(ILCE-(1\\b|7M4|7RM5|7SM3)|ILME-FX3)")
     private val sonyD = Regex("^(ILCE-(6700|7CM2|7CR)|ILME-FX2|ZV-(E1|E10M2))\\b")
     private val sonyDMech = Regex("^(ILCE-(1M2|7M5|7RM6))")
+    /** Older bodies with a second, more accurate counter that is skipped when the flash fires. */
+    private val sonySecondCounter = Regex("^(ILCE-(7(R|S|M2)?|[56]000|5100|QX1))\\b")
 
     private fun sonyTable(model: String, raw: ByteArray): SonyTable? = when {
         !sonyA.containsMatchIn(model) -> SonyTable.A
@@ -258,7 +260,7 @@ object PhotoShutterReader {
             SonyTable.A -> {
                 val flashFired = ((byte(0x31) ?: 0) and 1) == 1
                 val sc = masked(0x32)
-                val sc2 = if (!flashFired && Regex("^(ILCE-(7(R|S|M2)?|[56]000|5100|QX1))\\b").containsMatchIn(model)) masked(0x4c) else null
+                val sc2 = if (!flashFired && sonySecondCounter.containsMatchIn(model)) masked(0x4c) else null
                 val sc3 = when {
                     Regex("^(ILCE-(5100|QX1)|ILCA-(68|77M2))").containsMatchIn(model) -> u32(0x1a0)
                     Regex("^(SLT-A(58|99V?)|HV|NEX-(3N|5R|5T|6|VG900|VG30E)|ILCE-([35]000|3500))\\b").containsMatchIn(model) -> u32(0x1aa)
@@ -270,7 +272,7 @@ object PhotoShutterReader {
                     sc3 != null && sc != null && sc3 > sc -> sc3
                     else -> sc
                 }
-                if (sc2 == null && flashFired && Regex("^(ILCE-(7(R|S|M2)?|[56]000|5100|QX1))\\b").containsMatchIn(model)) {
+                if (sc2 == null && flashFired && sonySecondCounter.containsMatchIn(model)) {
                     warnings += "The flash fired in this photo. On this model the most accurate counter is skipped when the flash fires; take a new photo without flash for the best reading."
                 }
                 if (count != null && count < 65536 && sc2 == null && sc3 == null && model.startsWith("ILCE-7")) {

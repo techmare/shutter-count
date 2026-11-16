@@ -39,7 +39,9 @@ data class CanonReading(
 }
 
 /**
- * Reads Canon EOS shutter counters over USB.
+ * Reads a camera's shutter count over USB. Despite the name it handles all three brands: Nikon,
+ * Sony and recent Canons are read from the newest photo on the card; older Canon EOS bodies from
+ * their own counters:
  *
  * 1. Standard property 0xD1AC (DIGIC 5 and older bodies).
  * 2. The same property as reported through Canon's EOS event stream.
@@ -118,9 +120,8 @@ class CanonReader(private val session: PtpSession) {
             // didn't list them showed Err 70 when they were sent anyway.
             if (!listed) {
                 return result(emptyList(), null,
-                    problem = if (CameraModels.canonPhotoOffset(model) != null)
-                        "This Canon can't be read safely over USB, but its count is saved in every photo. Take a new photo, copy the original JPEG or CR3 to this phone, and pick it in the Photo tab."
-                    else
+                    // (Canons whose photos can be read never get here: they returned above.)
+                    problem =
                         "This Canon doesn't offer a way to read its shutter count over USB that this app can use safely. " +
                             "For this model, ask a Canon service centre or use a tool that officially supports it.")
             }
@@ -130,7 +131,7 @@ class CanonReader(private val session: PtpSession) {
                     canTryAdvanced = true)
             }
 
-            val confirmed = listed && CONFIRMED_FACTORY_MODELS.any { model.contains(it, ignoreCase = true) }
+            val confirmed = CONFIRMED_FACTORY_MODELS.any { model.contains(it, ignoreCase = true) }
             val counters = readFactory()
             if (counters.isEmpty()) {
                 return result(emptyList(), CanonMethod.FACTORY, false,
@@ -296,10 +297,6 @@ class CanonReader(private val session: PtpSession) {
             "Mirror actuations" to 0x100BL,
             "Total counter" to 0x1015L,
         )
-
-        /** Scans a Canon EOS GetEvent dataset for property 0xD1AC. */
-        fun findCounterInEvents(d: ByteArray): Long? =
-            findPropInEvents(d, PROP_SHUTTER_COUNTER)?.takeIf { it.size >= 4 }?.let { le32(it, 0) }
 
         /** Value bytes of a property-changed record in a Canon EOS GetEvent dataset. */
         fun findPropInEvents(d: ByteArray, wanted: Int): ByteArray? {

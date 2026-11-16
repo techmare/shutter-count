@@ -5,6 +5,7 @@ import com.techmare.shuttercount.core.CameraModels
 import com.techmare.shuttercount.core.PhotoShutterReader
 import com.techmare.shuttercount.core.SonyCipher
 import com.techmare.shuttercount.data.matches
+import com.techmare.shuttercount.data.wearPercentText
 import com.techmare.shuttercount.ptp.CanonReader
 import com.techmare.shuttercount.ptp.FactoryCommand
 import org.junit.Assert.assertEquals
@@ -182,5 +183,15 @@ class ReaderTests {
             i(3, "DSC_0002.JPG", "20261102T100500"), i(4, "IMG_2445.JPG", "20261031T201700"),
         ))
         assertEquals(listOf("DSC_0002.JPG", "DSC_0001.JPG", "IMG_2445.JPG"), shots.map { it.name })
+    }
+
+    @Test
+    fun wearPercentNeverContradictsItsLabel() {
+        assertEquals("12%", wearPercentText(12_345, 100_000))
+        assertEquals("0%", wearPercentText(0, 100_000))
+        assertEquals("Under 1%", wearPercentText(535, 100_000))        // "Like new", not "0%"
+        assertEquals("100%", wearPercentText(150_000, 150_000))        // exactly at the rating: "High wear"
+        assertEquals("Over 100%", wearPercentText(151_204, 150_000))   // "Beyond rating", not "100%"
+        assertEquals("155%", wearPercentText(233_870, 150_000))
     }
 }

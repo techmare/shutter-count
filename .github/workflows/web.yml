@@ -1,0 +1,31 @@
+name: Web tests
+
+# Runs the shared JavaScript reader and USB tests, and checks that the Midox page still carries
+# exact copies of the shared code (midox-shutter-count-website/build.py makes them).
+on:
+  push:
+    branches: [main, 'check-*']
+    paths: ["web/**", "midox-shutter-count-website/**", ".github/workflows/web.yml"]
+  pull_request:
+    paths: ["web/**", "midox-shutter-count-website/**", ".github/workflows/web.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Reader and USB tests
+        run: |
+          node web/test/reader.test.mjs
+          node web/test/usb.test.mjs
+      - name: Midox copies match web/
+        run: |
+          cmp web/reader.js midox-shutter-count-website/reader.js
+          cmp web/ptp-usb.js midox-shutter-count-website/ptp-usb.js

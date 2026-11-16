@@ -54,7 +54,7 @@ import com.techmare.shuttercount.data.Midox
 import com.techmare.shuttercount.data.shareReport
 import com.techmare.shuttercount.data.formatCount
 import com.techmare.shuttercount.data.formatDate
-import com.techmare.shuttercount.data.wearPercent
+import com.techmare.shuttercount.data.wearPercentText
 
 @Composable
 fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
@@ -127,15 +127,7 @@ fun HistoryScreen(vm: MainViewModel, onCheck: () -> Unit) {
     editing?.let { e ->
         NoteDialog(initial = e.note, onDismiss = { editing = null }, onSave = { vm.updateNote(e.id, it); editing = null })
     }
-    deleting?.let { e ->
-        AlertDialog(
-            onDismissRequest = { deleting = null },
-            title = { Text("Delete this check?") },
-            text = { Text("${e.camera}, ${formatCount(e.count)} shots on ${formatDate(e.time)}") },
-            confirmButton = { QuietButton(onClick = { vm.deleteEntry(e.id); deleting = null }) { Text("Delete") } },
-            dismissButton = { QuietButton(onClick = { deleting = null }) { Text("Cancel") } },
-        )
-    }
+    deleting?.let { e -> DeleteCheckDialog(e, onDismiss = { deleting = null }, onDelete = { vm.deleteEntry(e.id) }) }
 }
 
 @Composable
@@ -147,9 +139,9 @@ private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, 
         verticalAlignment = Alignment.Top,
     ) {
         Column(Modifier.weight(1f).padding(start = 4.dp)) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(e.camera, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, color = c.ink)
-                Text(formatCount(e.count), style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"), color = c.ink)
+            Row {
+                Text(e.camera, Modifier.weight(1f).alignByBaseline(), style = MaterialTheme.typography.titleMedium, color = c.ink)
+                Text(formatCount(e.count), Modifier.alignByBaseline(), style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"), color = c.ink)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -161,7 +153,7 @@ private fun HistoryRow(e: HistoryEntry, showWear: Boolean, onShare: () -> Unit, 
                     val wear = CameraModels.wear(e.count, rated)
                     Box(Modifier.size(8.dp).clip(CircleShape).background(wearColor(wear)))
                     Spacer(Modifier.width(6.dp))
-                    Text("${wear.label}, ${wearPercent(e.count, rated)}%", style = MaterialTheme.typography.bodySmall, color = c.muted)
+                    Text("${wear.label}, ${wearPercentText(e.count, rated)}", style = MaterialTheme.typography.bodySmall, color = c.muted)
                 }
             }
             if (e.experimental) Text("Experimental reading", style = MaterialTheme.typography.bodySmall, color = c.mid)
@@ -199,13 +191,11 @@ private fun reportFor(e: HistoryEntry, reportWear: Boolean) = ReportData(
 fun CheckScreen(vm: MainViewModel, id: Long) {
     val entries by vm.history.collectAsState()
     val e = entries.firstOrNull { it.id == id } ?: return
-    val context = LocalContext.current
     val c = LocalAppColors.current
     val showWear by vm.showWear.collectAsState()
     val reportWear by vm.reportWear.collectAsState()
     var editing by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
-    val midox = remember { Midox.installed(context) }
     val others = remember(entries, e) { vm.otherChecks(e) }
 
     Column(
@@ -263,34 +253,24 @@ fun CheckScreen(vm: MainViewModel, id: Long) {
             }
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-            androidx.compose.material3.Button(
-                onClick = { shareReport(context, reportFor(e, reportWear)) },
-                modifier = Modifier.weight(1f).height(48.dp),
-            ) { Text("Share report") }
-            GhostButton(onClick = { editing = true }, modifier = Modifier.weight(1f).height(48.dp)) {
-                Text(if (e.note.isBlank()) "Add note" else "Edit note")
-            }
-        }
-        if (midox) {
-            GhostButton(onClick = { Midox.addSerial(context, e.camera, e.serial, e.count) }, modifier = Modifier.fillMaxWidth().height(48.dp)) {
-                Text("Add to Midox serial numbers")
-            }
-        }
+        ResultActions(noteLabel = if (e.note.isBlank()) "Add note" else "Edit note", onNote = { editing = true }) { reportFor(e, reportWear) }
         QuietButton(onClick = { deleting = true }) { Text("Delete this check", color = c.high) }
         Spacer(Modifier.height(8.dp))
     }
 
     if (editing) NoteDialog(initial = e.note, onDismiss = { editing = false }, onSave = { vm.updateNote(e.id, it); editing = false })
-    if (deleting) {
-        AlertDialog(
-            onDismissRequest = { deleting = false },
-            title = { Text("Delete this check?") },
-            text = { Text("${e.camera}, ${formatCount(e.count)} shots on ${formatDate(e.time)}") },
-            confirmButton = { QuietButton(onClick = { deleting = false; vm.deleteEntry(e.id) }) { Text("Delete") } },
-            dismissButton = { QuietButton(onClick = { deleting = false }) { Text("Cancel") } },
-        )
-    }
+    if (deleting) DeleteCheckDialog(e, onDismiss = { deleting = false }, onDelete = { vm.deleteEntry(e.id) })
+}
+
+@Composable
+private fun DeleteCheckDialog(e: HistoryEntry, onDismiss: () -> Unit, onDelete: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Delete this check?") },
+        text = { Text("${e.camera}, ${formatCount(e.count)} shots on ${formatDate(e.time)}") },
+        confirmButton = { QuietButton(onClick = { onDismiss(); onDelete() }) { Text("Delete") } },
+        dismissButton = { QuietButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }
 
 @Composable

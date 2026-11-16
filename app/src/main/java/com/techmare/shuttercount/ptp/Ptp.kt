@@ -109,20 +109,19 @@ class PtpSession(
         }
     }
 
-    private fun fill(n: Int): ByteArray {
-        val buf = ByteArray(readChunk)
-        var empty = 0
-        while (pending.size < n) {
+    /** One bulk read. Zero-length packets are retried a few times; throws when the camera goes quiet. */
+    private fun readSome(buf: ByteArray): Int {
+        repeat(9) {
             val r = transport.read(buf, timeoutMs)
             if (r < 0) throw PtpException("The camera stopped responding. Check the cable, and turn the camera's Wi-Fi off.")
-            if (r == 0) {
-                if (++empty > 8) throw PtpException("The camera stopped responding.")
-                continue
-            }
-            empty = 0
-            pending += buf.copyOfRange(0, r)
+            if (r > 0) return r
         }
-        return pending
+        throw PtpException("The camera stopped responding.")
+    }
+
+    private fun fill(n: Int) {
+        val buf = ByteArray(readChunk)
+        while (pending.size < n) pending += buf.copyOfRange(0, readSome(buf))
     }
 
     private fun readContainer(): Triple<Int, Int, ByteArray> {
@@ -138,12 +137,8 @@ class PtpSession(
         pending.copyInto(whole, 0, 0, have)
         pending = if (pending.size > length) pending.copyOfRange(length, pending.size) else ByteArray(0)
         val buf = ByteArray(readChunk)
-        var empty = 0
         while (have < length) {
-            val r = transport.read(buf, timeoutMs)
-            if (r < 0) throw PtpException("The camera stopped responding. Check the cable, and turn the camera's Wi-Fi off.")
-            if (r == 0) { if (++empty > 8) throw PtpException("The camera stopped responding."); continue }
-            empty = 0
+            val r = readSome(buf)
             val use = minOf(r, length - have)
             buf.copyInto(whole, have, 0, use)
             have += use
