@@ -5,6 +5,7 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -177,8 +178,9 @@ private object OdometerMemory { var lastRolled: Long? = null }
 
 /**
  * Mechanical counter: each wheel rolls like a real odometer, higher wheels only
- * turning as the one below passes 9. Rolls up once when a new count arrives, ends
- * with a confirm tick; with no count the wheels show dashes, never a misleading 000000.
+ * turning as the one below passes 9. Rolls up once when a new count arrives, ticking as it
+ * turns and ending with a confirm; with no count the wheels show dashes, never a misleading
+ * 000000. After the opening animation the dashes drop into place one wheel after another.
  */
 @Composable
 fun Odometer(value: Long?, roll: Boolean = true) {
@@ -192,13 +194,34 @@ fun Odometer(value: Long?, roll: Boolean = true) {
             anim.snapTo(0f)
         } else if (!fresh || reduced) {
             anim.snapTo(value.toFloat())
-            if (fresh) confirmTick(view)
+            if (fresh) view.buzz(Buzz.CONFIRM)
             OdometerMemory.lastRolled = value
         } else {
             OdometerMemory.lastRolled = value
             anim.snapTo(0f)
-            anim.animateTo(value.toFloat(), tween(durationMillis = 1100, easing = CubicBezierEasing(0.23f, 1f, 0.32f, 1f)))
-            confirmTick(view)
+            // a tick each time the roll passes another twelfth of the way: quick at first, then
+            // slowing with the wheels
+            var ticks = 0
+            anim.animateTo(value.toFloat(), tween(durationMillis = 1100, easing = CubicBezierEasing(0.23f, 1f, 0.32f, 1f))) {
+                val passed = (this.value / value.toFloat() * ROLL_TICKS).toInt()
+                if (passed > ticks && passed < ROLL_TICKS) { ticks = passed; view.buzz(Buzz.TICK) }
+            }
+            view.buzz(Buzz.CONFIRM)
+        }
+    }
+
+    // the empty counter's entrance after the opening animation
+    val launching = LocalLaunching.current
+    val settle = remember { Animatable(if (launching && value == null) 0f else 1f) }
+    LaunchedEffect(launching) {
+        if (!launching && settle.value < 1f) {
+            if (reduced) settle.snapTo(1f) else {
+                var ticks = 0
+                settle.animateTo(1f, tween(durationMillis = 460, easing = LinearEasing)) {
+                    val landed = (this.value * 6).toInt()
+                    if (landed > ticks && landed < 6) { ticks = landed; view.buzz(Buzz.TICK) }
+                }
+            }
         }
     }
     val target = value ?: 0L
@@ -218,14 +241,17 @@ fun Odometer(value: Long?, roll: Boolean = true) {
                 val rem = v - base * unit
                 base + max(0.0, rem - (unit - 1))
             }
-            Wheel(pos, dim = i >= significant, blank = value == null, modifier = Modifier.weight(1f), colors = c)
+            // wheels land left to right, each a little after the one before
+            val order = (wheels - 1 - i) / (wheels - 1).toFloat()
+            val landed = ((settle.value * 1.6f) - order * 0.6f).coerceIn(0f, 1f)
+            Wheel(pos, dim = i >= significant, blank = value == null, settle = 1f - (1f - landed) * (1f - landed), modifier = Modifier.weight(1f), colors = c)
             if (i % 3 == 0 && i != 0) Spacer(Modifier.width(6.dp))
         }
     }
 }
 
 @Composable
-private fun Wheel(position: Double, dim: Boolean, blank: Boolean, modifier: Modifier, colors: AppColors) {
+private fun Wheel(position: Double, dim: Boolean, blank: Boolean, settle: Float, modifier: Modifier, colors: AppColors) {
     val height = 64.dp
     val hPx = with(LocalDensity.current) { height.toPx() }
     val whole = floor(position)
@@ -247,7 +273,10 @@ private fun Wheel(position: Double, dim: Boolean, blank: Boolean, modifier: Modi
         contentAlignment = Alignment.Center,
     ) {
         if (blank) {
-            Text("–", fontFamily = Fonts.condensed, fontWeight = FontWeight.Bold, fontSize = 40.sp, color = textColor)
+            Text(
+                "–", fontFamily = Fonts.condensed, fontWeight = FontWeight.Bold, fontSize = 40.sp, color = textColor,
+                modifier = Modifier.offset { IntOffset(0, (-(1f - settle) * hPx).roundToInt()) },
+            )
             return@Box
         }
         DigitText(digit, textColor, Modifier.offset { IntOffset(0, (-frac * hPx).roundToInt()) })
@@ -264,12 +293,7 @@ private fun DigitText(d: Int, color: Color, modifier: Modifier) {
 }
 
 /** Haptic punctuation for "the count is in": one tick, on the frame the wheels settle. */
-private fun confirmTick(view: android.view.View) {
-    view.performHapticFeedback(
-        if (android.os.Build.VERSION.SDK_INT >= 30) android.view.HapticFeedbackConstants.CONFIRM
-        else android.view.HapticFeedbackConstants.KEYBOARD_TAP,
-    )
-}
+private const val ROLL_TICKS = 12
 
 // ------------------------------------------------------------- wear scale
 

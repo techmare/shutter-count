@@ -9,13 +9,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
 import com.techmare.shuttercount.ui.App
 import com.techmare.shuttercount.ui.LaunchReveal
+import com.techmare.shuttercount.ui.LocalLaunching
 import com.techmare.shuttercount.ui.ShutterTheme
 import com.techmare.shuttercount.ui.Tab
 
@@ -38,9 +39,10 @@ class MainActivity : ComponentActivity() {
         if (launching && Build.VERSION.SDK_INT >= 31) splashScreen.setOnExitAnimationListener { it.remove() }
         setContent {
             ShutterTheme {
-                Box {
-                    App(vm, tab) { tab = it }
-                    if (launching) LaunchReveal { launching = false }
+                CompositionLocalProvider(LocalLaunching provides launching) {
+                    LaunchReveal(active = launching, onDone = { launching = false }) {
+                        App(vm, tab) { tab = it }
+                    }
                 }
             }
         }

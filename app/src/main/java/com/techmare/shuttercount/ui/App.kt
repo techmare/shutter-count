@@ -26,6 +26,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
 
@@ -53,6 +55,8 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
     BackHandler(enabled = settingsOpen) { settingsOpen = false }
     BackHandler(enabled = checkOpen) { vm.openCheck(null) }
     val addNote = { noteFor = vm.latestEntryId() }
+    val view = LocalView.current
+    LaunchedEffect(vm) { vm.buzz.collect { view.buzz(it) } }
 
     Scaffold(
         containerColor = c.paper,
@@ -84,6 +88,7 @@ fun App(vm: MainViewModel, tab: Tab, onTab: (Tab) -> Unit) {
                     NavigationBarItem(
                         selected = tab == t && !settingsOpen,
                         onClick = {
+                            if (t != tab || settingsOpen) view.buzz(Buzz.SEGMENT)
                             settingsOpen = false
                             // the History tab again from a check goes back to the list
                             if (t == Tab.HISTORY && tab == Tab.HISTORY) vm.openCheck(null)

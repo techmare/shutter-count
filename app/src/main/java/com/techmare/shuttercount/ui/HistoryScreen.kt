@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.techmare.shuttercount.MainViewModel
@@ -264,11 +265,12 @@ fun CheckScreen(vm: MainViewModel, id: Long) {
 
 @Composable
 private fun DeleteCheckDialog(e: HistoryEntry, onDismiss: () -> Unit, onDelete: () -> Unit) {
+    val view = LocalView.current
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Delete this check?") },
         text = { Text("${e.camera}, ${formatCount(e.count)} shots on ${formatDate(e.time)}") },
-        confirmButton = { QuietButton(onClick = { onDismiss(); onDelete() }) { Text("Delete") } },
+        confirmButton = { QuietButton(onClick = { view.buzz(Buzz.CLICK); onDismiss(); onDelete() }) { Text("Delete") } },
         dismissButton = { QuietButton(onClick = onDismiss) { Text("Cancel") } },
     )
 }
@@ -276,6 +278,7 @@ private fun DeleteCheckDialog(e: HistoryEntry, onDismiss: () -> Unit, onDelete: 
 @Composable
 fun NoteDialog(initial: String, onDismiss: () -> Unit, onSave: (String) -> Unit) {
     var text by remember { mutableStateOf(initial) }
+    val view = LocalView.current
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Note") },
@@ -286,7 +289,7 @@ fun NoteDialog(initial: String, onDismiss: () -> Unit, onSave: (String) -> Unit)
                 modifier = Modifier.fillMaxWidth(), minLines = 2,
             )
         },
-        confirmButton = { QuietButton(onClick = { onSave(text.trim()) }) { Text("Save note") } },
+        confirmButton = { QuietButton(onClick = { view.buzz(Buzz.CONFIRM); onSave(text.trim()) }) { Text("Save note") } },
         dismissButton = { QuietButton(onClick = onDismiss) { Text("Cancel") } },
     )
 }
