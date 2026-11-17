@@ -22,12 +22,16 @@ import com.techmare.shuttercount.ptp.CanonMethod
 import com.techmare.shuttercount.ptp.CanonReader
 import com.techmare.shuttercount.ptp.CanonReading
 import com.techmare.shuttercount.ptp.PtpSession
+import com.techmare.shuttercount.ui.Buzz
 import com.techmare.shuttercount.usb.UsbCameraConnection
 import com.techmare.shuttercount.usb.cameraName
 import com.techmare.shuttercount.usb.findCamera
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,6 +57,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val usbManager = app.getSystemService(Context.USB_SERVICE) as UsbManager
     private val store = HistoryStore(app)
+
+    private val _buzz = MutableSharedFlow<Buzz>(extraBufferCapacity = 4)
+    /**
+     * Haptic cues for things that happen without a tap: a read that failed, a camera plugged in.
+     * (A successful read is felt through the odometer as it rolls and settles.)
+     */
+    val buzz: SharedFlow<Buzz> = _buzz.asSharedFlow()
 
     private val _photo = MutableStateFlow<PhotoState>(PhotoState.Idle)
     val photo: StateFlow<PhotoState> = _photo.asStateFlow()
@@ -90,7 +101,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             if (intent.action != ACTION_USB_PERMISSION) return
             val granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
             if (granted) readCanon(pendingAdvanced)
-            else _usb.value = UsbState.Error("USB access was not allowed. Tap Read again and choose Allow.")
+            else usbFailed("USB access was not allowed. Tap Read again and choose Allow.")
         }
     }
 
@@ -155,9 +166,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     PhotoShutterReader.read(ByteArray(0)).copy(problem = "Couldn't open this file. Try copying it to the phone first."),
                     name, null,
                 )
+                _buzz.tryEmit(Buzz.REJECT)
                 return@launch
             }
             _photo.value = PhotoState.Done(result, name, recordPhoto(result))
+            if (result.shutterCount == null) _buzz.tryEmit(Buzz.REJECT)
         }
     }
 
@@ -180,12 +193,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         if (keepResult && (now is UsbState.Done || now is UsbState.Error)) return
         val device = findCamera(usbManager)
         _usb.value = if (device == null) UsbState.NoCamera else UsbState.Connected(cameraName(device))
+        if (now is UsbState.NoCamera && device != null) _buzz.tryEmit(Buzz.CLICK)
+    }
+
+    private fun usbFailed(message: String) {
+        _usb.value = UsbState.Error(message)
+        _buzz.tryEmit(Buzz.REJECT)
     }
 
     fun readCanon(allowAdvanced: Boolean) {
         val device = findCamera(usbManager)
         if (device == null) {
-            _usb.value = UsbState.Error("No camera found. Check that it's switched on and the cable is plugged in on both ends.")
+            usbFailed("No camera found. Check that it's switched on and the cable is plugged in on both ends.")
             return
         }
         if (!usbManager.hasPermission(device)) {
@@ -214,9 +233,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         )
                     }
                     _usb.value = UsbState.Done(reading, previous)
+                    if (reading.shutterCount == null) _buzz.tryEmit(Buzz.REJECT)
                 },
                 onFailure = { e ->
-                    _usb.value = UsbState.Error(e.message ?: "Couldn't read the camera. Check the cable, turn the camera's Wi-Fi off, and try again.")
+                    usbFailed(e.message ?: "Couldn't read the camera. Check the cable, turn the camera's Wi-Fi off, and try again.")
                 },
             )
         }
