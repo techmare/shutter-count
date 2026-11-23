@@ -33,11 +33,10 @@ struct ReportCard: View {
             Text("déclenchements").font(Fonts.text(38)).foregroundStyle(muted).padding(.top, 22)
             if let rated = r.ratedLife {
                 let wear = CameraModels.wear(r.count, rated)
-                let pct = CameraModels.wearPercent(r.count, rated)
                 ReportScale(count: r.count, rated: rated, official: r.ratedOfficial).padding(.top, 40)
                 HStack(alignment: .firstTextBaseline, spacing: 24) {
                     Text(wear.french).font(Fonts.display(64, bold: false)).foregroundStyle(text)
-                    Text((pct == 0 && r.count > 0 ? "moins de 1 %" : "\(pct) %") + (r.ratedOfficial ? " de la durée de vie nominale" : " de la durée de vie estimée"))
+                    Text(CameraModels.wearPercentTextFr(r.count, rated) + (r.ratedOfficial ? " de la durée de vie nominale" : " de la durée de vie estimée"))
                         .font(Fonts.text(36)).foregroundStyle(muted)
                 }
                 .padding(.top, 40)

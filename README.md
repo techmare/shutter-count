@@ -9,11 +9,11 @@ Checks a camera's shutter count (number of actuations) — for buying, selling a
 | **Canon R3, R5, R5 Mark II, R6, R6 Mark II, R7, R8, R10, R50, R100, RP, 250D, M50, M50 Mark II, M6 Mark II and PowerShot G5 X Mark II** | Pick a photo (JPEG / CR3) | Count includes electronic-shutter shots (offsets from ExifTool). |
 | **Canon** | USB cable (OTG) | Older bodies (DIGIC 5 and earlier) via the standard counter. Newer bodies via an experimental method, only on cameras that list it (confirmed on the EOS 5D Mark IV). Not supported: EOS R50 (sending the commands anyway caused Err 70, cleared by a battery pull). |
 
-**Over USB:** plug in any Nikon, Sony or Canon R body and the app reads the count from the newest photo on the card (standard photo-transfer commands only). Older Canons are read from the camera's own counter.
+**Over USB:** plug in any Nikon, Sony or recent Canon body and the app reads the count from the newest photo on the card (standard photo-transfer commands only). Older Canons are read from the camera's own counter.
 
 **Seen before:** when a serial number is already in History, the app shows the earlier check and warns if the count went down.
 
-**Mac:** [Shutter Count for Mac](../../releases/download/mac-latest/ShutterCount-mac.zip). Drop photos on the window, or plug in a camera. First launch: right-click the app and choose Open.
+**Mac:** [Shutter Count for Mac](../../releases/download/mac-latest/ShutterCount-mac.zip). Drop photos on the window, or plug in a camera. First launch: open it once, then System Settings → Privacy & Security → Open Anyway.
 
 **Download:** [latest APK](../../releases/latest/download/ShutterCount.apk) — open it on the phone to install or update.
 

@@ -160,7 +160,7 @@ final class CameraPane: NSView {
         if !manager.diagnostics.isEmpty && !manager.busy {
             scroll.add(button("Copy Diagnostics", self, #selector(copyDiagnostics)), fill: false)
         }
-        scroll.add(label("Nikon, Sony and Canon R bodies are read from the newest photo on the card. Older Canon EOS bodies are read from their own counter with read-only status commands.",
+        scroll.add(label("Nikon, Sony and recent Canon bodies are read from the newest photo on the card. Older Canon EOS bodies are read from their own counter with read-only status commands.",
                          Style.text(12), Style.muted, wrap: true))
     }
 }
