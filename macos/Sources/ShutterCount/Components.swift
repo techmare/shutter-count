@@ -28,10 +28,9 @@ struct InstrumentPanel<Footer: View>: View {
             if let count, let rated = ratedLife, showWear {
                 WearScale(count: count, rated: rated, official: ratedOfficial).padding(.top, 18)
                 let wear = CameraModels.wear(count, rated)
-                let pct = CameraModels.wearPercent(count, rated)
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Text(wear.rawValue).font(Fonts.display(26, bold: false)).foregroundStyle(p.panelText)
-                    Text((pct == 0 && count > 0 ? "Under 1%" : "\(pct)%") + (ratedOfficial ? " of rated life used" : " of estimated life used"))
+                    Text(CameraModels.wearPercentText(count, rated) + (ratedOfficial ? " of rated life used" : " of estimated life used"))
                         .font(Fonts.text(16)).foregroundStyle(p.panelMuted)
                 }
                 .padding(.top, 14)

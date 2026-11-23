@@ -4,7 +4,7 @@ import ShutterCore
 
 /// ImageCaptureCore without async/await, so it runs on Mojave.
 /// Uses the block APIs on 10.15+ and the older delegate/selector APIs on 10.14.
-/// - Nikon, Sony and Canon R: newest photo on the card (first 512 KB).
+/// - Nikon, Sony and recent Canon: newest photo on the card (first 512 KB).
 /// - Older Canons: the camera's own counter through read-only PTP status commands.
 final class LegacyCameraManager: NSObject {
 

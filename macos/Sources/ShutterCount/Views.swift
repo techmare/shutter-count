@@ -130,7 +130,7 @@ struct PhotoView: View {
                     ProgressView().controlSize(.large).frame(maxWidth: .infinity).padding(40)
                 } else if model.photoResults.isEmpty {
                     InstrumentPanel(title: "No camera yet", titleDim: true, count: nil,
-                                    caption: "Drop photos from a Nikon, Sony or Canon R here to read their count")
+                                    caption: "Drop photos from a Nikon, Sony or recent Canon here to read their count")
                     Steps(title: "Before you start", steps: [
                         "Take a new photo with the camera, using the mechanical shutter (not silent mode).",
                         "Copy the original JPEG or RAW file to this Mac from the card.",
@@ -214,6 +214,13 @@ struct CameraView: View {
                 case .error(let msg):
                     InstrumentPanel(title: "Couldn't read the camera", titleDim: true, count: nil, caption: "Nothing was changed on the camera")
                     Note(text: msg, warning: true)
+                    if !cameras.diagnostics.isEmpty {
+                        Button("Copy diagnostic report") {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(cameras.diagnostics, forType: .string)
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                    }
                     tips
                 case .idle:
                     if let r = cameras.result {
@@ -243,7 +250,7 @@ struct CameraView: View {
 
     private var tips: some View {
         Steps(title: "Connect a camera", steps: [
-            "Take one photo first. Nikon, Sony and Canon R are read from the newest photo on the card.",
+            "Take one photo first. Nikon, Sony and recent Canon bodies are read from the newest photo on the card.",
             "Turn off the camera's Wi-Fi and Bluetooth. They block the USB port.",
             "Connect it with a USB cable and turn it on. On Sony, set USB Connection to MTP.",
             "Quit Photos, Image Capture or EOS Utility if they open, then click Read camera.",
@@ -291,7 +298,7 @@ struct HistoryView: View {
                     let w = CameraModels.wear(e.count, rated)
                     HStack(spacing: 6) {
                         Circle().fill(wearColor(w)).frame(width: 8, height: 8)
-                        Text("\(w.rawValue), \(CameraModels.wearPercent(e.count, rated))%").font(Fonts.text(13)).foregroundStyle(p.muted)
+                        Text("\(w.rawValue), \(CameraModels.wearPercentText(e.count, rated))").font(Fonts.text(13)).foregroundStyle(p.muted)
                     }
                 }
                 if !e.note.isEmpty { Text(e.note).font(Fonts.text(14)).foregroundStyle(p.ink) }

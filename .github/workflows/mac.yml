@@ -65,7 +65,7 @@ jobs:
           name: Shutter Count for Mac
           body: |
             Download **ShutterCount-mac.zip**, unzip it and drag **Shutter Count** to Applications.
-            First launch: right-click the app and choose Open (or System Settings → Privacy & Security → Open Anyway), because it isn't notarized by Apple.
+            First launch: open it once, then go to System Settings → Privacy & Security and click Open Anyway, because it isn't notarized by Apple. Runs on macOS 13 Ventura through macOS 27 Golden Gate, Intel and Apple Silicon.
             Build ${{ github.run_number }}.
           files: ShutterCount-mac.zip
           make_latest: false

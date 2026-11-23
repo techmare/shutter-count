@@ -138,9 +138,8 @@ final class PanelView: NSView {
             Draw.text(Fmt.count(rated / 2), Style.text(13), Style.panelMuted, x: pad, top: 208, align: .center, width: inner)
             Draw.text("\(Fmt.count(rated)) " + (official ? "rated" : "est."), Style.text(13), Style.panelMuted, x: pad, top: 208, align: .right, width: inner)
             let wear = CameraModels.wear(c, rated)
-            let pct = CameraModels.wearPercent(c, rated)
             let size = Draw.text(wear.rawValue, Style.display(26, bold: false), Style.panelText, x: pad, top: 238)
-            Draw.text((pct == 0 && c > 0 ? "Under 1%" : "\(pct)%") + (official ? " of rated life used" : " of estimated life used"),
+            Draw.text(CameraModels.wearPercentText(c, rated) + (official ? " of rated life used" : " of estimated life used"),
                       Style.text(16), Style.panelMuted, x: pad + size.width + 10, top: 246)
         }
     }
@@ -197,9 +196,8 @@ enum Report {
             Draw.text("\(Fmt.count(rated)) " + (r.official ? "(nominale)" : "(estimée)"), Style.text(30), muted, x: P, top: y, align: .right, width: inner)
             y += 72
             let wear = CameraModels.wear(r.count, rated)
-            let pct = CameraModels.wearPercent(r.count, rated)
             let s = Draw.text(wear.french, Style.display(64, bold: false), text, x: P, top: y)
-            Draw.text((pct == 0 && r.count > 0 ? "moins de 1 %" : "\(pct) %") + (r.official ? " de la durée de vie nominale" : " de la durée de vie estimée"),
+            Draw.text(CameraModels.wearPercentTextFr(r.count, rated) + (r.official ? " de la durée de vie nominale" : " de la durée de vie estimée"),
                       Style.text(36), muted, x: P + s.width + 24, top: y + 20)
         }
         // details anchored to the bottom

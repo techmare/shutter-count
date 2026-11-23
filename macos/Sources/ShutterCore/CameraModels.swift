@@ -211,4 +211,21 @@ public enum CameraModels {
     }
 
     public static func wearPercent(_ count: Int, _ rated: Int) -> Int { Int(Double(count) * 100.0 / Double(rated)) }
+
+    /// The wear percentage as shown in the app: a used camera never reads as "0%", and one past its
+    /// rating never reads as a bare "100%" next to "Beyond rating". Same wording as Android.
+    public static func wearPercentText(_ count: Int, _ rated: Int) -> String {
+        let p = wearPercent(count, rated)
+        if p == 0 && count > 0 { return "Under 1%" }
+        if p == 100 && count > rated { return "Over 100%" }
+        return "\(p)%"
+    }
+
+    /// French wording for the customer report.
+    public static func wearPercentTextFr(_ count: Int, _ rated: Int) -> String {
+        let p = wearPercent(count, rated)
+        if p == 0 && count > 0 { return "moins de 1 %" }
+        if p == 100 && count > rated { return "plus de 100 %" }
+        return "\(p) %"
+    }
 }

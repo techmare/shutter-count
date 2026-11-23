@@ -181,4 +181,15 @@ final class ShutterCoreTests: XCTestCase {
         XCTAssertTrue(CameraModels.photoFromCamera("Canon EOS R6 Mark II", nil, "Canon EOS R6m2", nil))
         XCTAssertFalse(CameraModels.photoFromCamera("D750", nil, "NIKON D7500", nil))
     }
+
+    func testWearPercentText() {
+        XCTAssertEqual(CameraModels.wearPercentText(50, 150_000), "Under 1%")
+        XCTAssertEqual(CameraModels.wearPercentText(0, 150_000), "0%")
+        XCTAssertEqual(CameraModels.wearPercentText(75_000, 150_000), "50%")
+        XCTAssertEqual(CameraModels.wearPercentText(150_000, 150_000), "100%")
+        XCTAssertEqual(CameraModels.wearPercentText(150_500, 150_000), "Over 100%")
+        XCTAssertEqual(CameraModels.wearPercentText(310_000, 150_000), "206%")
+        XCTAssertEqual(CameraModels.wearPercentTextFr(50, 150_000), "moins de 1 %")
+        XCTAssertEqual(CameraModels.wearPercentTextFr(150_500, 150_000), "plus de 100 %")
+    }
 }

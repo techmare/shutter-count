@@ -3,7 +3,7 @@ import ImageCaptureCore
 import ShutterCore
 
 /// Finds cameras through ImageCaptureCore (the framework Image Capture uses) and reads them:
-/// - Nikon, Sony and Canon R: the newest photo on the card, first 512 KB, parsed like the Photo tab.
+/// - Nikon, Sony and recent Canon: the newest photo on the card, first 512 KB, parsed like the Photo tab.
 /// - Older Canons: the camera's own counter through read-only PTP status commands.
 @MainActor
 final class CameraManager: NSObject, ObservableObject {
